@@ -96,11 +96,12 @@ export class UserService {
   // 更新
   async update(user: User): Promise<Result<User>> {
     const result = new Result<User>()
-    const data = await prisma.user.update({
-      data: user,
+    const data = base.toEntity(user, UserEntity)
+    const row = await prisma.user.update({
+      data,
       where: { id: user.id }
     })
-    if (data) {
+    if (row) {
       result.success({ msg: '更新成功' })
     } else {
       result.fail('更新失败')
