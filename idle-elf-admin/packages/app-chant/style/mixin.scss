@@ -1,0 +1,51 @@
+@mixin scroll-beautify {
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    position: absolute;
+    height: 5px;
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba($color: #000000, $alpha: 0.3);
+    border-radius: 10px;
+  }
+  -webkit-overflow-scrolling: touch;
+}
+
+// 位置
+@mixin gravity-center {
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+@mixin across-center {
+  position: absolute;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+// 主体内容高度
+@mixin main-height {
+  height: calc(100vh - 89px);
+}
+// 主体布局
+@mixin main-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}

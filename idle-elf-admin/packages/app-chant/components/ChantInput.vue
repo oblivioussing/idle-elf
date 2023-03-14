@@ -1,0 +1,85 @@
+<template>
+  <el-input
+    v-model="vModel"
+    v-bind="$attrs"
+    :clearable="clearable"
+    :placeholder="placeholder"
+    @input="onInput">
+    <template v-if="slots.append" #append>
+      <slot name="append"></slot>
+    </template>
+    <template v-if="slots.prepend" #prepend>
+      <slot name="prepend"></slot>
+    </template>
+  </el-input>
+</template>
+
+<script setup lang="ts">
+import { computed, useSlots } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useVModel } from '@vueuse/core'
+import { base } from '@chant'
+
+interface Props {
+  max?: number
+  min?: number
+  modelValue: any
+  modelModifiers?: {
+    number: boolean
+  }
+  clearable?: boolean
+  placeholder?: string
+  textType?: 'string' | 'number' | 'phone-key'
+  tip?: boolean
+}
+// props
+const props = withDefaults(defineProps<Props>(), {
+  placeholder: '',
+  textType: 'string',
+  tip: true
+})
+// emit
+const emit = defineEmits(['input', 'update:modelValue'])
+// use
+const vModel = useVModel(props, 'modelValue', emit)
+const { t: tg } = useI18n({ useScope: 'global' })
+const slots = useSlots()
+// computed
+const placeholder = computed(() => {
+  if (props.tip) {
+    return tg('tips.enter') + props.placeholder
+  } else {
+    return props.placeholder
+  }
+})
+// input
+function onInput(val: string) {
+  if (base.isEmpty(val)) {
+    vModel.value = val
+    return
+  }
+  // 数值
+  if (props?.modelModifiers?.number || props.textType === 'number') {
+    if (val === '-') {
+      vModel.value = val
+      return
+    }
+    const match = val.match(/-?[1-9]\d*/)
+    const negativeInt = match ? parseInt(match[0]) : null
+    let num = Number(negativeInt)
+    const min = Number(props.min)
+    const max = Number(props.max)
+    if (!base.isEmpty(props.min) && num < min) {
+      num = min
+    } else if (!base.isEmpty(props.max) && num > max) {
+      num = max
+    }
+    vModel.value = base.isEmpty(num) ? '' : num
+  }
+  // 电话按键
+  if (props.textType === 'phone-key') {
+    val = val?.replace(/[^\d*#]/g, '')
+    vModel.value = val
+  }
+}
+</script>
