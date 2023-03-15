@@ -24,12 +24,9 @@ interface Props {
   max?: number
   min?: number
   modelValue: any
-  modelModifiers?: {
-    number: boolean
-  }
   clearable?: boolean
   placeholder?: string
-  textType?: 'string' | 'number' | 'phone-key'
+  textType?: 'string' | 'number' | 'float' | 'phone-key'
   tip?: boolean
 }
 // props
@@ -59,14 +56,19 @@ function onInput(val: string) {
     return
   }
   // 数值
-  if (props?.modelModifiers?.number || props.textType === 'number') {
+  if (['number', 'float'].includes(props.textType)) {
     if (val === '-') {
       vModel.value = val
       return
     }
-    const match = val.match(/-?[1-9]\d*/)
-    const negativeInt = match ? parseInt(match[0]) : null
-    let num = Number(negativeInt)
+    const isPoint = val.substring(val.length - 1, val.length) === '.'
+    if (props.textType === 'float' && isPoint) {
+      vModel.value = val
+      return
+    }
+    const regex = /-?\d+(\.\d+)?/g
+    const matchs = val.match(regex)
+    let num = Number(matchs?.[0] || 0)
     const min = Number(props.min)
     const max = Number(props.max)
     if (!base.isEmpty(props.min) && num < min) {
