@@ -3,10 +3,10 @@ import config from '@/config'
 
 const algorithm = 'aes-256-ctr'
 const secretKey = config.secretKey
-const iv = randomBytes(16)
 
 // 加密
 export function encrypt(text: string) {
+  const iv = randomBytes(16)
   const cipher = createCipheriv(algorithm, secretKey, iv)
   const encrypted = Buffer.concat([cipher.update(text), cipher.final()])
   return {
