@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  UnauthorizedException
-} from '@nestjs/common'
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { Result } from '@/share'
 import { base } from '@/utils'
@@ -23,8 +18,9 @@ export class AuthGuard implements CanActivate {
     if (isAuth === false) {
       return true
     }
-    // request
-    const request = context.switchToHttp().getRequest()
+    const http = context.switchToHttp()
+    const request = http.getRequest()
+    const response = http.getResponse()
     // result
     const result = new Result()
     // token
@@ -32,13 +28,15 @@ export class AuthGuard implements CanActivate {
     if (!token) {
       result.code = ApiCode.NoLogin
       result.msg = '请先登陆'
-      throw new UnauthorizedException(result)
+      response.status(200).send(result)
+      return false
     }
     const uid = base.getUidByToken(token)
     if (!uid) {
       result.code = ApiCode.NoLogin
       result.msg = '权限校验失败,请重新登陆'
-      throw new UnauthorizedException(result)
+      response.status(200).send(result)
+      return false
     }
     const value = await this.redisService.get(uid)
     if (token === value) {
@@ -47,7 +45,8 @@ export class AuthGuard implements CanActivate {
     } else {
       result.code = ApiCode.NoLogin
       result.msg = '登陆失效,请重新登陆'
-      throw new UnauthorizedException(result)
+      response.status(200).send(result)
+      return false
     }
     return true
   }
