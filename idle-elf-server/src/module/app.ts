@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
-import { AuthGuard } from '../guard'
+import { AuthGuard } from '../guard/auth'
 import { RedisModule } from './redis/module'
 import sence from './scene'
 
