@@ -39,7 +39,10 @@ export class UserService {
       where: user
     })
     const total = await prisma.user.count()
-    pageData.list = data
+    pageData.list = data?.map((item) => {
+      Reflect.deleteProperty(item, 'password')
+      return item
+    })
     pageData.total = total
     result.data = pageData
     result.success({ msg: '查询用户列表成功' })
