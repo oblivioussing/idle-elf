@@ -1,5 +1,5 @@
 {
-  "name": "idle-elf-admin",
+  "name": "admin",
   "private": true,
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.4",
