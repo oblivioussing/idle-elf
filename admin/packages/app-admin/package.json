@@ -1,23 +1,12 @@
 {
-  "name": "@chant/app-admin",
-  "version": "1.0.0",
+  "name": "app-admin",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "dev": "vite --host --mode dev",
-    "test": "vite --host --mode test",
-    "prod": "vite --host --mode prod",
-    "build:dev": "vite build --mode dev",
-    "build:test": "vite build --mode test",
-    "build:prod": "vite build --mode prod"
+    "build": "run-p type-check && vite build",
+    "type-check": "vue-tsc --noEmit -p ./tsconfig/app.json --composite false"
   },
-  "dependencies": {
-    "chant": "workspace:*"
-  },
-  "dependenciesMeta": {},
-  "devDependencies": {},
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
+  "dependencies": {},
+  "devDependencies": {}
 }
