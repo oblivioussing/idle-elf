@@ -1,0 +1,152 @@
+@import './mixin.scss';
+@import './var.scss';
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+// x6里面自定义也会存在body标签(所以必须明确定义是html里面的body)
+html > body {
+  min-width: 980px;
+}
+
+// * {
+//   &:not([class^='el-']) {
+//     box-sizing: border-box;
+//     margin: 0;
+//     padding: 0;
+//   }
+// }
+
+.toolbar {
+  background-color: $color-gray;
+  line-height: 1;
+  padding: 10px;
+}
+
+.statistics {
+  background-color: #d6a6671d;
+  color: $color-yellow1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 14px;
+  margin-top: 5px;
+  padding: 5px 0 5px 10px;
+  .item {
+    margin-right: 20px;
+    white-space: nowrap;
+  }
+}
+
+.split-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  .split-left {
+    display: flex;
+    flex-direction: column;
+    margin-right: 5px;
+    width: 500px;
+  }
+  .split-middle {
+    @include main-layout;
+  }
+  .split-right {
+    @include main-layout;
+  }
+}
+
+.label-operation {
+  font-size: 12px;
+  margin-top: 5px;
+  .item {
+    display: flex;
+    margin-top: -5px;
+    .title {
+      color: $color-black;
+      margin-top: 6px;
+    }
+    .content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .el-tag {
+      cursor: pointer;
+      margin-top: 5px;
+      margin-left: 10px;
+    }
+  }
+  .item + .item {
+    margin-top: 5px;
+  }
+}
+
+.picker-input {
+  .el-input__inner {
+    cursor: pointer;
+  }
+}
+
+.collapse-item {
+  border: 1px solid $color-gray3;
+  border-radius: 5px;
+  padding: 10px 5px 10px 5px;
+  .row-box {
+    color: $color-black2;
+    display: flex;
+    align-items: center;
+    .label {
+      margin-right: 10px;
+      text-align: right;
+      width: 90px;
+    }
+  }
+  .row-box + .row-box {
+    margin-top: 10px;
+  }
+}
+
+.draw-editor {
+  @include scroll-beautify;
+  background-color: $color-gray;
+  margin-left: 20px;
+  padding: 25px;
+  width: 630px;
+  img {
+    width: 100%;
+  }
+  .title {
+    font-weight: bold;
+  }
+  .release-by {
+    color: $color-bule;
+  }
+  .release-time {
+    color: $color-gray8;
+    padding-left: 10px;
+  }
+}
+
+.badge {
+  @include flex-center;
+  background-color: $color-red;
+  border-radius: 50%;
+  color: $color-white;
+  height: 22px;
+  position: absolute;
+  transform: scale(0.8);
+  width: 22px;
+}
+.color-block {
+  background-color: $color-orange;
+  border-radius: 3px;
+  color: $color-white;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 7px;
+}
