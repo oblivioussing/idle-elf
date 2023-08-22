@@ -24,8 +24,6 @@ export type FormColumn = {
   ignorePta?: boolean // 忽略pta规则
   itemSlot?: boolean // form-item slot
   label?: string // 标签文本
-  labelEn?: string // 标签文本英文
-  labelZh?: string // 标签文本中文
   labelSlot?: boolean // 标签文本 slot
   lineFeed?: boolean // 是否换行
   min?: number // 最小值(只有textType为number才生效)
@@ -50,7 +48,7 @@ export type FormColumn = {
 export type ListColumn = {
   align?: 'left' | 'center' | 'right' // 对齐方式
   apiUrl?: string // 接口地址
-  appendLabel?: string // 输入框后置内容(常量)
+  appendLabel?: string // 输入框后置内容
   clearable?: boolean // 是否可清空
   copy?: boolean // 是否可以复制
   dynamicId?: string // 动态id字段
@@ -62,8 +60,6 @@ export type ListColumn = {
   hide?: boolean // 是否隐藏
   show?: boolean // 是否显示
   label?: string // 标签文本
-  labelEn?: string // 标签文本英文
-  labelZh?: string // 标签文本中文
   like?: boolean // 是否为模糊查询
   link?: boolean // 是否为链接
   linkData?: any[] // 链接携带的字段

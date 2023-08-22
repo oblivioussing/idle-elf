@@ -170,7 +170,7 @@ export default {
   // 获取父页面路径
   getParentPath(path: string) {
     const appStore = useAppStore()
-    const pageRelation = appStore.pageRelation[path]
+    const pageRelation = appStore.state.pageRelation[path]
     return pageRelation?.parent
   }
 }

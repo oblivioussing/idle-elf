@@ -1,36 +1,41 @@
 <template>
-  <div>
-    <el-tabs
-      v-model="state.path"
-      type="card"
-      @tab-click="onTab"
-      @tab-remove="onTabRemove as any"
-      class="home-tab">
-      <el-tab-pane
-        v-for="(item, index) in state.tabs"
-        :key="index"
-        :label="title(item)"
-        :name="item.path"
-        :closable="item.path !== '/'">
-        <template #label>
-          <span
-            v-contextmenu:contextmenu
-            @contextmenu="onContextmenu(item.path)">
-            {{ title(item) }}
-          </span>
-        </template>
-      </el-tab-pane>
-    </el-tabs>
-    <v-contextmenu ref="contextmenu">
-      <v-contextmenu-item @click="onRemove">关闭</v-contextmenu-item>
-      <v-contextmenu-item @click="onRemoveOther">关闭其他</v-contextmenu-item>
-      <v-contextmenu-item @click="onRemoveAll">关闭所有</v-contextmenu-item>
-    </v-contextmenu>
-  </div>
+  <el-tabs
+    v-model="state.path"
+    type="card"
+    @tab-click="onTab"
+    @tab-remove="onTabRemove"
+    class="nav-tab">
+    <el-tab-pane
+      v-for="(item, index) in state.tabs"
+      :key="index"
+      :label="item.title"
+      :name="item.path"
+      :closable="item.path !== '/'">
+      <template #label>
+        <el-dropdown
+          ref="dropdownRef"
+          trigger="contextmenu"
+          :id="item.path"
+          @visible-change="onVisibleChange($event, item.path)"
+          @command="onCommand($event, item.path)">
+          <span>{{ item.title }}</span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="close">关闭</el-dropdown-item>
+              <el-dropdown-item command="closeOther">
+                关闭其他
+              </el-dropdown-item>
+              <el-dropdown-item command="closeAll">关闭所有</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </template>
+    </el-tab-pane>
+  </el-tabs>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, watch } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Bus, StorageEnum } from '@/enum'
 import { base, bus, storage } from '@/share'
@@ -39,8 +44,7 @@ import { useChaoser } from '@/use'
 
 type PathMapping = {
   path: string
-  titleEn: string
-  titleZh: string
+  title: string
   name: string
 }
 
@@ -54,14 +58,14 @@ const chaoser = useChaoser()
 // var
 const indexRaw = {
   path: '/',
-  titleEn: 'index',
-  titleZh: '首页',
+  title: '首页',
   name: '/'
 }
 const tabs = (storage.getSession(StorageEnum.HomeNavTab) || [
   indexRaw
 ]) as PathMapping[]
-let contextmenuPath = '' // contextmenu path
+// ref
+const dropdownRef = ref()
 // state
 const state = reactive({
   path: route?.path,
@@ -104,7 +108,7 @@ function routerChange() {
     return
   }
   // 排除的页面
-  const excludeList = ['/404', '/login', '/auth']
+  const excludeList = ['/404', '/login']
   if (excludeList.includes(route.path)) {
     return
   }
@@ -114,8 +118,7 @@ function routerChange() {
   if (meta) {
     state.tabs.push({
       path: route.path,
-      titleEn: meta?.titleEn as string,
-      titleZh: meta?.titleZh as string,
+      title: meta?.title as string,
       name: getName(path)
     })
   }
@@ -125,10 +128,6 @@ function routerChange() {
 function getName(path: any) {
   const name = path?.replace(/^\/|\/$/g, '')
   return name?.replace(/\//g, '-')
-}
-// 标题
-function title(row?: any) {
-  return row?.title
 }
 // 通知外部keeps发生了变化
 function busKeeps() {
@@ -166,19 +165,29 @@ function onTabRemove(path: string) {
     router.push({ path })
   }
 }
-// 菜单显示时触发
-function onContextmenu(path: string) {
-  contextmenuPath = path
+// 下拉菜单显示
+function onVisibleChange(visible: boolean, path: string) {
+  if (visible) {
+    dropdownRef.value.forEach((item: any) => {
+      if (item.id !== path) {
+        item.handleClose()
+      }
+    })
+  }
 }
-// 关闭
-function onRemove() {
-  onTabRemove(contextmenuPath)
+// 下拉菜单选择
+function onCommand(command: string, path: string) {
+  if (command === 'close') {
+    onTabRemove(path)
+  } else if (command === 'closeOther') {
+    onRemoveOther(path)
+  } else {
+    onRemoveAll()
+  }
 }
 // 关闭其他
-function onRemoveOther() {
-  const row = state.tabs.find(
-    (item) => item?.path === contextmenuPath
-  ) as PathMapping
+function onRemoveOther(path: string) {
+  const row = state.tabs.find((item) => item?.path === path) as PathMapping
   if (row.path === '/') {
     state.tabs = [row]
   } else {
@@ -187,9 +196,9 @@ function onRemoveOther() {
   // 路由参数
   const routerQuery = storage.getSession(StorageEnum.RouterQuery) as any
   if (routerQuery) {
-    const pathQuery = routerQuery[contextmenuPath]
+    const pathQuery = routerQuery[path]
     const map = {} as any
-    map[contextmenuPath] = pathQuery
+    map[path] = pathQuery
     storage.setSession(StorageEnum.RouterQuery, map)
   }
   router.push({ path: row?.path })
@@ -203,8 +212,21 @@ function onRemoveAll() {
 }
 </script>
 
-<style scoped lang="scss">
-.v-contextmenu-item {
-  padding: 5px 14px;
+<style lang="scss">
+.nav-tab {
+  .el-tabs__item {
+    &.is-active {
+      .el-tooltip__trigger {
+        color: #409eff;
+      }
+    }
+    .el-dropdown {
+      line-height: inherit;
+      .el-tooltip__trigger {
+        font-size: 12px;
+        font-weight: 400;
+      }
+    }
+  }
 }
 </style>

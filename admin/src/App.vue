@@ -6,4 +6,8 @@
 import { RouterView } from 'vue-router'
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+@import './style/base.scss';
+@import './style/core.scss';
+@import './style/element.scss';
+</style>

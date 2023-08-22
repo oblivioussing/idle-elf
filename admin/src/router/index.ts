@@ -1,28 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-const HomeLayout = () => import('@/components/home-layout/index.vue')
-const index = () => import('@/views/index/index.vue')
-const login = () => import('@/views/app/login/index.vue')
+import app from './app' // app
+import custom from './custom' // 客户管理
+import order from './order' // 订单管理
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      component: HomeLayout,
-      children: [
-        {
-          path: '/',
-          component: index,
-          meta: { title: '首页' }
-        }
-      ]
-    },
-    {
-      path: '/login',
-      component: login
-    }
-  ]
+  routes: [...app, ...custom, ...order]
 })
 
 export default router

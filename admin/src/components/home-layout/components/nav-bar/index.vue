@@ -1,9 +1,9 @@
 <template>
   <div class="home-header">
     <div class="left">
-      <img src="/logo.png" class="logo-ic" />
+      <img src="/image/logo.png" class="logo-ic" />
       <div>野鬼的窝</div>
-      <img @click="onCollapse" src="./img/ic_menu.png" class="menu-ic" />
+      <img src="./img/ic_menu.png" class="menu-ic" @click="onCollapse" />
     </div>
     <div class="right">
       <!-- 退出 -->
