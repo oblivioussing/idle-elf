@@ -36,6 +36,11 @@ export enum FormType {
   TimeSelect = 'timeselect'
 }
 
+export enum LangEnum {
+  En = 'en',
+  Zh = 'zh'
+}
+
 export enum PageEnum {
   Add = 'add',
   Edit = 'edit',
@@ -47,6 +52,7 @@ export enum PagePathEnum {
 }
 
 export enum StorageEnum {
+  Lang = 'language',
   HomeNavTab = 'hom-nav-tab',
   PageRelation = 'page-relation',
   RouterQuery = 'router-query',

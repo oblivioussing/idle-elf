@@ -2,7 +2,7 @@ import { onActivated } from 'vue'
 import { useRoute } from 'vue-router'
 import shiki from '../api/shiki'
 import { type FormColumn as Column } from '../type'
-import { base, bus } from '../share'
+import { base, bus } from '../utils'
 
 type State = {
   dict: Record<string, any>

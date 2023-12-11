@@ -1,23 +1,23 @@
 <template>
   <el-table
     ref="tableRef"
-    v-loading="props?.modelValue?.loading"
+    v-loading="props?.modelValue?.loading || false"
     v-bind="$attrs"
     :border="true"
+    class="chant-table"
+    :data="props.list || props?.modelValue?.list"
+    :empty-text="props?.emptyText"
     :height="state.height ? state.height : undefined"
     :highlight-current-row="props.highlightCurrentRow"
-    :data="props.list || props?.modelValue?.list"
     :row-key="props.rowKey"
     :show-summary="props?.showSummary"
-    :summary-method="props?.summaryMethod"
     :span-method="props?.objectSpanMethod"
-    :empty-text="props?.emptyText"
-    class="chant-table"
+    :summary-method="props?.summaryMethod"
+    @row-click="onRowClick"
+    @row-dblclick="onRowDbClick"
     @select="onSelect"
     @select-all="onSelectAll"
     @selection-change="onSelectionChange"
-    @row-click="onRowClick"
-    @row-dblclick="onRowDbClick"
     @sort-change="onSortChange">
     <!-- 复选框 -->
     <el-table-column
@@ -132,11 +132,10 @@
 </template>
 
 <script setup lang="ts">
-import { ElMessage, ElTable } from 'element-plus'
+import { ElMessage } from 'element-plus'
 // @ts-ignore
 import Sortable from 'sortablejs'
 import {
-  computed,
   nextTick,
   onActivated,
   onMounted,
@@ -152,8 +151,8 @@ import { DocumentCopy } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
 import { Format as FormatEnum, FormType } from '../enum'
 import { type ListColumn as Column, type ListState } from '../type'
-import { base, format } from '../share'
 import { useLister } from '../use'
+import { base, format } from '../utils'
 
 interface Props {
   columnWidth?: number // 列宽度
@@ -218,7 +217,7 @@ const slots = useSlots()
 // clip
 const { toClipboard } = useClipboard()
 // ref
-const tableRef = ref<InstanceType<typeof ElTable>>()
+const tableRef = ref()
 // state
 const state = reactive({
   height: 0,
@@ -388,30 +387,6 @@ function tagType(val: string, colorMap?: Record<string, string>) {
   if (colorMap) {
     return colorMap[val]
   }
-  const type: Record<string, string> = {
-    0: 'color-0',
-    1: 'color-1',
-    2: 'color-2',
-    3: 'color-3',
-    4: 'color-4',
-    5: 'color-5',
-    6: 'color-6',
-    7: 'color-7',
-    8: 'color-8',
-    9: 'color-9',
-    10: 'color-10',
-    11: 'color-11',
-    12: 'color-2',
-    13: 'color-3',
-    14: 'color-4',
-    15: 'color-5',
-    16: 'color-6',
-    17: 'color-7',
-    18: 'color-8',
-    19: 'color-9',
-    99: 'color-99'
-  }
-  return type[val]
 }
 // 链接
 function onLink(column: Column, row: any) {
@@ -451,9 +426,10 @@ function selectHandle(type: 'checked' | 'remove', index: number, row: any) {
 }
 // 勾选数据行
 function onSelect(selection: any[], row: any) {
+  const selectionList = vModel.value!.selectionList
   const id = props.rowKey
-  const index = selection.findIndex((item) => item[id] === row[id])
-  const type = index >= 0 ? 'checked' : 'remove'
+  const index = selectionList.findIndex((item) => item[id] === row[id])
+  const type = selection.length > selectionList.length ? 'checked' : 'remove'
   selectHandle(type, index, row)
 }
 // 手动勾选全选

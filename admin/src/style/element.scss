@@ -1,5 +1,3 @@
-@import './var.scss';
-
 // collapse
 .el-collapse {
   .el-collapse-item__header {
@@ -77,11 +75,11 @@
     height: 100% !important;
   }
   .el-table__header-wrapper {
-    background-color: $color-gray;
+    background-color: #f2f2f2;
     height: 38px;
     tr,
     th.el-table__cell {
-      background-color: $color-gray !important;
+      background-color: #f2f2f2 !important;
     }
     th.el-table__cell {
       padding: 7px 0;

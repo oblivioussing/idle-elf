@@ -7,7 +7,7 @@
         <slot></slot>
         <!-- 查询条件 -->
         <template v-for="item in props.modelValue.columns">
-          <chant-search-item v-if="isShowSearch(item)" :content="item.label">
+          <el-form-item v-if="isShowSearch(item)" :content="item.label">
             <!-- slot -->
             <slot v-if="item.searchSlot" :name="item.prop" :row="item"></slot>
             <!-- input -->
@@ -75,7 +75,7 @@
                 </template>
               </el-input>
             </div>
-          </chant-search-item>
+          </el-form-item>
         </template>
         <slot name="search-end"></slot>
       </el-form>
@@ -362,8 +362,6 @@ function onAllChecked(checked: boolean) {
 </script>
 
 <style lang="scss">
-@import '../../style/var.scss';
-
 $input-width: 165px;
 
 .chant-search {
@@ -404,7 +402,7 @@ $input-width: 165px;
       width: $input-width;
     }
     .el-range-editor.el-input__inner {
-      background-color: $color-white;
+      background-color: #ffffff;
       width: 362px;
     }
     // tanent-picker
@@ -413,7 +411,7 @@ $input-width: 165px;
     }
   }
   .icon-jinggao {
-    color: $color-black;
+    color: #333744;
     margin-left: 5px;
   }
 }

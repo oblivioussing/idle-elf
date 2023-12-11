@@ -81,7 +81,7 @@
 <script setup lang="ts">
 import { reactive, watch } from 'vue'
 import { CopyDocument, Edit, Plus } from '@element-plus/icons-vue'
-import { base } from '@/share'
+import { base } from '@/utils'
 import { type ListColumn as Column } from '@/type'
 import FieldFilter from './FieldFilter.vue'
 import ChantButtonGroup from '../../ChantButtonGroup.vue'

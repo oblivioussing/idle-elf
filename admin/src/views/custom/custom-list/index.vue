@@ -8,7 +8,7 @@
     @refresh="lister.refresh(getList, state)">
   </chant-operation>
   <!-- table -->
-  <chant-table v-model="state" :db-edit="false"></chant-table>
+  <chant-table v-model="state"></chant-table>
   <!-- pagination -->
   <chant-pagination
     v-model="state.pages"
@@ -27,7 +27,8 @@ const lister = useLister()
 // state
 const state = reactive({
   ...lister.state,
-  columns
+  columns,
+  list: [{ id: 1 }, { id: 2 }]
 })
 // created
 lister.created(() => {

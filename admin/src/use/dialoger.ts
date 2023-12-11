@@ -1,7 +1,7 @@
 import { getCurrentInstance } from 'vue'
 import { useRoute } from 'vue-router'
 import shiki from '../api/shiki'
-import { bus } from '../share'
+import { bus } from '../utils'
 
 type State = {
   form?: object

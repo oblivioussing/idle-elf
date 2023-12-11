@@ -1,11 +1,11 @@
 <template>
-  <el-config-provider :locale="zhCn" size="small">
+  <el-config-provider :locale="locale" size="small">
     <!-- header -->
     <nav-bar v-model="state.isCollapse"></nav-bar>
     <!-- body -->
     <div class="home-body">
       <!-- 菜单栏 -->
-      <nav-menu :isCollapse="state.isCollapse"> </nav-menu>
+      <nav-menu :isCollapse="state.isCollapse"></nav-menu>
       <!-- container -->
       <div class="home-container">
         <!-- tab -->
@@ -22,24 +22,30 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { ElConfigProvider } from 'element-plus'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import { Bus } from '@/enum'
-import { bus } from '@/share'
+import { useAppStore } from '@/store'
+import { bus } from '@/utils'
 import NavBar from './components/nav-bar/index.vue'
 import NavMenu from './components/NavMenu.vue'
 import NavTab from './components/NavTab.vue'
 
-// var
-const langMap = {
-  zh: zhCn,
-  en: undefined
-}
+// store
+const appStore = useAppStore()
 // state
 const state = reactive({
   isCollapse: false, // 是否水平折叠收起菜单
   keeps: []
+})
+// computed
+const locale = computed(() => {
+  const map = {
+    zh: zhCn,
+    en: undefined
+  }
+  return map[appStore.state.lang]
 })
 // 监听事件
 bus.on(Bus.HomeKeeps, (arr) => {

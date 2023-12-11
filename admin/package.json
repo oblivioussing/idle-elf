@@ -24,6 +24,7 @@
     "sortablejs": "^1.15.0",
     "vue": "^3.3.4",
     "vue-clipboard3": "^2.0.0",
+    "vue-i18n": "9.5.0",
     "vue-router": "^4.2.4",
     "vuedraggable": "^4.1.0"
   },

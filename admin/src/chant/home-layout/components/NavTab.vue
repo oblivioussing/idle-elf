@@ -38,7 +38,7 @@
 import { onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Bus, StorageEnum } from '@/enum'
-import { base, bus, storage } from '@/share'
+import { base, bus, storage } from '@/utils'
 import { useAppStore } from '@/store'
 import { useChaoser } from '@/use'
 

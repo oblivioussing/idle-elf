@@ -1,8 +1,8 @@
 import qs from 'qs'
 import { ElMessage } from 'element-plus'
-import base from '../share/base'
-import { useUserStore } from '../store'
 import { ApiCode } from '../enum'
+import base from '../utils/base'
+import { useUserStore } from '../store'
 import 'abortcontroller-polyfill/dist/polyfill-patch-fetch'
 
 // 返回类型枚举

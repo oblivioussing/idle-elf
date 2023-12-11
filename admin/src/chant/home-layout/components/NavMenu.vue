@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { core } from '@/share'
+import { core } from '@/utils'
 
 // props
 const props = defineProps<{

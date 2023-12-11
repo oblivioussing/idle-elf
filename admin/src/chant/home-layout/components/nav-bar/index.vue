@@ -6,6 +6,21 @@
       <img src="./img/ic_menu.png" class="menu-ic" @click="onCollapse" />
     </div>
     <div class="right">
+      <!-- 语言 -->
+      <el-dropdown @command="onLang">
+        <div class="dropdown">
+          <div>{{ lang }}</div>
+          <el-icon class="arrow-down-icon">
+            <caret-bottom />
+          </el-icon>
+        </div>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item :command="LangEnum.Zh">中文</el-dropdown-item>
+            <el-dropdown-item :command="LangEnum.En">English</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
       <!-- 退出 -->
       <el-dropdown @command="onQuit">
         <div class="dropdown">
@@ -31,20 +46,23 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { StorageEnum } from '@/enum'
-import { base, storage } from '@/share'
+import { CaretBottom } from '@element-plus/icons-vue'
+import { LangEnum, StorageEnum } from '@/enum'
+import { vuei18n } from '@/plugs'
 import { useAppStore, useUserStore } from '@/store'
+import { storage } from '@/utils'
 
 // props
 const props = defineProps<{
   modelValue: boolean
 }>()
-// emit
-const emit = defineEmits(['update:modelValue'])
-// use
+// emits
+const emits = defineEmits(['update:modelValue'])
+// router
+const router = useRouter()
+// store
 const appStore = useAppStore()
 const userStore = useUserStore()
-const router = useRouter()
 // state
 const state = reactive({
   orgs: [] as any[],
@@ -55,10 +73,23 @@ const state = reactive({
 const avatarUrl = computed(() => {
   return ''
 })
+const lang = computed(() => {
+  const map = {
+    en: 'English',
+    zh: '中文'
+  }
+  return map[appStore.state.lang]
+})
 // 切换
 function onCollapse() {
   state.isCollapse = !state.isCollapse
-  emit('update:modelValue', state.isCollapse)
+  emits('update:modelValue', state.isCollapse)
+}
+// 设置语言
+function onLang(lang: LangEnum) {
+  storage.setLocal(StorageEnum.Lang, lang)
+  appStore.state.lang = lang
+  vuei18n.global.locale.value = lang
 }
 // 退出
 async function onQuit() {
@@ -69,10 +100,9 @@ async function onQuit() {
 </script>
 
 <style scoped lang="scss">
-@import '@/style/var.scss';
 .home-header {
-  background-color: $color-black;
-  color: $color-white;
+  background-color: #333744;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -102,14 +132,14 @@ async function onQuit() {
       right: -5px;
     }
     .dropdown {
-      color: $color-white;
+      color: #ffffff;
       cursor: pointer;
       display: flex;
       align-items: center;
       font-size: 12px;
       margin-left: 10px;
       .arrow-down-icon {
-        color: $color-gray2;
+        color: #999999;
       }
     }
   }

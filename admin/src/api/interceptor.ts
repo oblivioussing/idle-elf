@@ -1,6 +1,6 @@
 import { ApiCode } from '../enum'
 import router from '../router'
-import shiki, { Result } from './shiki'
+import shiki, { type Result } from './shiki'
 
 export default () => {
   // 请求拦截器

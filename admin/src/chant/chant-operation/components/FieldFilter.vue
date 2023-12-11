@@ -70,7 +70,6 @@ function onShowFilter() {
 
 <style scoped lang="scss">
 @import '@/style/mixin.scss';
-@import '@/style/var.scss';
 
 .filter {
   background-color: #ffffff;

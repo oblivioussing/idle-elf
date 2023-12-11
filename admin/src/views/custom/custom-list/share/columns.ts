@@ -10,6 +10,7 @@ export default [
   {
     label: '年龄',
     prop: 'age',
-    type: FormType.Select
+    search: true,
+    type: FormType.Range
   }
 ] as Column[]

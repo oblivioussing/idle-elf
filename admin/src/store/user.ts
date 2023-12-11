@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
 import { StorageEnum } from '../enum'
-import { storage } from '../share'
+import { storage } from '../utils'
 
 export type User = {
   token: string
