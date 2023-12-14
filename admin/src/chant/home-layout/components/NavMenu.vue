@@ -23,14 +23,13 @@
         </el-menu-item-group>
       </el-sub-menu>
     </el-menu>
-    <div class="version">版本号: {{ core.getVersion() }}</div>
+    <div class="version">版本号: {{ appVersion }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { core } from '@/utils'
 
 // props
 const props = defineProps<{
@@ -41,6 +40,7 @@ const route = useRoute()
 const router = useRouter()
 // var
 let subIndex = ''
+const appVersion = window.__APP_VERSION__
 // state
 const menuRef = ref(null)
 const state = reactive({
