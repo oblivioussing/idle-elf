@@ -1,7 +1,7 @@
 export default [
   {
     path: '/order',
-    component: () => import('@/chant/home-layout/index.vue'),
+    component: () => import('@/components/home-layout/index.vue'),
     meta: { icon: 'setting', title: '订单管理' },
     children: [
       {

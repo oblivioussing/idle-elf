@@ -3,14 +3,17 @@ import { type ListColumn as Column } from '@/type'
 
 export default [
   {
-    label: '姓名',
-    prop: 'name',
+    prop: 'name', // 姓名
     slot: true
   },
   {
-    label: '年龄',
-    prop: 'age',
+    prop: 'age', // 年龄
     search: true,
     type: FormType.Range
+  },
+  {
+    prop: 'sex', // 性别
+    search: true,
+    type: FormType.Select
   }
 ] as Column[]

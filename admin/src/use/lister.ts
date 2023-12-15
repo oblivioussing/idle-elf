@@ -25,17 +25,13 @@ const messages = {
     please: 'Please select ',
     only: 'Only one item can be selected to ',
     data: ' data',
-    confirmDelete: 'Confirm delete?',
-    tenantMust: 'please select a tenant',
-    systemTypeMust: 'system type must'
+    confirmDelete: 'Confirm delete?'
   },
   zh: {
     please: '请选择要',
     only: '只能选择一条要',
     data: '的数据',
-    confirmDelete: '确认删除?',
-    tenantMust: '请选择租户',
-    systemTypeMust: '请选择系统类型'
+    confirmDelete: '确认删除?'
   }
 }
 
@@ -63,7 +59,6 @@ function useLister(config?: {
     pages: { pageNum: 1, pageSize: 20 },
     pageElements: [],
     query: {} as Record<string, any>,
-    resultDict: {},
     selectionId: '',
     selectionRow: {} as Record<string, any>,
     selectionIdList: [] as string[],
@@ -175,42 +170,7 @@ function useLister(config?: {
       }
       // extra
       state.extra = data?.extra || {}
-      // pageElements
-      const pageElements = data?.pageElements
-      if (pageElements?.length) {
-        state.pageElements = pageElements
-        // lang
-        createLang(state)
-      }
       return true
-    }
-  }
-  // lang
-  function createLang(state: State) {
-    const columns = state.pageElements
-    const en: Record<string, any> = {}
-    const zh: Record<string, any> = {}
-    columns?.forEach((item) => {
-      en[item.prop] = item.labelEn
-      zh[item.prop] = item.labelZh
-    })
-    state.lang = { en, zh }
-  }
-  // columns
-  function createColumns(state: State, columns: Column[]) {
-    const pageElements = state?.pageElements
-    if (pageElements?.length) {
-      const list = columns.filter((item) => {
-        // operate
-        if (item.prop === 'operate') {
-          return true
-        }
-        const index = pageElements?.findIndex(
-          (child) => child.prop === item.prop
-        )
-        return index >= 0
-      })
-      state.columns = list
     }
   }
   // 字典绑定
@@ -478,7 +438,6 @@ function useLister(config?: {
     dataDeal,
     on,
     dictBind,
-    createColumns,
     query,
     refresh,
     clearSelection,

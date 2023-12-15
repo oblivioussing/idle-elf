@@ -2,7 +2,7 @@
   <div class="home-header">
     <div class="left">
       <img src="/image/logo.png" class="logo-ic" />
-      <div>野鬼的窝</div>
+      <div>{{ tg('app.project') }}</div>
       <img src="./img/ic_menu.png" class="menu-ic" @click="onCollapse" />
     </div>
     <div class="right">
@@ -35,7 +35,7 @@
         </div>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item command="quit">退出</el-dropdown-item>
+            <el-dropdown-item command="quit">{{ t('quit') }}</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -45,6 +45,7 @@
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { CaretBottom } from '@element-plus/icons-vue'
 import { LangEnum, StorageEnum } from '@/enum'
@@ -58,6 +59,18 @@ const props = defineProps<{
 }>()
 // emits
 const emits = defineEmits(['update:modelValue'])
+// i18n
+const { t: tg } = useI18n({ useScope: 'global' })
+const { t } = useI18n({
+  messages: {
+    en: {
+      quit: 'quit'
+    },
+    zh: {
+      quit: '退出'
+    }
+  }
+})
 // router
 const router = useRouter()
 // store

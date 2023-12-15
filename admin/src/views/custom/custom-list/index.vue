@@ -20,7 +20,7 @@
 <script setup lang="ts" name="custom-custom-list-index">
 import { reactive } from 'vue'
 import { useLister } from '@/use'
-import { columns } from './share'
+import { columns, dict } from './share'
 
 // use
 const lister = useLister()
@@ -28,7 +28,11 @@ const lister = useLister()
 const state = reactive({
   ...lister.state,
   columns,
-  list: [{ id: 1 }, { id: 2 }]
+  dict,
+  list: [
+    { id: 1, sex: '0' },
+    { id: 2, sex: '1' }
+  ]
 })
 // created
 lister.created(() => {

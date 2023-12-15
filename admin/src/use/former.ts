@@ -108,9 +108,6 @@ function useFormer() {
       state.model = columns.filter((item) => {
         return formColumns.find((child) => child.prop === item.prop)
       })
-      Reflect.deleteProperty(state.form, 'pageElements')
-      // lang
-      createLang(state, formColumns)
     }
   }
   // 修改字段
@@ -130,16 +127,6 @@ function useFormer() {
       }
     })
     return list
-  }
-  // lang
-  function createLang(state: State, columns: Column[]) {
-    const en: Record<string, any> = {}
-    const zh: Record<string, any> = {}
-    columns?.forEach((item) => {
-      en[item.prop] = item.labelEn
-      zh[item.prop] = item.labelZh
-    })
-    state.lang = { en, zh }
   }
   // 字典绑定
   function dictBind(map: Record<string, any>, state: State) {

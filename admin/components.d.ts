@@ -41,6 +41,10 @@ declare module 'vue' {
     ElTimePicker: typeof import('element-plus/es')['ElTimePicker']
     ElTimeSelect: typeof import('element-plus/es')['ElTimeSelect']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
+    HomeLayout: typeof import('./src/components/home-layout/index.vue')['default']
+    NavBar: typeof import('./src/components/home-layout/components/nav-bar/index.vue')['default']
+    NavMenu: typeof import('./src/components/home-layout/components/NavMenu.vue')['default']
+    NavTab: typeof import('./src/components/home-layout/components/NavTab.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

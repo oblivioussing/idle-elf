@@ -1,23 +1,23 @@
 <template>
   <el-table
-    ref="tableRef"
-    v-loading="props?.modelValue?.loading || false"
     v-bind="$attrs"
+    v-loading="props?.modelValue?.loading || false"
     :border="true"
     class="chant-table"
     :data="props.list || props?.modelValue?.list"
     :empty-text="props?.emptyText"
     :height="state.height ? state.height : undefined"
     :highlight-current-row="props.highlightCurrentRow"
+    ref="tableRef"
     :row-key="props.rowKey"
     :show-summary="props?.showSummary"
-    :span-method="props?.objectSpanMethod"
     :summary-method="props?.summaryMethod"
-    @row-click="onRowClick"
-    @row-dblclick="onRowDbClick"
+    :span-method="props?.objectSpanMethod"
     @select="onSelect"
     @select-all="onSelectAll"
     @selection-change="onSelectionChange"
+    @row-click="onRowClick"
+    @row-dblclick="onRowDbClick"
     @sort-change="onSortChange">
     <!-- 复选框 -->
     <el-table-column
@@ -50,7 +50,7 @@
           :sortable="props.sortable"
           :show-overflow-tooltip="state.showOverflowTooltip">
           <template #header>
-            <span>{{ item.label }}</span>
+            <span>{{ translate(item) }}</span>
           </template>
           <template #="scope">
             <div class="flex-center">
@@ -62,8 +62,24 @@
                 :item="item"
                 :value="scope.row[item.prop]"
                 :index="scope.$index"
-                :label="item.label">
+                :label="translate(item)">
               </slot>
+              <!-- 可编辑 -->
+              <template v-else-if="item.editable">
+                <!-- input -->
+                <chant-input
+                  v-if="!item.type"
+                  v-model="scope.row[item.prop]"
+                  :placeholder="translate(item)">
+                </chant-input>
+                <!-- select -->
+                <chant-select
+                  v-else-if="item.type === FormType.Select"
+                  v-model="scope.row[item.prop]"
+                  :data="getPropDict(item.prop)"
+                  :placeholder="translate(item)">
+                </chant-select>
+              </template>
               <!-- 格式化 -->
               <template
                 v-else-if="item.format || item.type === FormType.Select">
@@ -113,7 +129,7 @@
                     : scope.row[item.prop]
                 }}
                 <template v-if="item.appendLabel">
-                  {{ item.appendLabel }}
+                  {{ translate(item, item.appendLabel) }}
                 </template>
               </div>
               <!-- copy -->
@@ -132,10 +148,8 @@
 </template>
 
 <script setup lang="ts">
-import { ElMessage } from 'element-plus'
-// @ts-ignore
-import Sortable from 'sortablejs'
 import {
+  computed,
   nextTick,
   onActivated,
   onMounted,
@@ -146,13 +160,18 @@ import {
   type InputHTMLAttributes
 } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import useClipboard from 'vue-clipboard3'
+import { ElMessage, ElTable } from 'element-plus'
 import { DocumentCopy } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
-import { Format as FormatEnum, FormType } from '../enum'
-import { type ListColumn as Column, type ListState } from '../type'
-import { useLister } from '../use'
-import { base, format } from '../utils'
+// @ts-ignore
+import Sortable from 'sortablejs'
+import { Format as FormatEnum, FormType } from '@/enum'
+import { vuei18n } from '../plugs'
+import { type ListColumn as Column, type ListState } from '@/type'
+import { base, format } from '@/utils'
+import { useLister } from '@/use'
 
 interface Props {
   columnWidth?: number // 列宽度
@@ -205,7 +224,8 @@ const vModel = useVModel(props, 'modelValue', emit)
 defineExpose({
   scrollToBottom, // 滚动到底部
   setSelection, // 设置选中的selection
-  tableAdapter // 容器自适应
+  tableAdapter, // 容器自适应
+  toggleRowSelection // 切换某一行的选中状态
 })
 // use
 const lister = useLister()
@@ -216,10 +236,13 @@ const router = useRouter()
 const slots = useSlots()
 // clip
 const { toClipboard } = useClipboard()
+// i18n
+const { t: tg } = useI18n({ useScope: 'global' })
 // ref
-const tableRef = ref()
+const tableRef = ref<InstanceType<typeof ElTable>>()
 // state
 const state = reactive({
+  // selection: props.modelValue?.selectionList || ([] as any[]),
   height: 0,
   showOverflowTooltip: true
 })
@@ -227,6 +250,16 @@ const state = reactive({
 window.addEventListener('resize', () => {
   // 列表容器自适应
   tableAdapter()
+})
+// computed
+const messages = computed(() => {
+  const locale = vuei18n.global.locale.value
+  const lang = props?.modelValue?.lang || props.lang
+  if (lang) {
+    return lang[locale]
+  } else {
+    return {}
+  }
 })
 // 初始化
 onMounted(() => {
@@ -349,13 +382,15 @@ function tableAdapter() {
     state.height = el?.offsetHeight
   })
 }
+// 字段字典
+function getPropDict(prop: string) {
+  const dict = props.dict || props.modelValue?.dict
+  return dict?.[prop]
+}
 // 字典格式化
 function dictFmt(prop: string, value: any) {
-  const dict = props.dict || props.modelValue?.dict
-  if (!dict![prop]) {
-    return
-  }
-  return dict![prop][value]
+  const dict = getPropDict(prop)
+  return dict?.[value]
 }
 // 设置选中的selection
 function setSelection() {
@@ -378,6 +413,10 @@ function setSelection() {
     }
   }, 100)
 }
+// 切换某一行的选中状态
+function toggleRowSelection(row: any, selected: boolean) {
+  tableRef.value?.toggleRowSelection(row, selected)
+}
 // CheckBox是否可勾选
 function selectable() {
   return !props?.modelValue?.allFlag
@@ -387,6 +426,30 @@ function tagType(val: string, colorMap?: Record<string, string>) {
   if (colorMap) {
     return colorMap[val]
   }
+  const type: Record<string, string> = {
+    0: 'color-0',
+    1: 'color-1',
+    2: 'color-2',
+    3: 'color-3',
+    4: 'color-4',
+    5: 'color-5',
+    6: 'color-6',
+    7: 'color-7',
+    8: 'color-8',
+    9: 'color-9',
+    10: 'color-10',
+    11: 'color-11',
+    12: 'color-2',
+    13: 'color-3',
+    14: 'color-4',
+    15: 'color-5',
+    16: 'color-6',
+    17: 'color-7',
+    18: 'color-8',
+    19: 'color-9',
+    99: 'color-99'
+  }
+  return type[val]
 }
 // 链接
 function onLink(column: Column, row: any) {
@@ -429,7 +492,10 @@ function onSelect(selection: any[], row: any) {
   const selectionList = vModel.value!.selectionList
   const id = props.rowKey
   const index = selectionList.findIndex((item) => item[id] === row[id])
-  const type = selection.length > selectionList.length ? 'checked' : 'remove'
+  const type =
+    selection.findIndex((item) => item[id] === row[id]) >= 0
+      ? 'checked'
+      : 'remove'
   selectHandle(type, index, row)
 }
 // 手动勾选全选
@@ -466,20 +532,20 @@ function onSelectionChange(selection: any[]) {
 // 单元格点击
 function onRowClick(row: any) {
   emit('row-click', row)
-  // 如果高亮当前选中行,需要重新设置标光
-  if (props.highlightCurrentRow) {
-    // 设置行的光标
-    setRowPointer()
-  }
-  if (props.showSelection && props.rowSelection) {
-    const id = props.rowKey
-    const value = vModel.value!
-    const selectionList = value.selectionList
-    const index = selectionList.findIndex((item) => item[id] === row[id])
-    tableRef.value?.toggleRowSelection(row, index < 0)
-    const type = index >= 0 ? 'remove' : 'checked'
-    selectHandle(type, index, row)
-  }
+  // // 如果高亮当前选中行,需要重新设置标光
+  // if (props.highlightCurrentRow) {
+  //   // 设置行的光标
+  //   setRowPointer()
+  // }
+  // if (props.showSelection && props.rowSelection) {
+  //   const id = props.rowKey
+  //   const value = vModel.value!
+  //   const selectionList = value.selectionList
+  //   const index = selectionList.findIndex((item) => item[id] === row[id])
+  //   tableRef.value?.toggleRowSelection(row, index < 0)
+  //   const type = index >= 0 ? 'remove' : 'checked'
+  //   selectHandle(type, index, row)
+  // }
 }
 // 单元格双击
 function onRowDbClick(row: any) {
@@ -515,11 +581,28 @@ function onSortChange(row: any) {
 async function onCopy(text: string) {
   try {
     await toClipboard(text)
-    ElMessage.success('复制成功')
+    ElMessage.success(tg('tips.copySuccess'))
   } catch (e) {
     console.error(e)
-    ElMessage.error('复制失败')
+    ElMessage.error(tg('tips.copyFail'))
   }
+}
+// 翻译
+function translate(column: Column, type?: string) {
+  // 列表里有appendLabel大多是单位，不slot出去自定义了 start
+  if (type && type.indexOf('.') >= 0) {
+    return tg(type)
+  }
+  // 列表里有appendLabel大多是单位，不slot出去自定义了 end
+  let label = column.label || column.prop
+  if (label.indexOf('common.') >= 0) {
+    return tg(label)
+  }
+  var pattern = new RegExp('[\u4E00-\u9FA5]+')
+  if (pattern.test(label)) {
+    return label
+  }
+  return messages.value[label]
 }
 </script>
 

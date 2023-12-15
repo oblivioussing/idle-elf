@@ -1,7 +1,7 @@
 export default [
   {
     path: '/custom',
-    component: () => import('@/chant/home-layout/index.vue'),
+    component: () => import('@/components/home-layout/index.vue'),
     meta: { icon: 'nickname', title: '客户管理' },
     children: [
       {

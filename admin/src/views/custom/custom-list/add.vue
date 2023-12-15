@@ -1,17 +1,18 @@
 <template>
-  <chant-form v-model="state" @save="onSave" type="add"></chant-form>
+  <chant-form v-model="state" type="add" @save="onSave"></chant-form>
 </template>
 
 <script setup lang="ts" name="custom-custom-list-add">
 import { reactive } from 'vue'
 import { useFormer } from '@/use'
-import { model } from './share'
+import { lang, model } from './share'
 
 // use
 const former = useFormer()
 // state
 const state = reactive({
   ...former.state,
+  lang,
   model
 })
 // created

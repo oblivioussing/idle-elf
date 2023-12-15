@@ -53,6 +53,7 @@ export type ListColumn = {
   copy?: boolean // 是否可以复制
   dynamicId?: string // 动态id字段
   defaultValue?: boolean // 是否有默认值
+  editable?: boolean // 是否可编辑
   end?: string // 范围选择end字段
   fixed?: 'left' | 'right' // 列是否固定在左侧或者右侧
   forceShowTenant?: boolean // 强制显示租户picker
@@ -97,8 +98,6 @@ export type ListState = {
     pageSize: number
   } // 分页
   extra: Record<string, any> // 页面额外数据
-  pageElements?: FormColumn[] // 定义字段
-  resultDict: Record<string, any> // 字典初始值
   selectionId: string // 选中的id
   selectionRow: any // 选中的行
   selectionIdList: string[] // 选中的idList
