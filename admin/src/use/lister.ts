@@ -242,24 +242,21 @@ function useLister(config?: {
     jump(params, '/add')
   }
   // 复制新增
-  function copyAdd(state: State, linkData?: string[] | undefined) {
+  function copyAdd(state: State) {
     const status = getDealData(state, '复制新增')
     if (status) {
-      const query = linkDataTrans(state.selectionRow, linkData, state.tenant)
-      query.pageType = 'copy-add'
-      Object.assign(query, state.jumpParams)
+      const query = { id: state.selectionRow.id, pageType: 'copy-add' }
       // 页面跳转
-      jump(query, '/add')
+      jump('/add', query)
     }
   }
   // 编辑
-  function edit(state: State, linkData?: string[] | undefined) {
+  function edit(state: State) {
     const status = getDealData(state, '编辑')
     if (status) {
-      const query = linkDataTrans(state.selectionRow, linkData, state.tenant)
-      Object.assign(query, state.jumpParams)
+      const query = { id: state.selectionRow.id }
       // 页面跳转
-      jump(query, '/edit')
+      jump('/edit', query)
     }
   }
   // 获取要处理的数据
@@ -280,11 +277,11 @@ function useLister(config?: {
     return true
   }
   // 页面跳转
-  function jump(query: any, to: string) {
+  function jump(to: string, query: any) {
     const path = route?.path || ''
     const toPath = path?.replace('/index', to)
     appStore.updatePageRelation(toPath, path)
-    router.push({ path: toPath, query: base.filterObjectEmpty(query) })
+    router.push({ path: toPath, query })
   }
   // 删除
   async function remove(path: string, state: State) {
@@ -345,28 +342,6 @@ function useLister(config?: {
       path && bus.emit(path)
       return isSuccess
     }
-  }
-  // 参数转化
-  function linkDataTrans(
-    row: any,
-    linkData?: any[],
-    tenant?: Record<string, any>
-  ) {
-    const query: Record<string, any> = {}
-    if (linkData) {
-      linkData.forEach((item) => {
-        if (typeof item === 'string') {
-          query[item] = row[item]
-        } else if (typeof item === 'object') {
-          for (let child in item) {
-            query[child] = row[item[child]]
-          }
-        }
-      })
-    } else {
-      query.id = row.id
-    }
-    return base.filterObjectEmpty(query)
   }
   // 导出
   function download(
@@ -450,7 +425,6 @@ function useLister(config?: {
     getDealData,
     jump,
     remove,
-    linkDataTrans,
     operate,
     download,
     updateColumn,

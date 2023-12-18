@@ -2,7 +2,7 @@
   <chant-form v-model="state" type="add" @save="onSave"></chant-form>
 </template>
 
-<script setup lang="ts" name="custom-custom-list-add">
+<script setup lang="ts" name="user-user-list-add">
 import { reactive } from 'vue'
 import { useFormer } from '@/use'
 import { lang, model } from './share'

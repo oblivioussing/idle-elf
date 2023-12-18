@@ -17,10 +17,10 @@
   </chant-pagination>
 </template>
 
-<script setup lang="ts" name="custom-custom-list-index">
+<script setup lang="ts" name="user-user-list-index">
 import { reactive } from 'vue'
 import { useLister } from '@/use'
-import { columns, dict } from './share'
+import { columns, dict, lang } from './share'
 
 // use
 const lister = useLister()
@@ -29,9 +29,10 @@ const state = reactive({
   ...lister.state,
   columns,
   dict,
+  lang,
   list: [
-    { id: 1, sex: '0' },
-    { id: 2, sex: '1' }
+    { id: 1, name: '张三', age: '10', sex: '0' },
+    { id: 2, name: '李四', age: '20', sex: '1' }
   ]
 })
 // created

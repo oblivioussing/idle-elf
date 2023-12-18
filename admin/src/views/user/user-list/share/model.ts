@@ -3,13 +3,16 @@ import { type FormColumn as Column } from '@/type'
 
 export default [
   {
-    label: '姓名',
-    prop: 'name',
+    prop: 'name', // 姓名
     required: true
   },
   {
-    label: '年龄',
-    prop: 'age',
+    prop: 'age', // 年龄
     required: true
+  },
+  {
+    prop: 'sex', // 性别
+    required: true,
+    type: FormType.Select
   }
 ] as Column[]

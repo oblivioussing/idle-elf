@@ -62,10 +62,6 @@ export type ListColumn = {
   show?: boolean // 是否显示
   label?: string // 标签文本
   like?: boolean // 是否为模糊查询
-  link?: boolean // 是否为链接
-  linkData?: any[] // 链接携带的字段
-  linkParams?: (row: any) => any | Record<string, any> // 链接参数
-  linkUrl?: string // 链接地址
   onlySearch?: boolean // 只作为搜索条件
   prop: string // 字段值
   search?: boolean // 是否为搜索条件
