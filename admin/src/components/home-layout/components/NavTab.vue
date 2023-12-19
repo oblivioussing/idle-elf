@@ -1,31 +1,34 @@
 <template>
   <el-tabs
     v-model="state.path"
+    class="nav-tab"
     type="card"
     @tab-click="onTab"
-    @tab-remove="onTabRemove"
-    class="nav-tab">
+    @tab-remove="onTabRemove">
     <el-tab-pane
       v-for="(item, index) in state.tabs"
       :key="index"
-      :label="item.title"
-      :name="item.path"
-      :closable="item.path !== '/'">
+      :closable="item.path !== '/'"
+      :name="item.path">
       <template #label>
         <el-dropdown
+          :id="item.path"
           ref="dropdownRef"
           trigger="contextmenu"
-          :id="item.path"
-          @visible-change="onVisibleChange($event, item.path)"
-          @command="onCommand($event, item.path)">
-          <span>{{ item.title }}</span>
+          @command="onCommand($event, item.path)"
+          @visible-change="onVisibleChange($event, item.path)">
+          <span>{{ title(item) }}</span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="close">关闭</el-dropdown-item>
-              <el-dropdown-item command="closeOther">
-                关闭其他
+              <el-dropdown-item command="close">
+                {{ t('close') }}
               </el-dropdown-item>
-              <el-dropdown-item command="closeAll">关闭所有</el-dropdown-item>
+              <el-dropdown-item command="closeOther">
+                {{ t('closeOther') }}
+              </el-dropdown-item>
+              <el-dropdown-item command="closeAll">
+                {{ t('closeAll') }}
+              </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -35,31 +38,49 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { Bus, StorageEnum } from '@/enum'
+import { Bus, LangEnum, StorageEnum } from '@/enum'
 import { base, bus, storage } from '@/utils'
 import { useAppStore } from '@/store'
 import { useChaoser } from '@/use'
 
 type PathMapping = {
-  path: string
-  title: string
   name: string
+  path: string
+  titleEn: string
+  titleZh: string
 }
 
-// store
-const appStore = useAppStore()
+// chaoser
+const chaoser = useChaoser()
+// i18n
+const { t } = useI18n({
+  messages: {
+    en: {
+      close: 'close',
+      closeAll: 'close',
+      closeOther: 'close other'
+    },
+    zh: {
+      close: '关闭',
+      closeAll: '关闭所有',
+      closeOther: '关闭其他'
+    }
+  }
+})
 // router
 const route = useRoute()
 const router = useRouter()
-// chaoser
-const chaoser = useChaoser()
+// store
+const appStore = useAppStore()
 // var
 const indexRaw = {
+  name: '/',
   path: '/',
-  title: '首页',
-  name: '/'
+  titleEn: 'index',
+  titleZh: '首页'
 }
 const tabs = (storage.getSession(StorageEnum.HomeNavTab) || [
   indexRaw
@@ -70,13 +91,6 @@ const dropdownRef = ref()
 const state = reactive({
   path: route?.path,
   tabs: tabs
-})
-// 初始化
-onMounted(() => {
-  // 路由变化
-  routerChange()
-  // 通知外部keeps发生了变化
-  busKeeps()
 })
 // 监听页面关闭
 bus.on(Bus.ClosePage, (path) => {
@@ -98,6 +112,9 @@ watch(
 )
 // 监听路由变化
 watch(() => route?.path, routerChange)
+// 初始化
+routerChange() // 路由变化
+busKeeps() // 通知外部keeps发生了变化
 // 路由变化
 function routerChange() {
   const path = route?.path
@@ -118,7 +135,8 @@ function routerChange() {
   if (meta) {
     state.tabs.push({
       path: route.path,
-      title: meta?.title as string,
+      titleEn: meta?.titleEn as string,
+      titleZh: meta?.titleZh as string,
       name: getName(path)
     })
   }
@@ -128,6 +146,12 @@ function routerChange() {
 function getName(path: any) {
   const name = path?.replace(/^\/|\/$/g, '')
   return name?.replace(/\//g, '-')
+}
+// 标题
+function title(row?: any) {
+  const { titleEn, titleZh } = row || {}
+  const lang = appStore.state.lang
+  return lang === LangEnum.En ? titleEn : titleZh
 }
 // 通知外部keeps发生了变化
 function busKeeps() {
@@ -142,7 +166,7 @@ function onTab(row: any) {
   router.push({ path })
 }
 // tab删除
-function onTabRemove(path: string) {
+function onTabRemove(path: any) {
   const index = state.tabs.findIndex((item) => item?.path === path)
   if (index < 0) {
     return

@@ -8,7 +8,7 @@ export default {
     }
   },
   // 日期时间
-  dateTime(val: string | number) {
+  datetime(val: string | number) {
     if (val) {
       return dayjs(Number(val)).format('YYYY-MM-DD HH:mm:ss')
     }

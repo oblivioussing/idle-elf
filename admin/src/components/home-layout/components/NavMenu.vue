@@ -10,7 +10,7 @@
       <el-sub-menu v-for="item in menus" :key="item.path" :index="item.path">
         <template #title>
           <icon-font :icon="icon(item.meta?.icon)"></icon-font>
-          <span class="p-l-5">{{ item.meta?.title }}</span>
+          <span class="p-l-5">{{ title(item.meta) }}</span>
         </template>
         <el-menu-item-group>
           <el-menu-item
@@ -18,7 +18,7 @@
             :key="`${child.path}`"
             :index="`${item.path}/${child.path}`"
             @click="onTab(`${item.path}/${child.path}`)">
-            {{ child.meta?.title }}
+            {{ title(child.meta) }}
           </el-menu-item>
         </el-menu-item-group>
       </el-sub-menu>
@@ -30,6 +30,8 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { LangEnum } from '@/enum'
+import { useAppStore } from '@/store'
 
 // props
 const props = defineProps<{
@@ -38,6 +40,8 @@ const props = defineProps<{
 // router
 const route = useRoute()
 const router = useRouter()
+// store
+const appStore = useAppStore()
 // var
 let subIndex = ''
 const appVersion = window.__APP_VERSION__
@@ -71,6 +75,12 @@ watch(
     }
   }
 )
+// 标题
+function title(meta?: any) {
+  const { titleEn, titleZh } = meta || {}
+  const lang = appStore.state.lang
+  return lang === LangEnum.En ? titleEn : titleZh
+}
 // 菜单切换
 function onTab(path: string) {
   router.push({ path })

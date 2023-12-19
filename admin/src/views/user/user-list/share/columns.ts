@@ -4,6 +4,7 @@ import { type ListColumn as Column } from '@/type'
 export default [
   {
     prop: 'name', // 姓名
+    copy: true,
     search: true
   },
   {
@@ -19,6 +20,6 @@ export default [
   {
     prop: 'createTime', // 创建时间
     search: true,
-    type: FormType.Datetimerange
+    type: FormType.DatetimeRange
   }
 ] as Column[]

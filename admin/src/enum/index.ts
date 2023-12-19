@@ -9,10 +9,6 @@ export enum Bus {
 }
 
 export enum Format {
-  Dict = 'dict',
-  DictList = 'dict-list',
-  Date = 'date',
-  Datetime = 'datetime',
   Money = 'money'
 }
 
@@ -20,13 +16,13 @@ export enum FormType {
   Border = 'border',
   Date = 'date',
   DateTime = 'datetime',
-  Daterange = 'daterange',
-  Datetimerange = 'datetimerange',
+  DateRange = 'daterange',
+  DatetimeRange = 'datetimerange',
   Divider = 'divider',
   Input = 'input',
   InputNumber = 'inputnumber',
   Month = 'month',
-  Monthrange = 'monthrange',
+  MonthRange = 'monthrange',
   Range = 'range',
   Radio = 'radio',
   Select = 'select',
