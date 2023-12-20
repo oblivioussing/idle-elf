@@ -3,99 +3,96 @@
     <!-- search -->
     <div v-if="props.showSearch" class="toolbar chant-search" ref="searchRef">
       <!-- form -->
-      <el-form :inline="true" class="form m-r-10" @keyup.enter="onEnter">
+      <el-form class="form m-r-10" :inline="true" @keyup.enter="emits('query')">
         <slot></slot>
         <!-- 查询条件 -->
-        <template v-for="item in props.modelValue.columns">
-          <el-form-item v-if="isShowSearch(item)" :content="item.label">
-            <!-- slot -->
-            <slot v-if="item.searchSlot" :name="item.prop" :row="item"></slot>
-            <!-- input -->
-            <el-input
-              v-else-if="isInput(item)"
-              v-model="state.query[item.like ? item.prop + 'Like' : item.prop]"
-              :placeholder="item.label"
-              :clearable="item.clearable === false ? false : true">
-              <template v-if="item.appendLabel" #append>
-                {{ item.appendLabel }}
-              </template>
-            </el-input>
-            <!-- select -->
-            <el-select
-              v-else-if="item.type === FormTypeEnum.Select"
-              v-model="state.query[item.prop]"
-              :placeholder="item.label"
-              :clearable="item.clearable === false ? false : true"
-              @change="onQueryChange">
-              <el-option
-                v-for="(val, key) in props.modelValue?.dict![item.prop]"
-                :label="val"
-                :value="key">
-              </el-option>
-            </el-select>
-            <!-- date,datetime -->
-            <el-date-picker
-              v-else-if="isDate(item)"
-              v-model="state.query[item.prop]"
-              :type="item.type as any"
-              :value-format="item.valueFormat || 'x'"
-              :placeholder="item.label"
-              :clearable="item.clearable === false ? false : true"
-              @change="onQueryChange">
-            </el-date-picker>
-            <!-- daterange,datetimerange -->
-            <el-date-picker
-              v-else-if="isDateRange(item)"
-              v-model="state.dateRange[item.prop]"
-              :type="item.type as any"
-              :value-format="item.valueFormat || 'x'"
-              :clearable="item.clearable === false ? false : true"
-              :start-placeholder="item.label"
-              :end-placeholder="item.label"
-              :default-time="defaultTime"
-              @change="onDateRange(item)">
-            </el-date-picker>
-            <!-- range -->
-            <div
-              v-else-if="item.type === FormTypeEnum.Range"
-              class="input-range">
-              <el-input
-                v-model="state.query[rangeField(item, 'start')]"
-                :clearable="item.clearable === false ? false : true"
-                :placeholder="item.label">
-                <template v-if="item.appendLabel" #append>
-                  {{ item.label }}
-                </template>
-              </el-input>
-              <div class="connector">~</div>
-              <el-input
-                v-model="state.query[rangeField(item, 'end')]"
-                :clearable="item.clearable === false ? false : true"
-                :placeholder="item.label">
-                <template v-if="item.appendLabel" #append>
-                  {{ item.label }}
-                </template>
-              </el-input>
-            </div>
-          </el-form-item>
-        </template>
+        <el-form-item v-for="item in columnsList">
+          <!-- input -->
+          <el-input
+            v-if="isInput(item)"
+            v-model="vModel.query[item.like ? item.prop + 'Like' : item.prop]"
+            :clearable="item.clearable !== false"
+            :placeholder="translate(item)">
+            <template v-if="item.appendLabel" #append>
+              {{ tg(item.appendLabel) }}
+            </template>
+          </el-input>
+          <!-- input-number -->
+          <el-input-number
+            v-else-if="item.type === FormTypeEnum.InputNumber"
+            v-model="vModel.query[item.prop]"
+            controls-position="right"
+            :placeholder="translate(item)">
+          </el-input-number>
+          <!-- select -->
+          <el-select
+            v-else-if="item.type === FormTypeEnum.Select"
+            v-model="vModel.query[item.prop]"
+            :clearable="item.clearable !== false"
+            :placeholder="translate(item)"
+            @change="emits('query')">
+            <el-option
+              v-for="(val, key) in vModel?.dict![item.prop]"
+              :label="val"
+              :value="key">
+            </el-option>
+          </el-select>
+          <!-- date,datetime -->
+          <el-date-picker
+            v-else-if="isDate(item)"
+            v-model="vModel.query[item.prop]"
+            :clearable="item.clearable !== false"
+            :placeholder="translate(item)"
+            :type="columnType(item.type)"
+            :value-format="item.valueFormat || 'x'"
+            @change="emits('query')">
+          </el-date-picker>
+          <!-- daterange,datetimerange -->
+          <el-date-picker
+            v-else-if="isDateRange(item)"
+            v-model="state.dateRange[item.prop]"
+            :clearable="item.clearable !== false"
+            :start-placeholder="translate(item)"
+            :end-placeholder="translate(item)"
+            :type="columnType(item.type)"
+            :value-format="item.valueFormat || 'x'"
+            @change="onDateRange(item)">
+          </el-date-picker>
+          <!-- range -->
+          <div
+            v-else-if="item.type === FormTypeEnum.InputNumberRange"
+            class="input-range">
+            <el-input-number
+              v-model="vModel.query[rangeField(item, 'start')]"
+              controls-position="right"
+              :placeholder="translate(item)">
+            </el-input-number>
+            <div class="connector">~</div>
+            <el-input-number
+              v-model="vModel.query[rangeField(item, 'end')]"
+              controls-position="right"
+              :placeholder="translate(item)">
+            </el-input-number>
+          </div>
+          <!-- slot -->
+          <slot v-else-if="item.searchSlot" :name="item.prop" :row="item">
+          </slot>
+        </el-form-item>
         <slot name="search-end"></slot>
       </el-form>
       <template v-if="props.showFold">
         <!-- 展开搜索 -->
         <chant-icon-button
           v-if="state.arrow === 'down'"
-          content="展开搜索"
+          :content="t('spread')"
           :icon="ArrowDown"
-          type="primary"
           @click="onCollapse('up')">
         </chant-icon-button>
         <!-- 关闭搜索 -->
         <chant-icon-button
           v-if="state.arrow === 'up'"
-          content="关闭搜索"
+          :content="t('fold')"
           :icon="ArrowUp"
-          type="primary"
           @click="onCollapse('down')">
         </chant-icon-button>
       </template>
@@ -103,32 +100,30 @@
       <el-button-group class="m-l-10">
         <!-- 查询 -->
         <chant-icon-button
-          @click="onEmit('query')"
-          content="查询"
+          :content="t('query')"
           :icon="Search"
-          type="primary">
+          @click="onEmit('query')">
         </chant-icon-button>
         <!-- 刷新 -->
         <chant-icon-button
-          @click="onEmit('refresh')"
-          content="刷新"
+          :content="t('refresh')"
           :icon="Refresh"
-          type="primary">
+          @click="onEmit('refresh')">
         </chant-icon-button>
       </el-button-group>
     </div>
     <!-- operation -->
     <table-operation
       v-if="props.showOperation"
-      :columns="props.modelValue.columns!"
+      :columns="vModel.columns"
       :messages="props.modelValue.lang"
       :options="props.options"
       :show-checked-all="props.showCheckedAll"
       :show-filter="props.showFilter"
       :total="props.modelValue.total"
-      @emit="onEmit"
       @checked="onAllChecked"
-      @column-change="onColumnChange">
+      @column-change="onColumnChange"
+      @emit="onEmit">
       <slot name="group"></slot>
       <template #alone>
         <slot name="alone"></slot>
@@ -138,13 +133,16 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, reactive, ref, watch } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ArrowDown, ArrowUp, Refresh, Search } from '@element-plus/icons-vue'
+import { useVModel } from '@vueuse/core'
 import { FormTypeEnum } from '@/enum'
+import { vuei18n } from '@/plugs'
 import { type ListColumn as Column, type ListState } from '@/type'
 import TableOperation from './components/TableOperation.vue'
 
-type Options = 'add' | 'edit' | 'delete' | 'copy-add' | 'export' | 'void'
+type Options = 'add' | 'edit' | 'delete' | 'copy-add'
 
 interface Props {
   modelValue: ListState // modelValue
@@ -156,10 +154,6 @@ interface Props {
   showSearch?: boolean // 显示查询栏
   unfold?: boolean // 自动展开搜索条件
 }
-const defaultTime: [Date, Date] = [
-  new Date(2022, 1, 1, 0, 0, 0),
-  new Date(2022, 1, 1, 23, 59, 59)
-]
 // props
 const props = withDefaults(defineProps<Props>(), {
   showFilter: true, // 显示字段过滤
@@ -168,85 +162,78 @@ const props = withDefaults(defineProps<Props>(), {
   showSearch: true, // 显示查询栏
   unfold: false // 自动展开搜索条件
 })
-// emit
-const emit = defineEmits([
-  'update:modelValue',
-  'query',
-  'refresh',
+// emits
+const emits = defineEmits([
   'add',
   'copy-add',
   'delete',
   'edit',
-  'sort',
-  'export',
-  'void'
+  'query',
+  'refresh',
+  'update:modelValue'
 ])
+// i18n
+const { t: tg } = useI18n({ useScope: 'global' })
+const { t } = useI18n({
+  messages: {
+    en: {
+      spread: 'spread search',
+      fold: 'fold fold',
+      query: 'query',
+      refresh: 'refresh'
+    },
+    zh: {
+      spread: '展开搜索',
+      fold: '折叠搜索',
+      query: '查询',
+      refresh: '刷新'
+    }
+  }
+})
+// vModel
+const vModel = useVModel(props, 'modelValue', emits)
 // ref
 const searchRef = ref()
 // state
 const state = reactive({
-  allFlag: props.modelValue.allFlag,
-  dict: props.modelValue.dict,
-  tenant: props.modelValue.tenant,
-  query: props.modelValue.query,
-  pages: props.modelValue.pages,
   arrow: props.unfold ? 'up' : 'down',
   dateRange: {} as any
 })
-// defineExpose
-defineExpose({
-  containerAuto // 容器高度自适应
+// computed
+const columnsList = computed(() => {
+  return vModel.value.columns?.filter((item) => {
+    if (item.hide) {
+      return false
+    }
+    return item.search || item.onlySearch
+  })
+})
+const messages = computed(() => {
+  const locale = vuei18n.global.locale.value
+  const lang = vModel.value.lang
+  return lang ? lang[locale] : {}
 })
 // watch
 watch(
-  () => props.modelValue.query,
+  () => columnsList,
   () => {
-    state.query = props.modelValue.query
-  }
-)
-watch(
-  () => props.modelValue.columns,
-  () => {
+    // 容器高度自适应
     containerAuto()
-  },
-  { deep: true }
-)
-watch(
-  () => props.modelValue.dict,
-  () => {
-    state.dict = props.modelValue.dict
   }
 )
 // init
-setDefaultValue() // 设置默认值
+bindQueryValue() // 绑定查询条件的值
 containerAuto() // 容器高度自适应
-// 设置默认值
-function setDefaultValue() {
-  const query = props.modelValue.query
-  props.modelValue.columns?.forEach((item) => {
-    if (item.defaultValue) {
-      if (isDateRange(item)) {
-        const start = rangeField(item, 'start')
-        const end = rangeField(item, 'end')
-        state.dateRange[item.prop] = [query[start], query[end]]
-      } else {
-        state.query[item.prop] = query[item.prop]
-      }
+// 绑定查询条件的值
+function bindQueryValue() {
+  const query = vModel.value.query
+  vModel.value.columns?.forEach((item) => {
+    if (isDateRange(item)) {
+      const start = rangeField(item, 'start')
+      const end = rangeField(item, 'end')
+      state.dateRange[item.prop] = [query[start], query[end]]
     }
   })
-}
-// 是否显示搜索条件
-function isShowSearch(column: Column) {
-  if (column.showCustom) {
-    return column.showCustom({})
-  }
-  if (column.hide) {
-    return
-  }
-  if (!column.search && !column.onlySearch) {
-    return false
-  }
-  return true
 }
 // range start
 function rangeField(column: Column, type: 'start' | 'end') {
@@ -258,17 +245,7 @@ function rangeField(column: Column, type: 'start' | 'end') {
 function onColumnChange(columns: Column[]) {
   const value = props.modelValue
   value.columns = columns
-  emit('update:modelValue', value)
-}
-// 查询条件修改
-function onQueryChange() {
-  nextTick(() => {
-    emit('query')
-  })
-}
-// 回车事件
-function onEnter() {
-  emit('query')
+  emits('update:modelValue', value)
 }
 // 是否为input
 function isInput(row: Column) {
@@ -282,7 +259,7 @@ function isDate(row: Column) {
   if (row.type) {
     return [
       FormTypeEnum.Date,
-      FormTypeEnum.DateTime,
+      FormTypeEnum.Datetime,
       FormTypeEnum.Month
     ].includes(row.type)
   }
@@ -304,9 +281,9 @@ function onDateRange(row: Column) {
   if (!value) {
     value = ['', '']
   }
-  state.query[rangeField(row, 'start')] = value[0]
-  state.query[rangeField(row, 'end')] = value[1]
-  emit('query')
+  vModel.value.query[rangeField(row, 'start')] = value[0]
+  vModel.value.query[rangeField(row, 'end')] = value[1]
+  emits('query')
 }
 // 展开/关闭
 function onCollapse(type: 'down' | 'up') {
@@ -315,17 +292,11 @@ function onCollapse(type: 'down' | 'up') {
   if (type === 'up') {
     el.style.height = 'auto'
     const height = el.offsetHeight
-    if (height < 50) {
-      setTimeout(() => {
-        el.style.height = '24px'
-      }, 0)
-      return
-    }
-    // setTimeout(() => {
-    //   el.style.height = height + 'px'
-    // }, 0)
+    setTimeout(() => {
+      el.style.height = height + 'px'
+    }, 0)
   } else {
-    el.style.height = '24px'
+    el.style.height = '48px'
   }
 }
 // 容器高度自适应
@@ -336,9 +307,8 @@ function containerAuto() {
   setTimeout(() => {
     const el = searchRef.value
     el.style.height = 'auto'
-    // wjh注释，发现月份流水里高度过高
-    // const height = el.offsetHeight
-    // el.style.height = height + 'px'
+    const height = el.offsetHeight
+    el.style.height = height + 'px'
   }, 300)
 }
 // emit
@@ -347,24 +317,36 @@ function onEmit(type: any) {
     // 清空查询条件
     reset()
   }
-  emit(type)
+  emits(type)
 }
 // 清空查询条件
 function reset() {
   state.dateRange = {}
-  // 设置默认值
-  setDefaultValue()
-  for (let item in state.query) {
+  for (let item in vModel.value.query) {
     if (!['page', 'size'].includes(item)) {
-      state.query[item] = ''
+      vModel.value.query[item] = ''
     }
   }
 }
 // 全选
 function onAllChecked(checked: boolean) {
-  const value = props.modelValue
-  value.allFlag = checked ? 1 : 0
-  emit('update:modelValue', value)
+  vModel.value.allFlag = checked ? 1 : 0
+}
+// type类型转化
+function columnType(type?: FormTypeEnum) {
+  return type as any
+}
+// 翻译
+function translate(column: Column) {
+  let label = column.label || column.prop
+  var pattern = new RegExp('[\u4E00-\u9FA5]+')
+  if (pattern.test(label)) {
+    return label
+  }
+  if (label.indexOf('.') >= 0) {
+    return tg(label)
+  }
+  return messages.value[label]
 }
 </script>
 
@@ -372,54 +354,50 @@ function onAllChecked(checked: boolean) {
 $input-width: 165px;
 
 .chant-search {
+  box-sizing: border-box;
   display: flex;
-  height: 24px;
+  height: 48px;
   overflow: hidden;
-  // transition: height 0.3s;
+  transition: height 0.3s;
   .form {
     flex: 1;
     margin-top: -10px;
-    .tenant-seat {
-      display: inline-block;
-      min-width: 195px;
-    }
     .el-form-item {
-      margin: 10px 10px 0 0 !important;
+      margin: 12px 10px 0 0;
     }
+    // range
     .input-range {
       display: flex;
       align-items: center;
-      .el-input {
-        width: $input-width;
+      .el-input-number {
+        width: 154px;
       }
       .connector {
         text-align: center;
         width: 32px;
       }
     }
+    // input
     .el-input {
-      min-width: $input-width;
+      width: $input-width;
       .el-input-group__append,
       .el-input-group__prepend {
         padding: 0 6px;
       }
     }
+    // input-number
+    .el-input-number {
+      width: $input-width;
+    }
     // date
     .el-date-editor.el-input {
       width: $input-width;
     }
-    .el-range-editor.el-input__inner {
+    .el-range-editor.el-input__wrapper {
       background-color: #ffffff;
-      width: 362px;
+      box-sizing: border-box;
+      width: 340px;
     }
-    // tanent-picker
-    .picker-input {
-      width: $input-width;
-    }
-  }
-  .icon-jinggao {
-    color: #333744;
-    margin-left: 5px;
   }
 }
 </style>

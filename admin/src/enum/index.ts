@@ -29,7 +29,7 @@ export enum FormatEnum {
 export enum FormTypeEnum {
   Border = 'border',
   Date = 'date',
-  DateTime = 'datetime',
+  Datetime = 'datetime',
   DateRange = 'daterange',
   DatetimeRange = 'datetimerange',
   Divider = 'divider',
@@ -37,7 +37,7 @@ export enum FormTypeEnum {
   InputNumber = 'inputnumber',
   Month = 'month',
   MonthRange = 'monthrange',
-  Range = 'range',
+  InputNumberRange = 'input-number-range',
   Radio = 'radio',
   Select = 'select',
   SelectMultiple = 'select-multiple',

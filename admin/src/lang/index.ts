@@ -6,6 +6,9 @@ export default {
     tips: {
       copyFail: 'copy fail',
       copySuccess: 'copy success'
+    },
+    unit: {
+      minute: 'minute'
     }
   },
   zh: {
@@ -15,6 +18,9 @@ export default {
     tips: {
       copyFail: '复制失败',
       copySuccess: '复制成功'
+    },
+    unit: {
+      minute: '分钟'
     }
   }
 }

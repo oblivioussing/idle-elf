@@ -1,5 +1,5 @@
 <template>
-  <svg class="icon" aria-hidden="true" @click="emits('click')">
+  <svg v-bind="$attrs" class="icon" aria-hidden="true">
     <use :xlink:href="`#icon-${props.icon}`"></use>
   </svg>
 </template>
@@ -9,8 +9,6 @@
 const props = defineProps<{
   icon: string
 }>()
-// emits
-const emits = defineEmits(['click'])
 </script>
 
 <style scoped lang="scss">

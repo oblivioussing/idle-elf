@@ -1,8 +1,10 @@
 <template>
+  {{ state.query }}
   <!-- operation -->
   <chant-operation
     v-model="state"
     :options="['add', 'edit', 'delete']"
+    show-checked-all
     @add="lister.add"
     @query="getList"
     @refresh="lister.refresh(getList, state)">
@@ -35,14 +37,20 @@ const state = reactive({
     { id: 2, name: '李四', age: '20', sex: '1' }
   ]
 })
+// init
+state.query = {
+  name: '张三',
+  createTimeStart: new Date().getTime(),
+  createTimeEnd: new Date().getTime()
+}
 // created
 lister.created(() => {
   // 获取列表
-  // getList()
+  getList()
 })
 // 获取列表
 function getList() {
-  lister.getData('xx/xxx', state)
+  // lister.getData('xx/xxx', state)
 }
 </script>
 

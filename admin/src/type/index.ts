@@ -1,5 +1,5 @@
 import { type Ref } from 'vue'
-import { FormTypeEnum, PageEnum } from '../enum'
+import { FormatEnum, FormTypeEnum, PageEnum } from '../enum'
 
 export type Stage = 'dev' | 'test' | 'prod'
 
@@ -19,15 +19,13 @@ export type FormColumn = {
   dynamicCode?: string // 动态code字段
   dynamicName?: string // 动态name字段
   end?: string // 范围选择end字段
-  forceShowTenant?: boolean // 强制显示租户picker
   hideInPage?: PageEnum[] // 在特定页面类型中隐藏
-  ignorePta?: boolean // 忽略pta规则
   itemSlot?: boolean // form-item slot
   label?: string // 标签文本
   labelSlot?: boolean // 标签文本 slot
   lineFeed?: boolean // 是否换行
-  min?: number // 最小值(只有textType为number才生效)
-  max?: number // 最大值(只有textType为number才生效)
+  min?: number // 最小值
+  max?: number // 最大值
   nextRow?: boolean // 下一行
   prepend?: string // 输入框前置内容(字段)
   prependLabel?: string // 输入框前置内容(常量)
@@ -49,13 +47,12 @@ export type ListColumn = {
   appendLabel?: string // 输入框后置内容
   clearable?: boolean // 是否可清空
   copy?: boolean // 是否可以复制
-  dynamicEnd?: string // 动态范围选择end字段
   dynamicId?: string // 动态id字段
   dynamicStart?: string // 范围选择start字段
-  defaultValue?: boolean // 是否有默认值
+  dynamicEnd?: string // 动态范围选择end字段
   editable?: boolean // 是否可编辑
   fixed?: 'left' | 'right' // 列是否固定在左侧或者右侧
-  format?: any // 格式化
+  format?: FormatEnum // 格式化
   hide?: boolean // 是否隐藏
   label?: string // 标签文本
   like?: boolean // 是否为模糊查询
@@ -63,7 +60,6 @@ export type ListColumn = {
   prop: string // 字段值
   search?: boolean // 是否为搜索条件
   searchSlot?: boolean // 搜索条件slot
-  showCustom?: (row: any) => boolean // 自定义显示逻辑
   slot?: boolean // 字段内容slot
   tagColor?: Record<string, string> // tag 颜色
   type?: FormTypeEnum // 标签类型
@@ -75,7 +71,7 @@ export type Dict = Record<string, Record<string, any>>
 
 export type ListState = {
   allFlag?: 0 | 1 // 全选
-  columns?: ListColumn[] // 列表字段
+  columns: ListColumn[] // 列表字段
   dict?: Dict // 字典
   extra: Record<string, any> // 页面额外数据
   lang?: Record<string, any> // 国际化

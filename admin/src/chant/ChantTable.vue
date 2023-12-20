@@ -21,83 +21,81 @@
       :selectable="selectable"
       fixed="left"
       width="35" />
-    <template v-for="(item, index) in vModel.columns">
-      <el-table-column
-        v-if="showColumnItem(item, index)"
-        v-bind="item"
-        :align="'center'"
-        :fixed="item.fixed"
-        :min-width="item.width || columnWidth || 144"
-        show-overflow-tooltip
-        sortable>
-        <template #header>
-          <span>{{ translate(item) }}</span>
-        </template>
-        <template #="{ row, $index }">
-          <div class="flex-center">
-            <!-- slot -->
-            <slot
-              v-if="item.slot"
-              :index="$index"
-              :item="item"
-              :row="row"
-              :value="row[item.prop]">
-            </slot>
-            <!-- 可编辑 -->
-            <template v-else-if="item.editable">
-              <!-- input -->
-              <chant-input
-                v-if="!item.type"
-                v-model="row[item.prop]"
-                :placeholder="translate(item)">
-              </chant-input>
-              <!-- select -->
-              <el-select
-                v-else-if="item.type === FormTypeEnum.Select"
-                v-model="row[item.prop]"
-                :placeholder="translate(item)">
-                <el-option
-                  v-for="(val, key) in vModel.dict?.[item.prop]"
-                  :key="key"
-                  :label="val"
-                  :value="key">
-                </el-option>
-              </el-select>
-            </template>
-            <!-- dict -->
-            <div v-else-if="item.type === FormTypeEnum.Select">
-              {{ dictFmt(item.prop, row[item.prop]) || '-' }}
-            </div>
-            <!-- date -->
-            <div v-else-if="isDateFmt(item)">
-              {{ format.date(row[item.prop]) || '-' }}
-            </div>
-            <!-- datetime -->
-            <div v-else-if="isDatetimeFmt(item)">
-              {{ format.datetime(row[item.prop]) || '-' }}
-            </div>
-            <!-- 金额 -->
-            <div v-else-if="item.format === FormatEnum.Money">
-              {{ format.money(row[item.prop]) || '-' }}
-            </div>
-            <!-- value -->
-            <div v-else class="ellipsis-1">
-              {{ base.isEmpty(row[item.prop]) ? '-' : row[item.prop] }}
-              <template v-if="item.appendLabel">
-                {{ tg(item.appendLabel) }}
-              </template>
-            </div>
-            <!-- copy -->
-            <el-icon
-              v-if="item.copy && row[item.prop]"
-              class="table-icon-copy"
-              @click.stop="onCopy(row[item.prop])">
-              <DocumentCopy />
-            </el-icon>
+    <el-table-column
+      v-for="item in columnsList"
+      v-bind="item"
+      :align="'center'"
+      :fixed="item.fixed"
+      :min-width="item.width || columnWidth || 144"
+      show-overflow-tooltip
+      sortable>
+      <template #header>
+        <span>{{ translate(item) }}</span>
+      </template>
+      <template #="{ row, $index }">
+        <div class="flex-center">
+          <!-- slot -->
+          <slot
+            v-if="item.slot"
+            :index="$index"
+            :item="item"
+            :row="row"
+            :value="row[item.prop]">
+          </slot>
+          <!-- 可编辑 -->
+          <template v-else-if="item.editable">
+            <!-- input -->
+            <chant-input
+              v-if="!item.type"
+              v-model="row[item.prop]"
+              :placeholder="translate(item)">
+            </chant-input>
+            <!-- select -->
+            <el-select
+              v-else-if="item.type === FormTypeEnum.Select"
+              v-model="row[item.prop]"
+              :placeholder="translate(item)">
+              <el-option
+                v-for="(val, key) in vModel.dict?.[item.prop]"
+                :key="key"
+                :label="val"
+                :value="key">
+              </el-option>
+            </el-select>
+          </template>
+          <!-- dict -->
+          <div v-else-if="item.type === FormTypeEnum.Select">
+            {{ dictFmt(item.prop, row[item.prop]) || '-' }}
           </div>
-        </template>
-      </el-table-column>
-    </template>
+          <!-- date -->
+          <div v-else-if="isDateFmt(item)">
+            {{ format.date(row[item.prop]) || '-' }}
+          </div>
+          <!-- datetime -->
+          <div v-else-if="isDatetimeFmt(item)">
+            {{ format.datetime(row[item.prop]) || '-' }}
+          </div>
+          <!-- 金额 -->
+          <div v-else-if="item.format === FormatEnum.Money">
+            {{ format.money(row[item.prop]) || '-' }}
+          </div>
+          <!-- value -->
+          <div v-else class="ellipsis-1">
+            {{ row[item.prop] || '-' }}
+            <template v-if="item.appendLabel">
+              {{ tg(item.appendLabel) }}
+            </template>
+          </div>
+          <!-- copy -->
+          <el-icon
+            v-if="item.copy && row[item.prop]"
+            class="table-icon-copy"
+            @click.stop="onCopy(row[item.prop])">
+            <DocumentCopy />
+          </el-icon>
+        </div>
+      </template>
+    </el-table-column>
   </el-table>
 </template>
 
@@ -148,14 +146,14 @@ const props = withDefaults(defineProps<Props>(), {
 })
 // emits
 const emits = defineEmits(['update:modelValue', 'row-click'])
-// VModel
-const vModel = useVModel(props, 'modelValue', emits)
 // clip
 const { toClipboard } = useClipboard()
 // i18n
 const { t: tg } = useI18n({ useScope: 'global' })
 // use
 const lister = useLister()
+// vModel
+const vModel = useVModel(props, 'modelValue', emits)
 // ref
 const tableRef = ref()
 // state
@@ -168,6 +166,17 @@ window.addEventListener('resize', () => {
   tableAdapter()
 })
 // computed
+const columnsList = computed(() => {
+  return vModel.value.columns?.filter((item) => {
+    if (item.onlySearch) {
+      return false
+    }
+    if (item.hide) {
+      return false
+    }
+    return true
+  })
+})
 const messages = computed(() => {
   const locale = vuei18n.global.locale.value
   const lang = vModel.value.lang
@@ -210,16 +219,12 @@ onActivated(() => {
   sortCreate()
 })
 // 是否显示该项
-function showColumnItem(row: Column, index: number) {
+function showColumnItem(row: Column) {
   if (row.onlySearch) {
     return false
   }
   if (row.hide) {
     return false
-  }
-  if (row.showCustom) {
-    const list = vModel.value.list
-    return row?.showCustom(list?.[index])
   }
   return true
 }
