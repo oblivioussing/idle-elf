@@ -1,10 +1,9 @@
-import mitt from 'mitt'
 import { onActivated, onScopeDispose } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { shiki } from '../api'
 import { element } from '../plugs'
-import { base, core } from '../utils'
+import { base, bus, core } from '../utils'
 import { useAppStore } from '../store'
 import { type ListColumn as Column, type ListState } from '../type'
 
@@ -150,10 +149,10 @@ function useLister() {
   // 事件监听
   function on(callback: () => any, name?: string) {
     name = name || route?.path
-    name && mitt().on(name, callback)
+    name && bus.on(name, callback)
     // onScopeDispose
     onScopeDispose(() => {
-      name && mitt().off(name)
+      name && bus.off(name)
     })
   }
   // 查询
@@ -282,7 +281,7 @@ function useLister() {
     if (isSuccess) {
       const route = router?.currentRoute.value
       const path = route?.path
-      path && mitt().emit(path)
+      path && bus.emit(path)
       return isSuccess
     }
   }

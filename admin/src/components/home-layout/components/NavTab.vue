@@ -38,12 +38,11 @@
 </template>
 
 <script setup lang="ts">
-import mitt from 'mitt'
 import { reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { BusEnum, LangEnum, StorageEnum } from '@/enum'
-import { base, storage } from '@/utils'
+import { bus, core, storage } from '@/utils'
 import { useAppStore } from '@/store'
 import { useChaoser } from '@/use'
 
@@ -94,12 +93,12 @@ const state = reactive({
   tabs: tabs
 })
 // 监听页面关闭
-mitt().on(BusEnum.ClosePage, (path) => {
+bus.on(BusEnum.ClosePage, (path) => {
   path = path || route.path
   onTabRemove(path as string)
 })
 // 监听所有页面关闭
-mitt().on(BusEnum.CloseAllPage, () => {
+bus.on(BusEnum.CloseAllPage, () => {
   onRemoveAll()
 })
 // 监听tabs变化
@@ -159,7 +158,7 @@ function busKeeps() {
   let keeps = state.tabs.map((item) => {
     return item.name
   })
-  mitt().emit(BusEnum.HomeKeeps, keeps)
+  bus.emit(BusEnum.HomeKeeps, keeps)
 }
 // tab切换
 function onTab(row: any) {
@@ -174,9 +173,9 @@ function onTabRemove(path: any) {
   }
   state.tabs.splice(index, 1)
   // 移除路由参数
-  base.removeRouterQuery(path)
+  core.removeRouterQuery(path)
   // 跳转至父页面
-  const parentPath = base.getParentPath(path)
+  const parentPath = core.getParentPath(path)
   if (parentPath) {
     const inTab = state.tabs.some((item) => item.path === parentPath)
     if (inTab) {

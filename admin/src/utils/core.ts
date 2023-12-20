@@ -1,12 +1,12 @@
-import mitt from 'mitt'
-import { BusEnum, StorageEnum } from '../enum'
+import { BusEnum, StorageEnum } from '@/enum'
+import { useAppStore } from '@/store/app'
+import bus from './bus'
 import storage from './storage'
-import { useAppStore } from '../store/app'
 
 export default {
   // 关闭页面
   closePage(path?: string) {
-    mitt().emit(BusEnum.ClosePage, path || '')
+    bus.emit(BusEnum.ClosePage, path || '')
   },
   // 移除路由参数缓存
   removeRouterQuery(path: string) {

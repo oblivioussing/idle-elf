@@ -3,7 +3,7 @@ import {
   ExecutionContext,
   SetMetadata
 } from '@nestjs/common'
-import { base } from '@/utils'
+import { core } from '@/utils'
 
 // 是否需要校验权限
 export const Auth = (isAuth: boolean) => SetMetadata('isAuth', isAuth)
@@ -23,7 +23,7 @@ export const QueryEntity = createParamDecorator(
   (entity: object, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest()
     const query = request.query
-    const data = base.toEntity(query, entity)
+    const data = core.toEntity(query, entity)
     return data
   }
 )

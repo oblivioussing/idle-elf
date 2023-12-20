@@ -1,9 +1,8 @@
-import mitt from 'mitt'
 import { onActivated } from 'vue'
 import { useRoute } from 'vue-router'
 import shiki from '../api/shiki'
 import { type FormColumn as Column } from '../type'
-import { base } from '../utils'
+import { base, bus, core } from '../utils'
 
 type State = {
   dict: Record<string, any>
@@ -146,15 +145,15 @@ function useFormer() {
       // 刷新列表
       refresh()
       // 关闭页面
-      base.closePage()
+      core.closePage()
       return true
     }
   }
   // 刷新列表
   function refresh() {
-    const path = base.getParentPath(route?.path)
+    const path = core.getParentPath(route?.path)
     if (path) {
-      mitt().emit(path)
+      bus.emit(path)
     }
   }
 

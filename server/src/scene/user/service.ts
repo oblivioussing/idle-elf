@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common'
 import { PrismaClient, User } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 import { RedisService } from '@/module/redis/service'
-import { encrypt, PageData, Result } from '@/share'
+import { PageData, Result } from '@/share'
 import { Page } from '@/type'
-import { base, core } from '@/utils'
+import { base, core, encrypt } from '@/utils'
 import { UserEntity } from './entity'
 
 const prisma = new PrismaClient()
@@ -87,7 +87,7 @@ export class UserService {
     user.id = base.createUid()
     user.createTime = base.getChinaDate()
     user.password = await bcrypt.hash(user.password, 10)
-    const data = base.toEntity(user, UserEntity)
+    const data = core.toEntity(user, UserEntity)
     const row = await prisma.user.create({ data })
     if (row) {
       result.success({ msg: '注册成功' })
@@ -99,7 +99,7 @@ export class UserService {
   // 更新
   async update(user: User): Promise<Result<User>> {
     const result = new Result<User>()
-    const data = base.toEntity(user, UserEntity)
+    const data = core.toEntity(user, UserEntity)
     const row = await prisma.user.update({
       data,
       where: { id: user.id }

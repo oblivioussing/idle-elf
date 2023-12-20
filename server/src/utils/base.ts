@@ -1,5 +1,5 @@
 import { customAlphabet } from 'nanoid'
-import { decrypt } from '../share/crypto'
+import { decrypt } from './crypto'
 
 // 创建id
 export function createId() {

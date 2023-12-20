@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common'
 import { FastifyReply } from 'fastify'
 import { ApiCode } from '@/enum'
-import { logger, Result } from '@/share'
-import { base } from '@/utils'
+import { Result } from '@/share'
+import { base, logger } from '@/utils'
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {

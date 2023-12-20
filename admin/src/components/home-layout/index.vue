@@ -25,9 +25,9 @@
 import { computed, reactive } from 'vue'
 import { ElConfigProvider } from 'element-plus'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
-import mitt from 'mitt'
 import { BusEnum } from '@/enum'
 import { useAppStore } from '@/store'
+import { bus } from '@/utils'
 import NavBar from './components/nav-bar/index.vue'
 import NavMenu from './components/NavMenu.vue'
 import NavTab from './components/NavTab.vue'
@@ -48,7 +48,7 @@ const locale = computed(() => {
   return map[appStore.state.lang]
 })
 // 监听事件
-mitt().on(BusEnum.HomeKeeps, (arr) => {
+bus.on(BusEnum.HomeKeeps, (arr) => {
   state.keeps = arr as never[]
 })
 </script>
