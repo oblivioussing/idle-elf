@@ -1,6 +1,20 @@
-export * from './api-code'
+export enum ApiCode {
+  Success = '10', // 成功
+  NoLogin = '11', // 未登录
+  Fail = '12', // 失败
+  ParamError = '13', // 参数错误
+  Exception = '14' // 系统异常
+}
 
-export enum Bus {
+export enum BlobTypeEnum {
+  Audio = 'audio/wav',
+  Excel = 'application/vnd.ms-excel',
+  Text = 'text/javascript',
+  Wrod = 'application/msword',
+  Json = 'application/json'
+}
+
+export enum BusEnum {
   ClosePage = 'close-page',
   CloseAllPage = 'close-all-page',
   HomeKeeps = 'home-keeps',
@@ -8,11 +22,11 @@ export enum Bus {
   Mount = 'mount'
 }
 
-export enum Format {
+export enum FormatEnum {
   Money = 'money'
 }
 
-export enum FormType {
+export enum FormTypeEnum {
   Border = 'border',
   Date = 'date',
   DateTime = 'datetime',

@@ -1,12 +1,12 @@
+import mitt from 'mitt'
 import { onActivated, onScopeDispose } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { shiki, BlobType } from '../api'
+import { shiki } from '../api'
 import { element } from '../plugs'
-import { base, bus, core } from '../utils'
+import { base, core } from '../utils'
 import { useAppStore } from '../store'
 import { type ListColumn as Column, type ListState } from '../type'
-import useChaoser from './chaoser'
 
 type State = ListState
 type Data = {
@@ -35,33 +35,20 @@ const messages = {
   }
 }
 
-function useLister(config?: {
-  platform?: boolean
-  multiplePageSelection?: boolean
-}) {
-  const multiplePageSelection = config?.multiplePageSelection
+function useLister() {
   const appStore = useAppStore()
-  const chaoser = useChaoser()
   const route = useRoute()
   const router = useRouter()
-  const meta = chaoser.getMetaByPath()
-  const funKeyList = meta?.funKeyList as string[] | undefined
   const state = {
     allFlag: 0 as 0 | 1,
     columns: [],
     extra: {} as Record<string, any>,
-    extraQuery: {} as Record<string, any>,
-    jumpParams: {} as Record<string, any>,
-    urlParams: {} as Record<string, any>,
     lang: {},
     list: [] as any[],
     loading: false,
     pages: { pageNum: 1, pageSize: 20 },
-    pageElements: [],
     query: {} as Record<string, any>,
-    selectionId: '',
     selectionRow: {} as Record<string, any>,
-    selectionIdList: [] as string[],
     selectionList: [] as any[],
     total: 0
   }
@@ -76,7 +63,6 @@ function useLister(config?: {
   ) {
     // 参数合并
     if (state) {
-      state.urlParams = route.query as any
       if (config?.queryMerge !== false) {
         Object.assign(state.query, route.query)
       }
@@ -85,7 +71,6 @@ function useLister(config?: {
         const status = isRouterQueryModify(state)
         if (status) {
           reset(state)
-          state.urlParams = route.query as any
           if (config?.queryMerge !== false) {
             Object.assign(state.query, route.query)
           }
@@ -115,27 +100,16 @@ function useLister(config?: {
     state: State,
     config?: {
       limit?: boolean
-      dict?: Record<string, any>
       custom?: boolean
-      clear?: boolean
     }
   ) {
-    if (!multiplePageSelection) {
-      clearSelection(state)
-    }
-    if (config?.clear !== false) {
-      state.list = []
-    }
+    state.list = []
     const query = getQuery(state)
     if (config?.limit !== false) {
       Object.assign(query, state.pages)
     }
     state.loading = true
     const ret: Result = await shiki?.getData(path, query)
-    // 绑定字典
-    if (config?.dict) {
-      dictBind(config.dict, state)
-    }
     // 返回数据
     if (config?.custom) {
       state.loading = false
@@ -147,7 +121,7 @@ function useLister(config?: {
   }
   // 获取查询参数
   function getQuery(state: State) {
-    const query = { ...state.extraQuery, ...state.query }
+    const query = { ...state.query }
     return query
   }
   // 获取列表参数
@@ -163,8 +137,8 @@ function useLister(config?: {
     state.loading = false
     if (data) {
       if (limit !== false) {
-        state.list = data?.pageData || []
-        state.total = data?.totalRecord || 0
+        state.list = data?.list || []
+        state.total = data?.total || 0
       } else {
         state.list = data as any
       }
@@ -173,73 +147,42 @@ function useLister(config?: {
       return true
     }
   }
-  // 字典绑定
-  function dictBind(map: Record<string, any>, state: State) {
-    if (state.resultDict) {
-      for (let item in map) {
-        if (state.dict) {
-          state.dict[item] = state.resultDict[map[item]]
-        }
-      }
-    }
-  }
   // 事件监听
   function on(callback: () => any, name?: string) {
     name = name || route?.path
-    name && bus.on(name, callback)
+    name && mitt().on(name, callback)
     // onScopeDispose
     onScopeDispose(() => {
-      name && bus.off(name)
+      name && mitt().off(name)
     })
   }
   // 查询
   function query(method: Function, state: State) {
-    resetPages(state)
+    state.pages.pageNum = 1
     method()
   }
   // 刷新
-  function refresh(method: Function, state: State, extraClear?: boolean) {
-    reset(state, extraClear)
+  function refresh(method: Function, state: State) {
+    reset(state)
     method()
   }
   // 清空url参数
   function clearUrlQuery() {
-    base.removeRouterQuery(route.path)
+    core.removeRouterQuery(route.path)
     history.replaceState(history.state, '', route.path)
   }
-  // 清空选中的数据
-  function clearSelection(state: State) {
-    state.selectionList = []
-    state.selectionIdList = []
-    state.selectionRow = {}
-    state.selectionId = ''
-  }
   // 重置
-  function reset(state: State, extraClear?: boolean) {
-    if (extraClear) {
-      state.extraQuery = {}
-    }
+  function reset(state: State) {
     state.selectionList = []
-    state.selectionIdList = []
-    state.selectionId = ''
     state.selectionRow = {}
     state.query = {}
-    resetPages(state)
+    state.pages.pageNum = 1
     state.pages.pageSize = 20
   }
-  // 重置page
-  function resetPages(state: State) {
-    state.pages.pageNum = 1
-  }
   // 新增
-  function add(state?: State) {
-    const { sysCode, tenantId } = state?.tenant || {}
-    let params
-    if (state) {
-      params = { ...state.tenant, ...state.jumpParams }
-    }
+  function add() {
     // 页面跳转
-    jump(params, '/add')
+    jump('/add')
   }
   // 复制新增
   function copyAdd(state: State) {
@@ -277,7 +220,7 @@ function useLister(config?: {
     return true
   }
   // 页面跳转
-  function jump(to: string, query: any) {
+  function jump(to: string, query?: any) {
     const path = route?.path || ''
     const toPath = path?.replace('/index', to)
     appStore.updatePageRelation(toPath, path)
@@ -339,49 +282,9 @@ function useLister(config?: {
     if (isSuccess) {
       const route = router?.currentRoute.value
       const path = route?.path
-      path && bus.emit(path)
+      path && mitt().emit(path)
       return isSuccess
     }
-  }
-  // 导出
-  function download(
-    row: {
-      path: string
-      filename: string
-      blobType: BlobType
-    },
-    state: State,
-    config?: { selected?: boolean; params?: any }
-  ) {
-    config = config || {}
-    if (config.selected !== false) {
-      config.selected = true
-    }
-    const { selectionList, allFlag } = state
-    const idList = selectionList.map((item) => item.id)
-    if (config.selected) {
-      if (!idList.length && allFlag === 0) {
-        ElMessage.warning(`请选择导出数据`)
-        return
-      }
-    }
-    let filename = ''
-    if (row.blobType === BlobType.Excel) {
-      filename = `${row.filename}.xlsx`
-    }
-    if (row.blobType === BlobType.Json) {
-      filename = `${row.filename}.json`
-    }
-    const params = {
-      blobType: row.blobType,
-      filename,
-      params: config.params || {
-        idList,
-        allFlag,
-        searchAllForm: getQuery(state)
-      }
-    }
-    shiki.download(row.path, params)
   }
   // 修改字段
   function updateColumn(
@@ -401,10 +304,6 @@ function useLister(config?: {
     })
     return list
   }
-  // 权限校验
-  function permission(val: string) {
-    return funKeyList?.includes(val)
-  }
 
   return {
     state,
@@ -412,13 +311,10 @@ function useLister(config?: {
     getData,
     dataDeal,
     on,
-    dictBind,
     query,
     refresh,
-    clearSelection,
     reset,
     clearUrlQuery,
-    resetPages,
     add,
     copyAdd,
     edit,
@@ -426,10 +322,7 @@ function useLister(config?: {
     jump,
     remove,
     operate,
-    download,
     updateColumn,
-    permission,
-    getQuery,
     getListParams
   }
 }

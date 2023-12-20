@@ -1,4 +1,4 @@
-import { FormType } from '@/enum'
+import { FormTypeEnum } from '@/enum'
 import { type ListColumn as Column } from '@/type'
 
 export default [
@@ -10,16 +10,16 @@ export default [
   {
     prop: 'age', // 年龄
     search: true,
-    type: FormType.Range
+    type: FormTypeEnum.Range
   },
   {
     prop: 'sex', // 性别
     search: true,
-    type: FormType.Select
+    type: FormTypeEnum.Select
   },
   {
     prop: 'createTime', // 创建时间
     search: true,
-    type: FormType.DatetimeRange
+    type: FormTypeEnum.DatetimeRange
   }
 ] as Column[]

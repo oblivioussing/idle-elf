@@ -1,6 +1,6 @@
 import qs from 'qs'
 import { ElMessage } from 'element-plus'
-import { ApiCode } from '../enum'
+import { ApiCode, BlobTypeEnum } from '../enum'
 import base from '../utils/base'
 import { useUserStore } from '../store'
 import 'abortcontroller-polyfill/dist/polyfill-patch-fetch'
@@ -19,15 +19,6 @@ export enum Method {
   Put = 'PUT',
   Delete = 'DELETE'
 }
-// blobType
-export enum BlobType {
-  Audio = 'audio/wav',
-  Excel = 'application/vnd.ms-excel',
-  Text = 'text/javascript',
-  Wrod = 'application/msword',
-  Json = 'application/json'
-}
-
 // 返回结果
 type Result = {
   resultCode: ApiCode
@@ -189,7 +180,7 @@ class Shiki {
   async download(
     url: string,
     row: {
-      blobType: BlobType
+      blobType: BlobTypeEnum
       filename: string
       method?: Method
       params?: {}
@@ -220,7 +211,7 @@ class Shiki {
     url: string,
     row: { method?: Method; params?: {} },
     tip = true
-  ): Promise<{ filename: string; contentType: BlobType; blob: Blob }> {
+  ): Promise<{ filename: string; contentType: BlobTypeEnum; blob: Blob }> {
     const config = {} as RequestConfig
     config.url = url
     config.method = row.method || Method.Post
@@ -282,7 +273,7 @@ class Shiki {
         contentType = contentType && contentType[0]
         let json
         // 如果返回的结果中包含resultMsg说明请求已经报错
-        if (contentType === BlobType.Json) {
+        if (contentType === BlobTypeEnum.Json) {
           json = await response.json()
           if (json.resultMsg) {
             ElMessage.error(json.resultMsg)
@@ -291,7 +282,7 @@ class Shiki {
         }
         const filename = decodeURI(headers.get('filename') || '')
         let blob
-        if (contentType === BlobType.Json) {
+        if (contentType === BlobTypeEnum.Json) {
           blob = new Blob([JSON.stringify(json)])
         } else {
           blob = await response.blob()

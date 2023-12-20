@@ -38,11 +38,12 @@
 </template>
 
 <script setup lang="ts">
+import mitt from 'mitt'
 import { reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { Bus, LangEnum, StorageEnum } from '@/enum'
-import { base, bus, storage } from '@/utils'
+import { BusEnum, LangEnum, StorageEnum } from '@/enum'
+import { base, storage } from '@/utils'
 import { useAppStore } from '@/store'
 import { useChaoser } from '@/use'
 
@@ -93,12 +94,12 @@ const state = reactive({
   tabs: tabs
 })
 // 监听页面关闭
-bus.on(Bus.ClosePage, (path) => {
+mitt().on(BusEnum.ClosePage, (path) => {
   path = path || route.path
   onTabRemove(path as string)
 })
 // 监听所有页面关闭
-bus.on(Bus.CloseAllPage, () => {
+mitt().on(BusEnum.CloseAllPage, () => {
   onRemoveAll()
 })
 // 监听tabs变化
@@ -158,7 +159,7 @@ function busKeeps() {
   let keeps = state.tabs.map((item) => {
     return item.name
   })
-  bus.emit(Bus.HomeKeeps, keeps)
+  mitt().emit(BusEnum.HomeKeeps, keeps)
 }
 // tab切换
 function onTab(row: any) {

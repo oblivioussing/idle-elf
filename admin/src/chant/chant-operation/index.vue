@@ -22,7 +22,7 @@
             </el-input>
             <!-- select -->
             <el-select
-              v-else-if="item.type === FormType.Select"
+              v-else-if="item.type === FormTypeEnum.Select"
               v-model="state.query[item.prop]"
               :placeholder="item.label"
               :clearable="item.clearable === false ? false : true"
@@ -56,7 +56,9 @@
               @change="onDateRange(item)">
             </el-date-picker>
             <!-- range -->
-            <div v-else-if="item.type === FormType.Range" class="input-range">
+            <div
+              v-else-if="item.type === FormTypeEnum.Range"
+              class="input-range">
               <el-input
                 v-model="state.query[rangeField(item, 'start')]"
                 :clearable="item.clearable === false ? false : true"
@@ -138,7 +140,7 @@
 <script setup lang="ts">
 import { nextTick, reactive, ref, watch } from 'vue'
 import { ArrowDown, ArrowUp, Refresh, Search } from '@element-plus/icons-vue'
-import { FormType } from '@/enum'
+import { FormTypeEnum } from '@/enum'
 import { type ListColumn as Column, type ListState } from '@/type'
 import TableOperation from './components/TableOperation.vue'
 
@@ -249,7 +251,8 @@ function isShowSearch(column: Column) {
 // range start
 function rangeField(column: Column, type: 'start' | 'end') {
   const suffix = type.replace(/^\S/, (s) => s.toUpperCase())
-  return column[type] || `${column.prop}${suffix}`
+  const key = `dynamic${suffix}` as 'dynamicStart' | 'dynamicEnd'
+  return column[key] || `${column.prop}${suffix}`
 }
 // column change
 function onColumnChange(columns: Column[]) {
@@ -269,7 +272,7 @@ function onEnter() {
 }
 // 是否为input
 function isInput(row: Column) {
-  if (row.type === FormType.Input) {
+  if (row.type === FormTypeEnum.Input) {
     return true
   }
   return !row.type && !row.searchSlot
@@ -277,16 +280,20 @@ function isInput(row: Column) {
 // 是否为date
 function isDate(row: Column) {
   if (row.type) {
-    return [FormType.Date, FormType.DateTime, FormType.Month].includes(row.type)
+    return [
+      FormTypeEnum.Date,
+      FormTypeEnum.DateTime,
+      FormTypeEnum.Month
+    ].includes(row.type)
   }
 }
 // 是否为daterange
 function isDateRange(row: Column) {
   if (row.type) {
     return [
-      FormType.Daterange,
-      FormType.Datetimerange,
-      FormType.Monthrange
+      FormTypeEnum.DateRange,
+      FormTypeEnum.DatetimeRange,
+      FormTypeEnum.MonthRange
     ].includes(row.type)
   }
 }

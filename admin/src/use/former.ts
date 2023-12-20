@@ -1,8 +1,9 @@
+import mitt from 'mitt'
 import { onActivated } from 'vue'
 import { useRoute } from 'vue-router'
 import shiki from '../api/shiki'
 import { type FormColumn as Column } from '../type'
-import { base, bus } from '../utils'
+import { base } from '../utils'
 
 type State = {
   dict: Record<string, any>
@@ -153,7 +154,7 @@ function useFormer() {
   function refresh() {
     const path = base.getParentPath(route?.path)
     if (path) {
-      bus.emit(path)
+      mitt().emit(path)
     }
   }
 

@@ -1,4 +1,4 @@
-import { FormType } from '@/enum'
+import { FormTypeEnum } from '@/enum'
 import { type FormColumn as Column } from '@/type'
 
 export default [
@@ -13,6 +13,6 @@ export default [
   {
     prop: 'sex', // 性别
     required: true,
-    type: FormType.Select
+    type: FormTypeEnum.Select
   }
 ] as Column[]

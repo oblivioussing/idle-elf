@@ -53,7 +53,7 @@
               </chant-input>
               <!-- select -->
               <el-select
-                v-else-if="item.type === FormType.Select"
+                v-else-if="item.type === FormTypeEnum.Select"
                 v-model="row[item.prop]"
                 :placeholder="translate(item)">
                 <el-option
@@ -65,7 +65,7 @@
               </el-select>
             </template>
             <!-- dict -->
-            <div v-else-if="item.type === FormType.Select">
+            <div v-else-if="item.type === FormTypeEnum.Select">
               {{ dictFmt(item.prop, row[item.prop]) || '-' }}
             </div>
             <!-- date -->
@@ -119,7 +119,7 @@ import { DocumentCopy } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
 // @ts-ignore
 import Sortable from 'sortablejs'
-import { Format as FormatEnum, FormType } from '@/enum'
+import { FormatEnum, FormTypeEnum } from '@/enum'
 import { vuei18n } from '@/plugs'
 import { type ListColumn as Column, type ListState } from '@/type'
 import { useLister } from '@/use'
@@ -264,14 +264,16 @@ function tableAdapter() {
 // 是否date格式化
 function isDateFmt(column: Column) {
   if (column.type) {
-    return [FormType.Date, FormType.DateRange].includes(column.type)
+    return [FormTypeEnum.Date, FormTypeEnum.DateRange].includes(column.type)
   }
   return false
 }
 // 是否datetime格式化
 function isDatetimeFmt(column: Column) {
   if (column.type) {
-    return [FormType.DateTime, FormType.DatetimeRange].includes(column.type)
+    return [FormTypeEnum.DateTime, FormTypeEnum.DatetimeRange].includes(
+      column.type
+    )
   }
   return false
 }

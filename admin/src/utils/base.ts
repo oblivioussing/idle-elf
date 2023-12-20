@@ -1,27 +1,10 @@
-import bus from './bus'
-import { Bus, StorageEnum } from '../enum'
-import { BlobType } from '../api/shiki'
-import storage from './storage'
-import { useAppStore } from '../store/app'
+import { BlobTypeEnum } from '../enum'
 
 export default {
   // 去除空白字符
   spaceDel(val: string) {
     const reg = new RegExp('\\s', 'g')
     return val.replace(reg, '')
-  },
-  // 手机号码分段
-  mobileCut(val: string) {
-    val = this.spaceDel(val)
-    let tpl = ''
-    for (let i = 0; i < val.length; i++) {
-      if (i == 2 || i == 6) {
-        tpl = tpl + val.charAt(i) + ' '
-      } else {
-        tpl = tpl + val.charAt(i)
-      }
-    }
-    return tpl
   },
   // 对象数组去重
   distinct(arr: any[], field = 'id') {
@@ -119,10 +102,6 @@ export default {
     const str = arr.map((name) => `.${name}`).join('|')
     return new RegExp(`(${str})$`)
   },
-  // 关闭页面
-  closePage(path?: string) {
-    bus.emit(Bus.ClosePage, path || '')
-  },
   // 过滤对象空值
   filterObjectEmpty(params: any, char = true) {
     if (params?.constructor === Object) {
@@ -153,24 +132,14 @@ export default {
     document.body.removeChild(link)
   },
   // 下载根据blob
-  downloadByBlob(row: { blob: Blob; blobType: BlobType; filename: string }) {
+  downloadByBlob(row: {
+    blob: Blob
+    blobType: BlobTypeEnum
+    filename: string
+  }) {
     const blob = new Blob([row.blob], { type: row.blobType })
     let url = window.URL.createObjectURL(blob)
     this.downloadByUrl({ url, filename: row.filename })
     URL.revokeObjectURL(url)
-  },
-  // 移除路由参数缓存
-  removeRouterQuery(path: string) {
-    const routerQuery = storage.getSession(StorageEnum.RouterQuery)
-    if (routerQuery) {
-      Reflect.deleteProperty(routerQuery as any, path)
-      storage.setSession(StorageEnum.RouterQuery, routerQuery)
-    }
-  },
-  // 获取父页面路径
-  getParentPath(path: string) {
-    const appStore = useAppStore()
-    const pageRelation = appStore.state.pageRelation[path]
-    return pageRelation?.parent
   }
 }

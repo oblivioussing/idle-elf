@@ -9,8 +9,10 @@
       @open="onMenuOpen">
       <el-sub-menu v-for="item in menus" :key="item.path" :index="item.path">
         <template #title>
-          <icon-font :icon="icon(item.meta?.icon)"></icon-font>
-          <span class="p-l-5">{{ title(item.meta) }}</span>
+          <div class="flex-align-center">
+            <icon-font :icon="icon(item.meta?.icon)"></icon-font>
+            <div class="p-l-5">{{ title(item.meta) }}</div>
+          </div>
         </template>
         <el-menu-item-group>
           <el-menu-item
@@ -23,12 +25,14 @@
         </el-menu-item-group>
       </el-sub-menu>
     </el-menu>
-    <div class="version">版本号: {{ appVersion }}</div>
+    <!-- 版本号 -->
+    <div class="version">{{ t('version') }}: {{ appVersion }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { LangEnum } from '@/enum'
 import { useAppStore } from '@/store'
@@ -37,6 +41,17 @@ import { useAppStore } from '@/store'
 const props = defineProps<{
   isCollapse: boolean
 }>()
+// i18n
+const { t } = useI18n({
+  messages: {
+    en: {
+      version: 'version'
+    },
+    zh: {
+      version: '版本号'
+    }
+  }
+})
 // router
 const route = useRoute()
 const router = useRouter()

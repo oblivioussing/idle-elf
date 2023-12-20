@@ -3,7 +3,7 @@
   <chant-operation
     v-model="state"
     :options="['add', 'edit', 'delete']"
-    @add="lister.add(state)"
+    @add="lister.add"
     @query="getList"
     @refresh="lister.refresh(getList, state)">
   </chant-operation>

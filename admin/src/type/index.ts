@@ -1,5 +1,5 @@
 import { type Ref } from 'vue'
-import { FormType, PageEnum } from '../enum'
+import { FormTypeEnum, PageEnum } from '../enum'
 
 export type Stage = 'dev' | 'test' | 'prod'
 
@@ -40,7 +40,7 @@ export type FormColumn = {
   start?: string // 范围选择start字段
   textType?: 'string' | 'number' | 'float' | 'password' | 'phone-key' // 输入框文本类型
   tips?: string // 提示文本
-  type?: FormType // 标签类型
+  type?: FormTypeEnum // 标签类型
   valueFormat?: string // 绑定值的格式
   width?: string // 宽度
 }
@@ -66,7 +66,7 @@ export type ListColumn = {
   showCustom?: (row: any) => boolean // 自定义显示逻辑
   slot?: boolean // 字段内容slot
   tagColor?: Record<string, string> // tag 颜色
-  type?: FormType // 标签类型
+  type?: FormTypeEnum // 标签类型
   valueFormat?: string // 绑定值的格式
   width?: number // 对应列的宽度
 }

@@ -1,7 +1,7 @@
+import mitt from 'mitt'
 import { getCurrentInstance } from 'vue'
 import { useRoute } from 'vue-router'
 import shiki from '../api/shiki'
-import { bus } from '../utils'
 
 type State = {
   form?: object
@@ -33,7 +33,7 @@ function useDialoger() {
       close()
       // 通知
       if (config?.eventBus !== false) {
-        bus.emit(route.path)
+        mitt().emit(route.path)
       }
       instance?.emit('update')
     }

@@ -27,13 +27,13 @@
           <template v-for="item in state.columns">
             <!-- divider -->
             <el-divider
-              v-if="item.type === FormType.Divider && showFormItem(item)"
+              v-if="item.type === FormTypeEnum.Divider && showFormItem(item)"
               content-position="left">
               {{ translate(item.label as string) }}
             </el-divider>
             <!-- border -->
             <div
-              v-else-if="item.type === FormType.Border"
+              v-else-if="item.type === FormTypeEnum.Border"
               class="split-border"></div>
             <!-- item-slot -->
             <slot
@@ -105,7 +105,7 @@
               </chant-input>
               <!-- inputnumber -->
               <el-input-number
-                v-else-if="item.type === FormType.InputNumber"
+                v-else-if="item.type === FormTypeEnum.InputNumber"
                 v-model="formVModel[item.prop]"
                 controls-position="right"
                 :min="item.min || 0"
@@ -113,7 +113,7 @@
               </el-input-number>
               <!-- timeselect -->
               <el-time-select
-                v-else-if="item.type === FormType.TimeSelect"
+                v-else-if="item.type === FormTypeEnum.TimeSelect"
                 :placeholder="translate(item.label as string, 'select')"
                 :clearable="item?.attr?.clearable !== false"
                 v-model="formVModel[item.prop]"
@@ -124,7 +124,7 @@
               </el-time-select>
               <!-- timepicker -->
               <el-time-picker
-                v-else-if="item.type === FormType.TimePicker"
+                v-else-if="item.type === FormTypeEnum.TimePicker"
                 :placeholder="translate(item.label as string, 'select')"
                 :clearable="item?.attr?.clearable !== false"
                 :value-format="item.valueFormat || 'HH:mm:ss'"
@@ -152,7 +152,9 @@
                 @change="onDateRange(item)">
               </el-date-picker>
               <!-- range -->
-              <div v-else-if="item.type === FormType.Range" class="input-range">
+              <div
+                v-else-if="item.type === FormTypeEnum.Range"
+                class="input-range">
                 <el-input
                   v-model="formVModel[item.start as string]"
                   :placeholder="translate(item.label as string, 'enter')">
@@ -165,7 +167,7 @@
               </div>
               <!-- radio -->
               <el-radio-group
-                v-else-if="item.type === FormType.Radio"
+                v-else-if="item.type === FormTypeEnum.Radio"
                 v-model="formVModel[item.prop]"
                 :disabled="isDisabled(item)"
                 :placeholder="translate(item.label as string, 'select')">
@@ -182,9 +184,9 @@
                 :disabled="isDisabled(item)"
                 :placeholder="translate(item.label as string, 'select')"
                 :clearable="item?.attr?.clearable !== false"
-                :multiple="item.type === FormType.SelectMultiple"
+                :multiple="item.type === FormTypeEnum.SelectMultiple"
                 :class="{
-                  'multiple-select': item.type === FormType.SelectMultiple
+                  'multiple-select': item.type === FormTypeEnum.SelectMultiple
                 }"
                 @change="onChange(item)">
                 <el-option
@@ -196,7 +198,7 @@
               </el-select>
               <!-- textarea -->
               <el-input
-                v-else-if="item.type === FormType.Textarea"
+                v-else-if="item.type === FormTypeEnum.Textarea"
                 v-model="formVModel[item.prop]"
                 :placeholder="translate(item?.label as string, 'enter')"
                 :disabled="isDisabled(item)"
@@ -260,8 +262,8 @@ import { useI18n } from 'vue-i18n'
 import type { ElForm } from 'element-plus'
 import { ArrowDown, ArrowUp } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
-import { FormType, PageEnum } from '@/enum'
-import { base, core, format } from '@/utils'
+import { FormTypeEnum, PageEnum } from '@/enum'
+import { base, format } from '@/utils'
 import { element, vuei18n } from '../plugs'
 import { type FormColumn as Column } from '@/type'
 import ChantInput from './ChantInput.vue'
@@ -399,7 +401,7 @@ function createColumns() {
       rules[item.prop] = item.rules
     }
     // SelectMultiple
-    if (item.type === FormType.SelectMultiple) {
+    if (item.type === FormTypeEnum.SelectMultiple) {
       formVModel.value[item.prop] = []
     }
     // range
@@ -461,7 +463,11 @@ function showFormItem(row: Column) {
 }
 // 是否为range
 function isRange(row: Column) {
-  const list = [FormType.Range, FormType.Daterange, FormType.Datetimerange]
+  const list = [
+    FormTypeEnum.Range,
+    FormTypeEnum.DateRange,
+    FormTypeEnum.DatetimeRange
+  ]
   if (row.type) {
     return list.includes(row.type)
   }
@@ -490,7 +496,7 @@ function showText(row: Column) {
   let value = formVModel.value[row.prop]
   const dict = dictCpd.value?.[row.prop] || {}
   // select-multiple
-  if (row.type === FormType.SelectMultiple) {
+  if (row.type === FormTypeEnum.SelectMultiple) {
     if (value?.length) {
       return (value as string[]).map((item) => dict![item]).toString()
     } else {
@@ -502,12 +508,12 @@ function showText(row: Column) {
     return dict?.[value] || '-'
   }
   // 是否为date
-  if (row.type === FormType.Date) {
+  if (row.type === FormTypeEnum.Date) {
     return value ? format.date(value) : '-'
   }
   // 是否为datetime
-  if (row.type === FormType.DateTime) {
-    return value ? format.dateTime(value) : '-'
+  if (row.type === FormTypeEnum.DateTime) {
+    return value ? format.datetime(value) : '-'
   }
   // 是否为range
   if (isRange(row)) {
@@ -517,16 +523,16 @@ function showText(row: Column) {
       return '-'
     }
     // range
-    if (row.type === FormType.Range) {
+    if (row.type === FormTypeEnum.Range) {
       return `${start} - ${end}`
     }
     // daterange
-    if (row.type === FormType.Daterange) {
+    if (row.type === FormTypeEnum.DateRange) {
       return `${format.date(start)} - ${format.date(end)}`
     }
     // datetimerange
-    if (row.type === FormType.Datetimerange) {
-      return `${format.dateTime(start)} - ${format.dateTime(end)}`
+    if (row.type === FormTypeEnum.DatetimeRange) {
+      return `${format.datetime(start)} - ${format.datetime(end)}`
     }
   }
   // -
@@ -560,14 +566,14 @@ function showText(row: Column) {
   return value
 }
 // 是否为字典
-function isDict(type?: FormType) {
+function isDict(type?: FormTypeEnum) {
   if (type) {
-    return [FormType.Radio, FormType.Select].includes(type)
+    return [FormTypeEnum.Radio, FormTypeEnum.Select].includes(type)
   }
 }
 // 是否为input
 function isInput(row: Column) {
-  if (row.type === FormType.Input) {
+  if (row.type === FormTypeEnum.Input) {
     return true
   }
   return !row.type && !row.slot
@@ -575,19 +581,21 @@ function isInput(row: Column) {
 // 是否为date
 function isDate(row: Column) {
   if (row.type) {
-    return [FormType.Date, FormType.DateTime].includes(row.type)
+    return [FormTypeEnum.Date, FormTypeEnum.DateTime].includes(row.type)
   }
 }
 // 是否为daterange
 function isDateRange(row: Column) {
   if (row.type) {
-    return [FormType.Daterange, FormType.Datetimerange].includes(row.type)
+    return [FormTypeEnum.DateRange, FormTypeEnum.DatetimeRange].includes(
+      row.type
+    )
   }
 }
 // 是否为select
 function isSelect(row: Column) {
   if (row.type) {
-    return [FormType.Select, FormType.SelectMultiple].includes(row.type)
+    return [FormTypeEnum.Select, FormTypeEnum.SelectMultiple].includes(row.type)
   }
 }
 // 日期范围选择
