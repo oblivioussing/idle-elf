@@ -1,26 +1,27 @@
 <template>
   <div class="m-l-10 rel">
-    <span @click.stop="onShowFilter">
-      <chant-icon-button content="过滤" :icon="Document" type="primary">
-      </chant-icon-button>
-    </span>
-    <div v-show="state.filterVisible" class="filter">
+    <chant-icon-button
+      :content="t('filter')"
+      :icon="Document"
+      type="primary"
+      @click.stop="onShowFilter">
+    </chant-icon-button>
+    <div v-show="state.visible" class="filter" @click.stop>
       <div class="bubble"></div>
       <draggable
-        :list="vModel"
         v-bind="{ animation: 200 }"
+        class="container"
         item-key="prop"
-        class="container">
+        :list="vModel.columns">
         <template #item="{ element }">
-          <div @click.stop class="item">
+          <div class="item">
             <el-icon class="handle">
               <Sort></Sort>
             </el-icon>
             <el-checkbox
-              v-model="element.show"
-              :label="false"
-              :checked="!element.hide">
-              {{ element }}
+              :checked="!element.hide"
+              @change="onChange($event, element)">
+              {{ translate(element) }}
             </el-checkbox>
           </div>
         </template>
@@ -30,47 +31,67 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from 'vue'
-import { Document, Sort } from '@element-plus/icons-vue'
+import { computed, reactive } from 'vue'
+import { useI18n } from 'vue-i18n'
 import draggable from 'vuedraggable'
+import { Document, Sort } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
-import { type ListColumn } from '@/type'
+import { vuei18n } from '@/plugs'
+import { type ListColumn as Column, type ListState } from '@/type'
 
-type Column = ListColumn & {
-  show?: boolean
-}
 // props
 const props = defineProps<{
-  modelValue: Column[]
-  messages?: any
+  modelValue: ListState
 }>()
-// emit
-const emit = defineEmits(['update:modelValue'])
+// emits
+const emits = defineEmits(['update:modelValue'])
+// i18n
+const { t } = useI18n({
+  messages: {
+    en: {
+      filter: 'filter'
+    },
+    zh: {
+      filter: '过滤'
+    }
+  }
+})
 // VModel
-const vModel = useVModel(props, 'modelValue', emit)
+const vModel = useVModel(props, 'modelValue', emits)
 // state
 const state = reactive({
-  filterVisible: false
+  visible: false
+})
+// computed
+const messages = computed(() => {
+  const locale = vuei18n.global.locale.value
+  const lang = vModel.value.lang
+  return lang ? lang[locale] : {}
 })
 // 空白处点击
 document.addEventListener('click', () => {
-  state.filterVisible = false
-})
-// watch
-watch(vModel.value, () => {
-  vModel.value.forEach((item) => {
-    item.hide = !item.show
-  })
+  state.visible = false
 })
 // 显示字段过滤
 function onShowFilter() {
-  state.filterVisible = !state.filterVisible
+  state.visible = !state.visible
+}
+// checkbox change
+function onChange(val: any, column: Column) {
+  column.hide = !val
+}
+// 翻译
+function translate(column: Column) {
+  let label = column.label || column.prop
+  var pattern = new RegExp('[\u4E00-\u9FA5]+')
+  if (pattern.test(label)) {
+    return label
+  }
+  return messages.value[label]
 }
 </script>
 
 <style scoped lang="scss">
-@import '@/style/mixin.scss';
-
 .filter {
   background-color: #ffffff;
   border-radius: 2px;
@@ -113,8 +134,8 @@ function onShowFilter() {
     }
   }
   .container {
-    @include scroll-beautify;
     max-height: 350px;
+    overflow: auto;
   }
   .item {
     cursor: pointer;

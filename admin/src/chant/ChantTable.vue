@@ -218,16 +218,6 @@ onActivated(() => {
   // 拖拽
   sortCreate()
 })
-// 是否显示该项
-function showColumnItem(row: Column) {
-  if (row.onlySearch) {
-    return false
-  }
-  if (row.hide) {
-    return false
-  }
-  return true
-}
 // 拖拽
 function sortCreate() {
   const list = vModel.value.list
@@ -276,7 +266,7 @@ function isDateFmt(column: Column) {
 // 是否datetime格式化
 function isDatetimeFmt(column: Column) {
   if (column.type) {
-    return [FormTypeEnum.DateTime, FormTypeEnum.DatetimeRange].includes(
+    return [FormTypeEnum.Datetime, FormTypeEnum.DatetimeRange].includes(
       column.type
     )
   }

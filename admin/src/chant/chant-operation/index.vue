@@ -4,7 +4,7 @@
     <div v-if="props.showSearch" class="toolbar chant-search" ref="searchRef">
       <!-- form -->
       <el-form class="form m-r-10" :inline="true" @keyup.enter="emits('query')">
-        <slot></slot>
+        <slot name="search-start"></slot>
         <!-- 查询条件 -->
         <el-form-item v-for="item in columnsList">
           <!-- input -->
@@ -115,25 +115,18 @@
     <!-- operation -->
     <table-operation
       v-if="props.showOperation"
-      :columns="vModel.columns"
-      :messages="props.modelValue.lang"
+      v-model="vModel"
       :options="props.options"
       :show-checked-all="props.showCheckedAll"
       :show-filter="props.showFilter"
-      :total="props.modelValue.total"
-      @checked="onAllChecked"
-      @column-change="onColumnChange"
       @emit="onEmit">
-      <slot name="group"></slot>
-      <template #alone>
-        <slot name="alone"></slot>
-      </template>
+      <slot></slot>
     </table-operation>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowDown, ArrowUp, Refresh, Search } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
@@ -221,6 +214,11 @@ watch(
     containerAuto()
   }
 )
+// resize
+window.addEventListener('resize', () => {
+  // 容器高度自适应
+  containerAuto()
+})
 // init
 bindQueryValue() // 绑定查询条件的值
 containerAuto() // 容器高度自适应
@@ -301,15 +299,14 @@ function onCollapse(type: 'down' | 'up') {
 }
 // 容器高度自适应
 function containerAuto() {
-  if (state.arrow === 'down') {
-    return
+  if (state.arrow === 'up') {
+    setTimeout(() => {
+      const el = searchRef.value
+      el.style.height = 'auto'
+      const height = el.offsetHeight
+      el.style.height = height + 'px'
+    }, 300)
   }
-  setTimeout(() => {
-    const el = searchRef.value
-    el.style.height = 'auto'
-    const height = el.offsetHeight
-    el.style.height = height + 'px'
-  }, 300)
 }
 // emit
 function onEmit(type: any) {
@@ -327,10 +324,6 @@ function reset() {
       vModel.value.query[item] = ''
     }
   }
-}
-// 全选
-function onAllChecked(checked: boolean) {
-  vModel.value.allFlag = checked ? 1 : 0
 }
 // type类型转化
 function columnType(type?: FormTypeEnum) {

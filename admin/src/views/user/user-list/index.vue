@@ -1,5 +1,4 @@
 <template>
-  {{ state.query }}
   <!-- operation -->
   <chant-operation
     v-model="state"
@@ -8,6 +7,7 @@
     @add="lister.add"
     @query="getList"
     @refresh="lister.refresh(getList, state)">
+    <chant-icon-button iconfont="nickname"></chant-icon-button>
   </chant-operation>
   <!-- table -->
   <chant-table v-model="state"></chant-table>
