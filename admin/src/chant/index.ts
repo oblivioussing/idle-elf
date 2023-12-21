@@ -2,6 +2,7 @@ import { defineAsyncComponent, type App } from 'vue'
 import './components.d'
 
 const ChantForm = defineAsyncComponent(() => import('./ChantForm.vue'))
+const ChantButton = defineAsyncComponent(() => import('./ChantButton.vue'))
 const ChantIconButton = defineAsyncComponent(
   () => import('./ChantIconButton.vue')
 )
@@ -17,6 +18,7 @@ const IconFont = defineAsyncComponent(() => import('./IconFont.vue'))
 
 function components(app: App<Element>) {
   app.component('ChantForm', ChantForm)
+  app.component('ChantButton', ChantButton)
   app.component('ChantIconButton', ChantIconButton)
   app.component('ChantInput', ChantInput)
   app.component('ChantOperation', ChantOperation)

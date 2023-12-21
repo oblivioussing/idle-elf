@@ -82,34 +82,34 @@
       </el-form>
       <template v-if="props.showFold">
         <!-- 展开搜索 -->
-        <chant-icon-button
+        <chant-button
           v-if="state.arrow === 'down'"
           :content="t('spread')"
           :icon="ArrowDown"
           @click="onCollapse('up')">
-        </chant-icon-button>
+        </chant-button>
         <!-- 关闭搜索 -->
-        <chant-icon-button
+        <chant-button
           v-if="state.arrow === 'up'"
           :content="t('fold')"
           :icon="ArrowUp"
           @click="onCollapse('down')">
-        </chant-icon-button>
+        </chant-button>
       </template>
       <!-- 查询,刷新 -->
       <el-button-group class="m-l-10">
         <!-- 查询 -->
-        <chant-icon-button
+        <chant-button
           :content="t('query')"
           :icon="Search"
           @click="onEmit('query')">
-        </chant-icon-button>
+        </chant-button>
         <!-- 刷新 -->
-        <chant-icon-button
+        <chant-button
           :content="t('refresh')"
           :icon="Refresh"
           @click="onEmit('refresh')">
-        </chant-icon-button>
+        </chant-button>
       </el-button-group>
     </div>
     <!-- operation -->
@@ -207,13 +207,12 @@ const messages = computed(() => {
   return lang ? lang[locale] : {}
 })
 // watch
-watch(
-  () => columnsList,
-  () => {
+watch(columnsList, () => {
+  setTimeout(() => {
     // 容器高度自适应
     containerAuto()
-  }
-)
+  }, 300)
+})
 // resize
 window.addEventListener('resize', () => {
   // 容器高度自适应
@@ -221,7 +220,9 @@ window.addEventListener('resize', () => {
 })
 // init
 bindQueryValue() // 绑定查询条件的值
-containerAuto() // 容器高度自适应
+setTimeout(() => {
+  containerAuto() // 容器高度自适应
+}, 1500)
 // 绑定查询条件的值
 function bindQueryValue() {
   const query = vModel.value.query
@@ -238,12 +239,6 @@ function rangeField(column: Column, type: 'start' | 'end') {
   const suffix = type.replace(/^\S/, (s) => s.toUpperCase())
   const key = `dynamic${suffix}` as 'dynamicStart' | 'dynamicEnd'
   return column[key] || `${column.prop}${suffix}`
-}
-// column change
-function onColumnChange(columns: Column[]) {
-  const value = props.modelValue
-  value.columns = columns
-  emits('update:modelValue', value)
 }
 // 是否为input
 function isInput(row: Column) {
@@ -286,26 +281,23 @@ function onDateRange(row: Column) {
 // 展开/关闭
 function onCollapse(type: 'down' | 'up') {
   state.arrow = type
-  const el = searchRef.value
-  if (type === 'up') {
-    el.style.height = 'auto'
-    const height = el.offsetHeight
-    setTimeout(() => {
-      el.style.height = height + 'px'
-    }, 0)
+  if (type === 'down') {
+    searchRef.value.style.height = '48px'
   } else {
-    el.style.height = '48px'
+    // 容器高度自适应
+    containerAuto()
   }
 }
 // 容器高度自适应
 function containerAuto() {
   if (state.arrow === 'up') {
+    const el = searchRef.value as HTMLElement
+    el.style.height = 'auto'
+    const height = el.offsetHeight
+    el.style.height = '48px'
     setTimeout(() => {
-      const el = searchRef.value
-      el.style.height = 'auto'
-      const height = el.offsetHeight
       el.style.height = height + 'px'
-    }, 300)
+    }, 0)
   }
 }
 // emit

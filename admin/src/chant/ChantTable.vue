@@ -39,6 +39,7 @@
             v-if="item.slot"
             :index="$index"
             :item="item"
+            :name="item.prop"
             :row="row"
             :value="row[item.prop]">
           </slot>
@@ -380,6 +381,13 @@ function translate(column: Column) {
     text-decoration: underline;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  ::v-deep(.el-button) {
+    height: 23px;
+    width: 23px;
+  }
+  ::v-deep(.el-button + .el-button) {
+    margin-left: 6px;
   }
   .table-icon-copy {
     color: #409eff;

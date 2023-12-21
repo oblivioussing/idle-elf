@@ -26,5 +26,12 @@ export default [
     prop: 'updateTime', // 更新时间
     search: true,
     type: FormTypeEnum.Datetime
+  },
+  {
+    prop: 'operate', // 操作
+    fixed: 'right',
+    label: 'common.operate',
+    slot: true,
+    width: 100
   }
 ] as Column[]

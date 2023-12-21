@@ -16,35 +16,30 @@
       <!-- button -->
       <el-button-group class="m-l-10">
         <!-- 新增 -->
-        <chant-icon-button
+        <chant-button
           v-if="show('add')"
-          :content="t('add')"
+          :content="tg('button.add')"
           :icon="Plus"
           type="primary"
           @click="onEmit('add')">
-        </chant-icon-button>
-        <!-- 复制新增 -->
-        <chant-icon-button
-          v-if="show('copy-add')"
-          :content="t('copyAdd')"
-          :icon="CopyDocument"
-          @click="onEmit('copy-add')">
-        </chant-icon-button>
+        </chant-button>
         <!-- 编辑 -->
-        <chant-icon-button
+        <chant-button
           v-if="show('edit')"
-          :content="t('edit')"
+          :content="t('batch') + tg('button.edit')"
+          :disabled="vModel.selectionList.length === 0"
           :icon="Edit"
           @click="onEmit('edit')">
-        </chant-icon-button>
+        </chant-button>
         <!-- 删除 -->
-        <chant-icon-button
+        <chant-button
           v-if="show('delete')"
-          :content="t('delete')"
+          :content="t('batch') + tg('button.delete')"
+          :disabled="vModel.selectionList.length === 0"
           :icon="Delete"
           type="danger"
           @click="onEmit('delete')">
-        </chant-icon-button>
+        </chant-button>
       </el-button-group>
       <!-- 字段筛选 -->
       <field-filter v-if="vModel.columns && props.showFilter" v-model="vModel">
@@ -56,7 +51,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { CopyDocument, Delete, Edit, Plus } from '@element-plus/icons-vue'
+import { Delete, Edit, Plus } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
 import { type ListState } from '@/type'
 import FieldFilter from './FieldFilter.vue'
@@ -71,23 +66,18 @@ const props = defineProps<{
 // emits
 const emits = defineEmits(['emit', 'update:modelValue'])
 // i18n
+const { t: tg } = useI18n({ useScope: 'global' })
 const { t } = useI18n({
   messages: {
     en: {
       all: 'all',
-      record: 'records',
-      add: 'add',
-      copyAdd: 'copy add',
-      edit: 'edit',
-      delete: 'delete'
+      batch: 'batch',
+      record: 'records'
     },
     zh: {
       all: '全部',
-      record: '条记录',
-      add: '新增',
-      copyAdd: '复制新增',
-      edit: '编辑',
-      delete: '删除'
+      batch: '批量',
+      record: '条记录'
     }
   }
 })
@@ -104,11 +94,11 @@ function buttonGroup() {
       '.el-button-group'
     ) as NodeListOf<Element>
     groups.forEach((item) => {
-      if (item.children.length < 2) {
+      if (item.children.length === 1) {
         item.removeAttribute('class')
       }
     })
-  }, 400)
+  }, 600)
 }
 // emit
 function onEmit(type: string) {

@@ -3,14 +3,24 @@
   <chant-operation
     v-model="state"
     :options="['add', 'edit', 'delete']"
-    show-checked-all
     @add="lister.add"
     @query="getList"
     @refresh="lister.refresh(getList, state)">
-    <chant-icon-button iconfont="nickname"></chant-icon-button>
   </chant-operation>
   <!-- table -->
-  <chant-table v-model="state"></chant-table>
+  <chant-table v-model="state">
+    <!-- 操作 -->
+    <template #operate>
+      <!-- 编辑 -->
+      <chant-icon-button icon-type="edit" @click="onEdit"></chant-icon-button>
+      <!-- 复制新增 -->
+      <chant-icon-button icon-type="copyDocument" @click="onEdit">
+      </chant-icon-button>
+      <!-- 删除 -->
+      <chant-icon-button icon-type="delete" type="danger" @click="onEdit">
+      </chant-icon-button>
+    </template>
+  </chant-table>
   <!-- pagination -->
   <chant-pagination
     v-model="state.pages"
@@ -51,6 +61,10 @@ lister.created(() => {
 // 获取列表
 function getList() {
   // lister.getData('xx/xxx', state)
+}
+// 编辑
+function onEdit() {
+  alert(1)
 }
 </script>
 

@@ -1,11 +1,11 @@
 <template>
   <div class="m-l-10 rel">
-    <chant-icon-button
+    <chant-button
       :content="t('filter')"
       :icon="Document"
       type="primary"
       @click.stop="onShowFilter">
-    </chant-icon-button>
+    </chant-button>
     <div v-show="state.visible" class="filter" @click.stop>
       <div class="bubble"></div>
       <draggable

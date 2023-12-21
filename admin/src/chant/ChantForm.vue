@@ -215,21 +215,21 @@
       </div>
       <div v-if="props.fold">
         <!-- 展开 -->
-        <chant-icon-button
+        <chant-button
           v-if="state.arrow === 'down'"
           :content="tg('button.spread')"
           :icon="ArrowDown"
           type="primary"
           @click="onCollapse('up')">
-        </chant-icon-button>
+        </chant-button>
         <!-- 关闭 -->
-        <chant-icon-button
+        <chant-button
           v-if="state.arrow === 'up'"
           :content="tg('button.fold')"
           :icon="ArrowUp"
           type="primary"
           @click="onCollapse('down')">
-        </chant-icon-button>
+        </chant-button>
       </div>
       <slot name="right"></slot>
     </div>

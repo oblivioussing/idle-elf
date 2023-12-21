@@ -1,38 +1,25 @@
 <template>
-  <el-tooltip
-    :content="props.content"
-    :disabled="!props.content"
-    effect="dark"
-    placement="top">
-    <el-button
-      v-bind="$attrs"
-      class="chant-icon-button"
-      :disabled="props.disabled"
-      :link="props.link"
-      :type="props.type || 'primary'">
-      <slot></slot>
-      <el-icon v-if="props.icon"><component :is="props.icon" /></el-icon>
-      <icon-font v-if="props.iconfont" :icon="props.iconfont"></icon-font>
-    </el-button>
-  </el-tooltip>
+  <chant-button v-bind="$attrs" :icon="icon"></chant-button>
 </template>
-
 <script setup lang="ts">
-import { buttonProps } from 'element-plus'
+import { computed } from 'vue'
+import { CopyDocument, Delete, Edit, Plus } from '@element-plus/icons-vue'
 
+// type
+type IconType = 'copyDocument' | 'delete' | 'edit' | 'plus'
 // props
-const props = defineProps({
-  content: String,
-  iconfont: String,
-  ...buttonProps
+const props = defineProps<{
+  iconType: IconType
+}>()
+// computed
+const icon = computed(() => {
+  const map = {
+    copyDocument: CopyDocument,
+    delete: Delete,
+    edit: Edit,
+    plus: Plus
+  }
+  return map[props.iconType]
 })
 </script>
-
-<style lang="scss">
-.chant-icon-button {
-  min-width: 28px;
-  height: 28px;
-  width: 28px;
-  padding: 0;
-}
-</style>
+<style scoped lang="scss"></style>
