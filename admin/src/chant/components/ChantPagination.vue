@@ -58,7 +58,6 @@ function onSize(size: number) {
   padding: 10px 5px;
   .el-pagination {
     justify-content: center;
-    min-height: 24px;
   }
 }
 </style>

@@ -14,7 +14,7 @@
         item-key="prop"
         :list="vModel.columns">
         <template #item="{ element }">
-          <div class="item">
+          <div v-if="element.prop !== 'operate'" class="item">
             <el-icon class="handle">
               <Sort></Sort>
             </el-icon>
@@ -45,7 +45,7 @@ const props = defineProps<{
 }>()
 // emits
 const emits = defineEmits(['update:modelValue'])
-// i18n
+// use
 const { t } = useI18n({
   messages: {
     en: {
@@ -56,7 +56,6 @@ const { t } = useI18n({
     }
   }
 })
-// VModel
 const vModel = useVModel(props, 'modelValue', emits)
 // state
 const state = reactive({

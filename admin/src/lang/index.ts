@@ -5,8 +5,10 @@ export default {
     },
     button: {
       add: 'add',
+      close: 'close',
       edit: 'edit',
-      delete: 'delete'
+      delete: 'delete',
+      save: 'save'
     },
     common: {
       operate: 'operate'
@@ -25,8 +27,10 @@ export default {
     },
     button: {
       add: '新增',
+      close: '关闭',
       edit: '编辑',
-      delete: '删除'
+      delete: '删除',
+      save: '保存'
     },
     common: {
       operate: '操作'

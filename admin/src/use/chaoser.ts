@@ -1,6 +1,5 @@
 import { useRoute, useRouter } from 'vue-router'
 import qs from 'qs'
-import { PagePathEnum } from '../enum'
 import { useAppStore } from '../store'
 
 function useChaoser() {
@@ -10,7 +9,7 @@ function useChaoser() {
   const routes = router.getRoutes()
 
   // 路由跳转
-  function push(config: { path: PagePathEnum; query?: any }) {
+  function push(config: { path: string; query?: any }) {
     const path = route?.path || ''
     appStore.updatePageRelation(config.path, path)
     router.push({ path: config.path, query: config.query })

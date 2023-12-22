@@ -9,7 +9,7 @@
         <el-form-item v-for="item in columnsList">
           <!-- input -->
           <el-input
-            v-if="isInput(item)"
+            v-if="formUtils.isInput(item)"
             v-model="vModel.query[item.like ? item.prop + 'Like' : item.prop]"
             :clearable="item.clearable !== false"
             :placeholder="translate(item)">
@@ -39,7 +39,7 @@
           </el-select>
           <!-- date,datetime -->
           <el-date-picker
-            v-else-if="isDate(item)"
+            v-else-if="formUtils.isDate(item)"
             v-model="vModel.query[item.prop]"
             :clearable="item.clearable !== false"
             :placeholder="translate(item)"
@@ -49,7 +49,7 @@
           </el-date-picker>
           <!-- daterange,datetimerange -->
           <el-date-picker
-            v-else-if="isDateRange(item)"
+            v-else-if="formUtils.isDateRange(item)"
             v-model="state.dateRange[item.prop]"
             :clearable="item.clearable !== false"
             :start-placeholder="translate(item)"
@@ -130,9 +130,9 @@ import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowDown, ArrowUp, Refresh, Search } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
-import { FormTypeEnum } from '@/enum'
+import { formUtils, type ListColumn as Column, type ListState } from '@/chant'
+import { FormTypeEnum } from '@/chant'
 import { vuei18n } from '@/plugs'
-import { type ListColumn as Column, type ListState } from '@/type'
 import TableOperation from './components/TableOperation.vue'
 
 type Options = 'add' | 'edit' | 'delete' | 'copy-add'
@@ -165,7 +165,7 @@ const emits = defineEmits([
   'refresh',
   'update:modelValue'
 ])
-// i18n
+// use
 const { t: tg } = useI18n({ useScope: 'global' })
 const { t } = useI18n({
   messages: {
@@ -183,7 +183,6 @@ const { t } = useI18n({
     }
   }
 })
-// vModel
 const vModel = useVModel(props, 'modelValue', emits)
 // ref
 const searchRef = ref()
@@ -227,7 +226,7 @@ setTimeout(() => {
 function bindQueryValue() {
   const query = vModel.value.query
   vModel.value.columns?.forEach((item) => {
-    if (isDateRange(item)) {
+    if (formUtils.isDateRange(item)) {
       const start = rangeField(item, 'start')
       const end = rangeField(item, 'end')
       state.dateRange[item.prop] = [query[start], query[end]]
@@ -239,33 +238,6 @@ function rangeField(column: Column, type: 'start' | 'end') {
   const suffix = type.replace(/^\S/, (s) => s.toUpperCase())
   const key = `dynamic${suffix}` as 'dynamicStart' | 'dynamicEnd'
   return column[key] || `${column.prop}${suffix}`
-}
-// 是否为input
-function isInput(row: Column) {
-  if (row.type === FormTypeEnum.Input) {
-    return true
-  }
-  return !row.type && !row.searchSlot
-}
-// 是否为date
-function isDate(row: Column) {
-  if (row.type) {
-    return [
-      FormTypeEnum.Date,
-      FormTypeEnum.Datetime,
-      FormTypeEnum.Month
-    ].includes(row.type)
-  }
-}
-// 是否为daterange
-function isDateRange(row: Column) {
-  if (row.type) {
-    return [
-      FormTypeEnum.DateRange,
-      FormTypeEnum.DatetimeRange,
-      FormTypeEnum.MonthRange
-    ].includes(row.type)
-  }
 }
 // 日期范围选择
 function onDateRange(row: Column) {

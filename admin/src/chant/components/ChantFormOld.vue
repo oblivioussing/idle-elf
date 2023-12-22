@@ -239,7 +239,7 @@
       v-if="!props.inDialog && !props.nest && props.showFooter"
       class="toolbar chant-form-footer">
       <!-- 关闭 -->
-      <el-button v-if="props.showClose" @click="base.closePage()">
+      <el-button v-if="props.showClose" @click="core.closePage()">
         {{ tg('button.close') }}
       </el-button>
       <slot name="footer"></slot>
@@ -262,75 +262,38 @@ import { useI18n } from 'vue-i18n'
 import type { ElForm } from 'element-plus'
 import { ArrowDown, ArrowUp } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
-import { FormTypeEnum, PageEnum } from '@/enum'
-import { base, format } from '@/utils'
-import { element, vuei18n } from '../plugs'
+import { FormTypeEnum } from '@/chant'
+import { PageEnum } from '@/enum'
+import { element, vuei18n } from '@/plugs'
 import { type FormColumn as Column } from '@/type'
-import ChantInput from './ChantInput.vue'
+import { base, core, format } from '@/utils'
 
 type FormInstance = InstanceType<typeof ElForm>
-type PageType = 'add' | 'detail' | 'edit'
+type PageType = 'add' | 'edit'
 
 type ModelValue = {
   dict?: Record<string, any>
-  form?: any
-  formLoading?: boolean
+  form: any
+  formLoading: boolean
   model?: Column[]
-  loading?: boolean
+  loading: boolean
   lang?: any
 }
 interface Props {
-  alterTenant?: boolean // 是否可以修改租户
-  dict?: Record<string, any> // dict
   disabled?: boolean // 禁用
-  disabledColumns?: string[] // 禁用的字段
-  heightFull?: boolean // 高度是否撑满
-  fold?: boolean // 折叠
-  form?: any // form
-  inDialog?: boolean // 是否处于dialog中
-  linefeed?: boolean // 换行
   labelWidth?: string // label宽度
-  lang?: any // lang
   modelValue?: ModelValue
-  model?: Column[] // model
   options?: 'close' | 'save'[] // 页面按钮
-  nest?: boolean // form内部嵌套
-  nestRefs?: Ref[] // 嵌套ref
-  readonly?: boolean // 只读
-  rules?: object // 校验规则
-  saveDisabled?: boolean // 保存按钮禁用
-  showClose?: boolean // 显示关闭按钮
-  showFooter?: boolean // 显示底部
-  size?: 'large' | 'default' | 'small' // size
   type?: PageType // 表单类型
   twoColumns?: boolean // 显示两列
-  wrapFull?: boolean // 表单最外层是否撑满
 }
 // props
-const props = withDefaults(defineProps<Props>(), {
-  alterTenant: false, // 是否可以修改租户-否
-  fold: false, // 折叠
-  heightFull: true, // 高度是否撑满-是
-  showClose: true, // 显示关闭按钮
-  showFooter: true, // 显示底部
-  wrapFull: true // 表单最外层是否撑满-是
-})
-// emit
-const emit = defineEmits([
-  'update:modelValue',
-  'update:form',
-  'before-save',
-  'close',
-  'save'
-])
-// VModel
-const formVModel = useVModel(
-  props?.form ? props : props?.modelValue || {},
-  'form',
-  emit
-)
-// i18n
+const props = withDefaults(defineProps<Props>(), {})
+// emits
+const emits = defineEmits(['update:modelValue', 'update:form'])
+// use
 const { t: tg } = useI18n({ useScope: 'global' })
+const vModel = useVModel(props, 'modelValue', emits)
 // ref
 const formRef = ref<FormInstance>()
 // state
@@ -339,44 +302,17 @@ const state = reactive({
   columns: [] as Column[],
   dateRange: {} as any
 })
-const rules: Record<string, any> = reactive({
-  ...props.rules
-})
+const rules = reactive({})
 // 默认时间
 const defaultTimes = [
   new Date(2022, 1, 1, 0, 0, 0),
   new Date(2022, 1, 1, 23, 59, 59)
 ] as any
-// defineExpose
-defineExpose({
-  formRef,
-  validate // form校验方法
-})
-// watch
-watch([() => props.modelValue?.model, () => props.model], () => {
-  // 创建columns
-  createColumns()
-})
-watch(
-  [() => props.modelValue?.lang, () => props.lang],
-  () => {
-    // 创建columns
-    createColumns()
-  },
-  { deep: true }
-)
 // computed
 const messages = computed(() => {
   const locale = vuei18n.global.locale.value
-  const lang = props.lang || props.modelValue?.lang
-  if (lang) {
-    return lang[locale]
-  } else {
-    return {}
-  }
-})
-const dictCpd = computed(() => {
-  return props.dict || props.modelValue?.dict
+  const lang = vModel.value?.lang
+  return lang ? lang[locale] : {}
 })
 // 创建columns
 createColumns()
@@ -581,7 +517,7 @@ function isInput(row: Column) {
 // 是否为date
 function isDate(row: Column) {
   if (row.type) {
-    return [FormTypeEnum.Date, FormTypeEnum.DateTime].includes(row.type)
+    return [FormTypeEnum.Date, FormTypeEnum.Datetime].includes(row.type)
   }
 }
 // 是否为daterange

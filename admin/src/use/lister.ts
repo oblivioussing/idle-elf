@@ -1,13 +1,11 @@
 import { onActivated, onScopeDispose } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { shiki } from '../api'
-import { element } from '../plugs'
-import { base, bus, core } from '../utils'
-import { useAppStore } from '../store'
-import { type ListColumn as Column, type ListState } from '../type'
+import { shiki } from '@/api'
+import { type ListState as State } from '@/chant'
+import { element } from '@/plugs'
+import { useAppStore } from '@/store'
+import { bus } from '@/utils'
 
-type State = ListState
 type Data = {
   pageElements?: []
   pageData: []
@@ -19,21 +17,6 @@ type Result = {
   data?: Data
 }
 
-const messages = {
-  en: {
-    please: 'Please select ',
-    only: 'Only one item can be selected to ',
-    data: ' data',
-    confirmDelete: 'Confirm delete?'
-  },
-  zh: {
-    please: '请选择要',
-    only: '只能选择一条要',
-    data: '的数据',
-    confirmDelete: '确认删除?'
-  }
-}
-
 function useLister() {
   const appStore = useAppStore()
   const route = useRoute()
@@ -42,6 +25,7 @@ function useLister() {
     allFlag: 0 as 0 | 1,
     columns: [],
     extra: {} as Record<string, any>,
+    keepQuery: {} as Record<string, any>,
     lang: {},
     list: [] as any[],
     loading: false,
@@ -120,7 +104,7 @@ function useLister() {
   }
   // 获取查询参数
   function getQuery(state: State) {
-    const query = { ...state.query }
+    const query = { ...state.keepQuery, ...state.query }
     return query
   }
   // 获取列表参数
@@ -165,11 +149,6 @@ function useLister() {
     reset(state)
     method()
   }
-  // 清空url参数
-  function clearUrlQuery() {
-    core.removeRouterQuery(route.path)
-    history.replaceState(history.state, '', route.path)
-  }
   // 重置
   function reset(state: State) {
     state.selectionList = []
@@ -185,38 +164,15 @@ function useLister() {
   }
   // 复制新增
   function copyAdd(state: State) {
-    const status = getDealData(state, '复制新增')
-    if (status) {
-      const query = { id: state.selectionRow.id, pageType: 'copy-add' }
-      // 页面跳转
-      jump('/add', query)
-    }
+    const query = { id: state.selectionRow.id, pageType: 'copy-add' }
+    // 页面跳转
+    jump('/add', query)
   }
   // 编辑
   function edit(state: State) {
-    const status = getDealData(state, '编辑')
-    if (status) {
-      const query = { id: state.selectionRow.id }
-      // 页面跳转
-      jump('/edit', query)
-    }
-  }
-  // 获取要处理的数据
-  function getDealData(state: State, msg: string, multiple?: boolean) {
-    const selection = state.selectionList as any[]
-    // 请选择数据
-    if (!selection.length && state.allFlag === 0) {
-      ElMessage.warning(`请选择${msg}数据`)
-      return false
-    }
-    // 只能选择一条数据
-    if (!multiple) {
-      if (selection.length > 1 || state.allFlag === 1) {
-        ElMessage.warning(`只能${msg}数据`)
-        return false
-      }
-    }
-    return true
+    const query = { id: state.selectionRow.id }
+    // 页面跳转
+    jump('/edit', query)
   }
   // 页面跳转
   function jump(to: string, query?: any) {
@@ -226,102 +182,21 @@ function useLister() {
     router.push({ path: toPath, query })
   }
   // 删除
-  async function remove(path: string, state: State) {
-    return await operate(path, state, {
-      selectionTip: '删除',
-      confirmTip: '确定删除'
-    })
-  }
-  // 操作
-  async function operate(
-    path: string,
-    state: State,
-    config: {
-      selectionTip: string
-      confirmTip?: string
-      params?: object
-      multiple?: boolean
-    }
-  ) {
-    const selection = state.selectionList
-    if (state.allFlag !== 1 && selection.length === 0) {
-      const selectionTip = '请选择' + config.selectionTip + '数据'
-      ElMessage.warning(selectionTip)
-      return
-    }
-    // 只能选择一条数据
-    if (config.multiple === false) {
-      if (selection.length > 1 || state.allFlag === 1) {
-        ElMessage.warning(`只能${config.selectionTip}数据`)
-        return
-      }
-    }
-    let confirmTip
-    if (config.confirmTip) {
-      confirmTip = config.confirmTip
-    } else {
-      confirmTip = '确定' + config.selectionTip + '?'
-    }
-    const status = await element.confirm(confirmTip)
-    if (!status) {
-      return
-    }
-    const idList = state.selectionIdList
-    const query = getQuery(state)
-    const params = {
-      idList,
-      allFlag: state.allFlag,
-      searchAllForm: query
-    }
-    Object.assign(params, config.params)
-    state.loading = true
-    const code = await shiki?.postCode(path, params)
-    state.loading = false
-    const isSuccess = shiki?.isSuccess(code)
-    if (isSuccess) {
-      const route = router?.currentRoute.value
-      const path = route?.path
-      path && bus.emit(path)
-      return isSuccess
-    }
-  }
-  // 修改字段
-  function updateColumn(
-    list: Column[],
-    row: Column,
-    config?: { merge: boolean }
-  ) {
-    list = base.clone(list)
-    list.forEach((item, index) => {
-      if (item.prop === row.prop) {
-        if (config?.merge) {
-          list[index] = Object.assign(item, row)
-        } else {
-          list[index] = row
-        }
-      }
-    })
-    return list
-  }
+  async function remove(path: string, state: State) {}
 
   return {
     state,
     created,
     getData,
     dataDeal,
-    on,
     query,
     refresh,
     reset,
-    clearUrlQuery,
     add,
     copyAdd,
     edit,
-    getDealData,
     jump,
     remove,
-    operate,
-    updateColumn,
     getListParams
   }
 }

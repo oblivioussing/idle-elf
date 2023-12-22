@@ -65,7 +65,7 @@ const props = defineProps<{
 }>()
 // emits
 const emits = defineEmits(['emit', 'update:modelValue'])
-// i18n
+// use
 const { t: tg } = useI18n({ useScope: 'global' })
 const { t } = useI18n({
   messages: {
@@ -81,7 +81,6 @@ const { t } = useI18n({
     }
   }
 })
-// vModel
 const vModel = useVModel(props, 'modelValue', emits)
 // ref
 const groupsRef = ref()

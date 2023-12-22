@@ -3,6 +3,7 @@
   <chant-operation
     v-model="state"
     :options="['add', 'edit', 'delete']"
+    show-checked-all
     @add="lister.add"
     @query="getList"
     @refresh="lister.refresh(getList, state)">
@@ -63,9 +64,7 @@ function getList() {
   // lister.getData('xx/xxx', state)
 }
 // 编辑
-function onEdit() {
-  alert(1)
-}
+function onEdit() {}
 </script>
 
 <style scoped lang="scss"></style>

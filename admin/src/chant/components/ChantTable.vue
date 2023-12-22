@@ -26,6 +26,7 @@
       v-bind="item"
       :align="'center'"
       :fixed="item.fixed"
+      :key="item.prop"
       :min-width="item.width || columnWidth || 144"
       show-overflow-tooltip
       sortable>
@@ -46,11 +47,11 @@
           <!-- 可编辑 -->
           <template v-else-if="item.editable">
             <!-- input -->
-            <chant-input
+            <el-input
               v-if="!item.type"
               v-model="row[item.prop]"
               :placeholder="translate(item)">
-            </chant-input>
+            </el-input>
             <!-- select -->
             <el-select
               v-else-if="item.type === FormTypeEnum.Select"
@@ -63,6 +64,13 @@
                 :value="key">
               </el-option>
             </el-select>
+            <!-- input-number -->
+            <el-input-number
+              v-else-if="item.type === FormTypeEnum.InputNumber"
+              v-model="row[item.prop]"
+              controls-position="right"
+              :placeholder="translate(item)">
+            </el-input-number>
           </template>
           <!-- dict -->
           <div v-else-if="item.type === FormTypeEnum.Select">
@@ -118,9 +126,13 @@ import { DocumentCopy } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
 // @ts-ignore
 import Sortable from 'sortablejs'
-import { FormatEnum, FormTypeEnum } from '@/enum'
+import {
+  FormatEnum,
+  FormTypeEnum,
+  type ListColumn as Column,
+  type ListState
+} from '@/chant'
 import { vuei18n } from '@/plugs'
-import { type ListColumn as Column, type ListState } from '@/type'
 import { useLister } from '@/use'
 import { base, format } from '@/utils'
 
@@ -147,13 +159,10 @@ const props = withDefaults(defineProps<Props>(), {
 })
 // emits
 const emits = defineEmits(['update:modelValue', 'row-click'])
-// clip
-const { toClipboard } = useClipboard()
-// i18n
-const { t: tg } = useI18n({ useScope: 'global' })
 // use
+const { toClipboard } = useClipboard()
+const { t: tg } = useI18n({ useScope: 'global' })
 const lister = useLister()
-// vModel
 const vModel = useVModel(props, 'modelValue', emits)
 // ref
 const tableRef = ref()
