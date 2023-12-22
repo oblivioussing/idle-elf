@@ -1,5 +1,4 @@
-import { FormTypeEnum } from '@/chant'
-import { type ListColumn as Column } from '@/type'
+import { FormTypeEnum, type ListColumn as Column } from '@/chant'
 
 export default [
   {

@@ -15,7 +15,9 @@ export default {
     },
     tips: {
       copyFail: 'copy fail',
-      copySuccess: 'copy success'
+      copySuccess: 'copy success',
+      enter: 'please enter',
+      select: 'please select'
     },
     unit: {
       minute: 'minute'
@@ -37,7 +39,9 @@ export default {
     },
     tips: {
       copyFail: '复制失败',
-      copySuccess: '复制成功'
+      copySuccess: '复制成功',
+      enter: '请输入',
+      select: '请选择'
     },
     unit: {
       minute: '分钟'

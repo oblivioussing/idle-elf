@@ -1,45 +1,32 @@
 import { type Ref } from 'vue'
-import { FormatEnum, FormTypeEnum, PageEnum } from '@/chant'
+import { FormatEnum, FormTypeEnum, PageTypeEnum } from '@/chant'
 
 export type Dict = Record<string, Record<string, any>>
 
 export type FormColumn = {
-  apiUrl?: string // 接口地址
   append?: string // 输入框后置内容(字段)
   appendLabel?: string // 输入框后置内容(常量)
   clearable?: boolean // 是否可清空
-  attr?: any // 标签属性
-  change?: (row: Ref<any>) => void // 值变更事件
-  contentLineFeed?: boolean // 内容标签换行
+  change?: (row: any) => void // 值变更事件
   defaultValue?: any // 默认值
   disabled?: boolean | ((row: any) => boolean) // 是否禁用
-  disabledOption?: string[] // 禁用的子项
-  disabledInPage?: PageEnum // 在特定页面类型中禁用
+  disabledInPage?: PageTypeEnum // 在特定页面类型中禁用
   dynamicId?: string // 动态id字段
-  dynamicCode?: string // 动态code字段
-  dynamicName?: string // 动态name字段
-  end?: string // 范围选择end字段
-  hideInPage?: PageEnum[] // 在特定页面类型中隐藏
-  itemSlot?: boolean // form-item slot
+  dynamicStart?: string // 范围选择start字段
+  dynamicEnd?: string // 动态范围选择end字段
+  hide?: boolean // 是否隐藏
+  hideInPage?: PageTypeEnum // 在特定页面类型中隐藏
   label?: string // 标签文本
-  labelSlot?: boolean // 标签文本 slot
   lineFeed?: boolean // 是否换行
-  min?: number // 最小值
-  max?: number // 最大值
-  nextRow?: boolean // 下一行
   prepend?: string // 输入框前置内容(字段)
   prependLabel?: string // 输入框前置内容(常量)
   prop: string // 字段值
-  readonly?: boolean // 只读
   required?: boolean // 是否必填
-  rules?: object | [] // 表单验证规则
+  rules?: any[] // 表单验证规则
   showCustom?: (row: any) => boolean // 自定义显示逻辑
   slot?: boolean // 字段内容slot
-  start?: string // 范围选择start字段
-  tips?: string // 提示文本
   type?: FormTypeEnum // 标签类型
   valueFormat?: string // 绑定值的格式
-  width?: string // 宽度
 }
 
 export type ListColumn = {

@@ -22,7 +22,7 @@ export enum FormTypeEnum {
   TimeSelect = 'timeselect'
 }
 
-export enum PageEnum {
+export enum PageTypeEnum {
   Add = 'add',
   Edit = 'edit'
 }

@@ -1,5 +1,4 @@
-import { FormTypeEnum } from '@/chant'
-import { type FormColumn as Column } from '@/type'
+import { FormTypeEnum, type FormColumn as Column } from '@/chant'
 
 export default [
   {
@@ -8,11 +7,16 @@ export default [
   },
   {
     prop: 'age', // 年龄
-    required: true
+    required: true,
+    type: FormTypeEnum.InputNumber
   },
   {
     prop: 'sex', // 性别
     required: true,
     type: FormTypeEnum.Select
+  },
+  {
+    prop: 'createTime', // 创建时间
+    type: FormTypeEnum.Datetime
   }
 ] as Column[]

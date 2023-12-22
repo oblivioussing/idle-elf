@@ -1,4 +1,5 @@
 <template>
+  {{ state.form }}
   <chant-form v-model="state" type="add"></chant-form>
   <chant-form-footer></chant-form-footer>
 </template>
