@@ -8,16 +8,21 @@
     </div>
     <div>
       <!-- 关闭 -->
-      <el-button>{{ tg('button.close') }}</el-button>
+      <el-button @click="core.closePage()">{{ tg('button.close') }}</el-button>
       <!-- 保存 -->
-      <el-button type="primary">{{ tg('button.save') }}</el-button>
+      <el-button type="primary" @click="emits('save')">
+        {{ tg('button.save') }}
+      </el-button>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import { reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { core } from '@/utils'
 
+// emits
+const emits = defineEmits(['save'])
 // use
 const { t: tg } = useI18n({ useScope: 'global' })
 const { t } = useI18n({

@@ -91,8 +91,8 @@
           <!-- value -->
           <div v-else class="ellipsis-1">
             {{ row[item.prop] || '-' }}
-            <template v-if="item.appendLabel">
-              {{ tg(item.appendLabel) }}
+            <template v-if="item.append">
+              {{ tg(item.append) }}
             </template>
           </div>
           <!-- copy -->

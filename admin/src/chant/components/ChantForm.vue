@@ -128,7 +128,7 @@
 
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus'
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch, type Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useVModel } from '@vueuse/core'
 import {
@@ -156,7 +156,7 @@ const props = defineProps<{
   pageType?: PageTypeEnum // 页面类型
 }>()
 // emits
-const emits = defineEmits(['update:modelValue'])
+const emits = defineEmits(['update:modelValue', 'ref'])
 // use
 const { t: tg } = useI18n({ useScope: 'global' })
 const vModel = useVModel(props, 'modelValue', emits)
@@ -186,7 +186,13 @@ const messages = computed(() => {
   const lang = vModel.value.lang
   return lang ? lang[locale] : {}
 })
-init() // 初始化
+// onMounted
+onMounted(() => {
+  // ref更新
+  emits('ref', formRef.value)
+  // 初始化
+  init()
+})
 // 初始化
 function init() {
   const model = vModel.value.model

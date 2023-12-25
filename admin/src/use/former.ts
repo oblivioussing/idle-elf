@@ -1,8 +1,9 @@
+import type { FormInstance } from 'element-plus'
 import { onActivated } from 'vue'
 import { useRoute } from 'vue-router'
 import shiki from '@/api/shiki'
 import { type FormColumn as Column } from '@/chant'
-import { base, bus, core } from '@/utils'
+import { bus, core } from '@/utils'
 
 type State = {
   dict: Record<string, any>
@@ -15,7 +16,6 @@ type State = {
   loading: boolean
   model: Column[]
   query: Record<string, any>
-  resultDict: Record<string, any>
 }
 
 function useFormer() {
@@ -27,10 +27,14 @@ function useFormer() {
     lang: {},
     loading: false,
     model: [],
-    query: {} as any,
-    resultDict: {} as any
+    query: {} as any
   }
+  let formInstance: FormInstance
 
+  // 绑定表单ref
+  function bindFormInstance(val: FormInstance) {
+    formInstance = val
+  }
   // 初始化
   function created(
     callback: () => void,
@@ -52,92 +56,24 @@ function useFormer() {
     })
   }
   // 获取数据
-  async function getData(
-    path: string,
-    state: State,
-    config?: { merge?: boolean; dict?: any; query?: any; loading?: boolean }
-  ) {
-    const query = config?.query || state.query
+  async function getData(path: string, state: State) {
     state.formLoading = true
-    const { data, dict, defaultValue } = await shiki?.getData(path, query)
-    if (!config?.loading) {
-      state.formLoading = false
-    }
-    let status = false
-    // 数据处理
-    if (data) {
-      state.form = data
-      status = true
-    }
-    if (defaultValue && config?.merge) {
-      state.form = Object.assign(state.form, defaultValue)
-    }
-    if (dict) {
-      state.resultDict = dict
-    }
-    if (config?.dict) {
-      // 绑定字典
-      dictBind(config.dict, state)
-    }
-    return status
+    const { data } = await shiki?.getData(path, state.query)
+    state.formLoading = false
+    state.form = data
   }
-  // 获取字典
-  async function getDict(
-    path: string,
-    state: State,
-    config?: { merge?: boolean; dict?: any }
-  ) {
-    const { dict: resultDict, defaultValue } = await shiki?.getData(
-      path,
-      state.query
-    )
-    if (defaultValue && config?.merge) {
-      state.form = Object.assign(state.form, defaultValue)
-    }
-    if (resultDict) {
-      state.resultDict = resultDict
-      // 绑定字典
-      dictBind(config?.dict, state)
-      return true
-    }
-  }
-  // columns
-  function createColumns(state: State, columns: Column[]) {
-    const formColumns = state.form?.pageElements
-    if (formColumns?.length) {
-      state.model = columns.filter((item) => {
-        return formColumns.find((child) => child.prop === item.prop)
-      })
-    }
-  }
-  // 修改字段
-  function updateColumn(
-    list: Column[],
-    row: Column,
-    config?: { merge: boolean }
-  ) {
-    list = base.clone(list)
-    list.forEach((item, index) => {
-      if (item.prop === row.prop) {
-        if (config?.merge) {
-          list[index] = Object.assign(item, row)
-        } else {
-          list[index] = row
-        }
-      }
-    })
-    return list
-  }
-  // 字典绑定
-  function dictBind(map: Record<string, any>, state: State) {
-    if (state.resultDict) {
-      for (let item in map) {
-        state.dict[item] = state.resultDict[map[item]]
-      }
+  // 刷新列表
+  function refresh() {
+    const path = core.getParentPath(route?.path)
+    if (path) {
+      bus.emit(path)
     }
   }
   // 保存
   async function save(path: string, state: State, params?: any) {
+    // 表单校验
+    const status = await validate()
+    console.log(status)
     state.loading = true
     const code = await shiki?.postCode(path, params || state.form)
     state.loading = false
@@ -149,22 +85,16 @@ function useFormer() {
       return true
     }
   }
-  // 刷新列表
-  function refresh() {
-    const path = core.getParentPath(route?.path)
-    if (path) {
-      bus.emit(path)
-    }
+  // 表单校验
+  async function validate() {
+    return await formInstance.validate()
   }
 
   return {
     state,
+    bindFormInstance,
     created,
-    createColumns,
-    updateColumn,
     getData,
-    getDict,
-    dictBind,
     save
   }
 }

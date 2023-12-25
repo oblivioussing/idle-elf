@@ -1,6 +1,6 @@
+import type { FormColumn, ListColumn } from '@/chant/type'
 import { BusEnum, StorageEnum } from '@/enum'
 import { useAppStore } from '@/store/app'
-import type { FormColumn, ListColumn } from '@/type'
 import base from './base'
 import bus from './bus'
 import storage from './storage'
