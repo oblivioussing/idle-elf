@@ -8,7 +8,7 @@ export default [
   {
     prop: 'age', // 年龄
     required: true,
-    type: FormTypeEnum.InputNumber
+    type: FormTypeEnum.InputNumberRange
   },
   {
     prop: 'sex', // 性别
@@ -17,6 +17,10 @@ export default [
   },
   {
     prop: 'createTime', // 创建时间
-    type: FormTypeEnum.Datetime
+    type: FormTypeEnum.DatetimeRange
+  },
+  {
+    prop: 'remark', // 备注
+    type: FormTypeEnum.Textarea
   }
 ] as Column[]

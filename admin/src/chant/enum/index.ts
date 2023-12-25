@@ -3,12 +3,10 @@ export enum FormatEnum {
 }
 
 export enum FormTypeEnum {
-  Border = 'border',
   Date = 'date',
   Datetime = 'datetime',
   DateRange = 'daterange',
   DatetimeRange = 'datetimerange',
-  Divider = 'divider',
   Input = 'input',
   InputNumber = 'inputnumber',
   Month = 'month',
@@ -16,10 +14,8 @@ export enum FormTypeEnum {
   InputNumberRange = 'input-number-range',
   Radio = 'radio',
   Select = 'select',
-  SelectMultiple = 'select-multiple',
   Textarea = 'textarea',
-  TimePicker = 'timepicker',
-  TimeSelect = 'timeselect'
+  TimePicker = 'timepicker'
 }
 
 export enum PageTypeEnum {

@@ -17,6 +17,7 @@ export default {
       copyFail: 'copy fail',
       copySuccess: 'copy success',
       enter: 'please enter',
+      required: 'can not be null',
       select: 'please select'
     },
     unit: {
@@ -41,6 +42,7 @@ export default {
       copyFail: '复制失败',
       copySuccess: '复制成功',
       enter: '请输入',
+      required: '不能为空',
       select: '请选择'
     },
     unit: {

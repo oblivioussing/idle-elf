@@ -4,8 +4,7 @@ import { FormatEnum, FormTypeEnum, PageTypeEnum } from '@/chant'
 export type Dict = Record<string, Record<string, any>>
 
 export type FormColumn = {
-  append?: string // 输入框后置内容(字段)
-  appendLabel?: string // 输入框后置内容(常量)
+  append?: string // 输入框后置内容
   clearable?: boolean // 是否可清空
   change?: (row: any) => void // 值变更事件
   defaultValue?: any // 默认值
@@ -18,19 +17,21 @@ export type FormColumn = {
   hideInPage?: PageTypeEnum // 在特定页面类型中隐藏
   label?: string // 标签文本
   lineFeed?: boolean // 是否换行
-  prepend?: string // 输入框前置内容(字段)
-  prependLabel?: string // 输入框前置内容(常量)
+  prepend?: string // 输入框前置内容
   prop: string // 字段值
   required?: boolean // 是否必填
+  rows?: number // 输入框行数,仅 type 为'textarea'时有效
   rules?: any[] // 表单验证规则
+  selectMultiple?: boolean // select是否多选
   showCustom?: (row: any) => boolean // 自定义显示逻辑
   slot?: boolean // 字段内容slot
+  title?: string // 标题
   type?: FormTypeEnum // 标签类型
   valueFormat?: string // 绑定值的格式
 }
 
 export type ListColumn = {
-  appendLabel?: string // 输入框后置内容
+  append?: string // 输入框后置内容
   clearable?: boolean // 是否可清空
   copy?: boolean // 是否可以复制
   dynamicId?: string // 动态id字段
@@ -43,6 +44,7 @@ export type ListColumn = {
   label?: string // 标签文本
   like?: boolean // 是否为模糊查询
   onlySearch?: boolean // 只作为搜索条件
+  prepend?: string // 输入框前置内容
   prop: string // 字段值
   search?: boolean // 是否为搜索条件
   searchSlot?: boolean // 搜索条件slot

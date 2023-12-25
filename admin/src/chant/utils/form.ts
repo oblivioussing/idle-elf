@@ -5,7 +5,10 @@ type Column = ListColumn | FormColumn
 export default {
   // 是否为input
   isInput(row: Column) {
-    return !row.type || row.type === FormTypeEnum.Input
+    return (
+      !row.type ||
+      [FormTypeEnum.Input, FormTypeEnum.Textarea].includes(row.type)
+    )
   },
   // 是否为date
   isDate(row: Column) {

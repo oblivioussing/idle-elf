@@ -13,8 +13,11 @@
             v-model="vModel.query[item.like ? item.prop + 'Like' : item.prop]"
             :clearable="item.clearable !== false"
             :placeholder="translate(item)">
-            <template v-if="item.appendLabel" #append>
-              {{ tg(item.appendLabel) }}
+            <template v-if="item.prepend" #prepend>
+              {{ tg(item.prepend) }}
+            </template>
+            <template v-else-if="item.append" #append>
+              {{ tg(item.append) }}
             </template>
           </el-input>
           <!-- input-number -->
@@ -43,6 +46,8 @@
             v-model="vModel.query[item.prop]"
             :clearable="item.clearable !== false"
             :placeholder="translate(item)"
+            :start-placeholder="translate(item)"
+            :end-placeholder="translate(item)"
             :type="columnType(item.type)"
             :value-format="item.valueFormat || 'x'"
             @change="emits('query')">
