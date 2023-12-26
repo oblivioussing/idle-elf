@@ -9,7 +9,7 @@ export default [
   {
     prop: 'age', // 年龄
     search: true,
-    type: FormTypeEnum.InputNumberRange
+    type: FormTypeEnum.InputNumber
   },
   {
     prop: 'sex', // 性别
@@ -19,18 +19,18 @@ export default [
   {
     prop: 'createTime', // 创建时间
     search: true,
-    type: FormTypeEnum.DatetimeRange
+    type: FormTypeEnum.DateRange
   },
   {
     prop: 'updateTime', // 更新时间
     search: true,
-    type: FormTypeEnum.Datetime
+    type: FormTypeEnum.DatetimeRange
   },
   {
     prop: 'operate', // 操作
-    fixed: 'right',
     label: 'common.operate',
+    fixed: 'right',
     slot: true,
-    width: 100
+    width: 120
   }
 ] as Column[]

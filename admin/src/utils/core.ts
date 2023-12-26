@@ -32,7 +32,7 @@ export default {
       storage.setSession(StorageEnum.RouterQuery, routerQuery)
     }
   },
-  // 修改列表字段
+  // 修改字段
   updateColumn<T extends Columns>(
     list: T,
     row: FormColumn | ListColumn,

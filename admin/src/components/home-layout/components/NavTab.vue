@@ -241,7 +241,7 @@ function onRemoveAll() {
   .el-tabs__item {
     &.is-active {
       .el-tooltip__trigger {
-        color: #409eff;
+        color: var(--main-color);
       }
     }
     .el-dropdown {

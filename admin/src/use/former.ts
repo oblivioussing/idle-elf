@@ -18,8 +18,9 @@ type State = {
   model: Column[]
   query: Record<string, any>
 }
+type Config = { type?: 'page' | 'dialog' }
 
-function useFormer() {
+function useFormer(formConfig?: Config) {
   const route = useRoute()
   const state = {
     continueAdd: false,
@@ -91,10 +92,13 @@ function useFormer() {
       formInstance.resetFields()
       return true
     }
-    // 刷新列表
-    refresh()
-    // 关闭页面
-    core.closePage()
+    if (!formConfig?.type || formConfig?.type === 'page') {
+      // 刷新列表
+      refresh()
+      // 关闭页面
+      core.closePage()
+    } else {
+    }
     return true
   }
   // 表单校验

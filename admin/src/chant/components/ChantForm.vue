@@ -1,7 +1,7 @@
 <template>
   <div class="chant-form">
     <el-form
-      :label-width="props.labelWidth || '100px'"
+      :label-width="props.labelWidth || '90px'"
       :model="vModel.form"
       ref="formRef">
       <template v-for="item in columnsList" :key="item.prop">
@@ -42,7 +42,7 @@
               :placeholder="translate(item, 'select')"
               @change="onChange(item)">
               <el-option
-                v-for="(val, key) in vModel?.dict![item.prop]"
+                v-for="(val, key) in props?.dict?.[item.prop]"
                 :label="val"
                 :value="key">
               </el-option>
@@ -76,7 +76,7 @@
             <!-- daterange,datetimerange -->
             <el-date-picker
               v-else-if="formUtils.isDateRange(item)"
-              v-model="state.dateRange[item.prop]"
+              v-model="state.range[item.prop]"
               :clearable="item.clearable !== false"
               :start-placeholder="translate(item)"
               :end-placeholder="translate(item)"
@@ -89,6 +89,8 @@
               v-else-if="item.type === FormTypeEnum.InputNumber"
               v-model="vModel.form[item.prop]"
               controls-position="right"
+              :min="item.min"
+              :max="item.max"
               :placeholder="translate(item, 'enter')">
             </el-input-number>
             <!-- range -->
@@ -114,7 +116,7 @@
               :disabled="isDisabled(item)"
               :placeholder="translate(item, 'select')">
               <el-radio
-                v-for="(val, key) in vModel.dict?.[item.prop]"
+                v-for="(val, key) in props.dict?.[item.prop]"
                 :label="key">
                 {{ val }}
               </el-radio>
@@ -128,7 +130,7 @@
 
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus'
-import { computed, onMounted, reactive, ref, watch, type Ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useVModel } from '@vueuse/core'
 import {
@@ -142,15 +144,15 @@ import { vuei18n } from '@/plugs'
 
 // type
 type ModelValue = {
-  dict?: Dict
   form: any
   formLoading: boolean
-  model?: Column[]
-  lang?: any
 }
 // props
 const props = defineProps<{
+  dict?: Dict // 字典
   labelWidth?: string // label宽度
+  lang?: any // 国际化
+  model?: Column[] // model
   modelValue: ModelValue // modelValue
   pageType?: PageTypeEnum // 页面类型
 }>()
@@ -163,11 +165,11 @@ const vModel = useVModel(props, 'modelValue', emits)
 const formRef = ref<FormInstance>()
 // state
 const state = reactive({
-  dateRange: {} as any
+  range: {} as any
 })
 // computed
 const columnsList = computed(() => {
-  return vModel.value.model?.filter((item) => {
+  return props.model?.filter((item) => {
     if (item.hide) {
       return false
     }
@@ -182,7 +184,7 @@ const columnsList = computed(() => {
 })
 const messages = computed(() => {
   const locale = vuei18n.global.locale.value
-  const lang = vModel.value.lang
+  const lang = props.lang
   return lang ? lang[locale] : {}
 })
 // onMounted
@@ -194,8 +196,7 @@ onMounted(() => {
 })
 // 初始化
 function init() {
-  const model = vModel.value.model
-  model?.forEach((item) => {
+  props.model?.forEach((item) => {
     // date range
     if (formUtils.isDateRange(item)) {
       const start = rangeField(item, 'start')
@@ -221,10 +222,10 @@ function dateRangeVoluation(column: Column) {
   const startTime = vModel.value.form[start]
   const endTime = vModel.value.form[end]
   if (startTime && endTime) {
-    state.dateRange[column.prop] = [startTime, endTime]
+    state.range[column.prop] = [startTime, endTime]
   }
   if (!startTime && !endTime) {
-    state.dateRange[column.prop] = [null, null]
+    state.range[column.prop] = [null, null]
   }
 }
 // 是否禁用
@@ -262,7 +263,7 @@ function onChange(row: Column) {
 // 日期范围选择
 function onDateRange(row: Column) {
   const prop = row.prop
-  let value = state.dateRange[prop]
+  let value = state.range[prop]
   if (!value) {
     value = ['', '']
   }

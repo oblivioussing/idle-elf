@@ -28,4 +28,5 @@ function setTitle() {
 @import './style/base.scss';
 @import './style/core.scss';
 @import './style/element.scss';
+@import './style/var.scss';
 </style>

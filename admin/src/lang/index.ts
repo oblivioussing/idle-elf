@@ -5,6 +5,7 @@ export default {
     },
     button: {
       add: 'add',
+      alter: 'alter',
       close: 'close',
       edit: 'edit',
       delete: 'delete',
@@ -30,6 +31,7 @@ export default {
     },
     button: {
       add: '新增',
+      alter: '修改',
       close: '关闭',
       edit: '编辑',
       delete: '删除',

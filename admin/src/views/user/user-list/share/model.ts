@@ -7,7 +7,9 @@ export default [
   },
   {
     prop: 'age', // 年龄
-    type: FormTypeEnum.InputNumberRange
+    min: 10,
+    max: 100,
+    type: FormTypeEnum.InputNumber
   },
   {
     prop: 'sex', // 性别

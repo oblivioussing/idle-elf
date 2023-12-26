@@ -1,25 +1,29 @@
 <template>
-  <!-- operation -->
-  <chant-operation
+  <!-- search -->
+  <chant-table-search
     v-model="state"
-    :options="['add', 'edit', 'delete']"
-    show-checked-all
-    @add="lister.add"
+    :dict="dict"
+    :lang="lang"
     @query="getList"
     @refresh="lister.refresh(getList, state)">
-  </chant-operation>
+  </chant-table-search>
+  <!-- operation -->
+  <chant-table-operation
+    v-model="state"
+    :lang="lang"
+    :options="['add', 'edit', 'delete']"
+    @add="lister.add">
+  </chant-table-operation>
   <!-- table -->
-  <chant-table v-model="state">
+  <chant-table v-model="state" :dict="dict" :lang="lang">
     <!-- 操作 -->
     <template #operate>
       <!-- 编辑 -->
-      <chant-icon-button icon-type="edit" @click="onEdit"></chant-icon-button>
-      <!-- 复制新增 -->
-      <chant-icon-button icon-type="copyDocument" @click="onEdit">
-      </chant-icon-button>
+      <el-button link type="primary" @click="onEdit">编辑</el-button>
+      <!-- 复制 -->
+      <el-button link type="primary" @click="onEdit">复制</el-button>
       <!-- 删除 -->
-      <chant-icon-button icon-type="delete" type="danger" @click="onEdit">
-      </chant-icon-button>
+      <el-button link type="danger" @click="onEdit">删除</el-button>
     </template>
   </chant-table>
   <!-- pagination -->
@@ -41,8 +45,6 @@ const lister = useLister()
 const state = reactive({
   ...lister.state,
   columns,
-  dict,
-  lang,
   list: [
     { id: 1, name: '张三', age: '10', sex: '0' },
     { id: 2, name: '李四', age: '20', sex: '1' }

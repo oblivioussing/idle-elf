@@ -55,7 +55,7 @@
               v-model="row[item.prop]"
               :placeholder="translate(item)">
               <el-option
-                v-for="(val, key) in vModel.dict?.[item.prop]"
+                v-for="(val, key) in props.dict?.[item.prop]"
                 :key="key"
                 :label="val"
                 :value="key">
@@ -126,6 +126,7 @@ import Sortable from 'sortablejs'
 import {
   FormatEnum,
   FormTypeEnum,
+  type Dict,
   type ListColumn as Column,
   type ListState
 } from '@/chant'
@@ -140,8 +141,10 @@ defineExpose({
 // type
 interface Props {
   columnWidth?: number // 列宽度
+  dict?: Dict // 字典
   dbEdit?: boolean // 是否双击编辑
   heightWild?: boolean // 高度不限制
+  lang?: any // 国际化
   modelValue: ListState // modelValue
   rowKey?: string // 行数据的key
   showSelection?: boolean // 显示勾选框
@@ -184,7 +187,7 @@ const columnsList = computed(() => {
 })
 const messages = computed(() => {
   const locale = vuei18n.global.locale.value
-  const lang = vModel.value.lang
+  const lang = props.lang
   return lang ? lang[locale] : {}
 })
 // watch
@@ -284,7 +287,7 @@ function isDatetimeFmt(column: Column) {
 }
 // 字典格式化
 function dictFmt(prop: string, value: any) {
-  return vModel.value.dict?.[prop]?.[value]
+  return props.dict?.[prop]?.[value]
 }
 // 切换某一行的选中状态
 function toggleRowSelection(row: any, selected: boolean) {
@@ -333,25 +336,23 @@ function translate(column: Column) {
 <style scoped lang="scss">
 .chant-table {
   flex: 1;
-  margin-top: 5px;
   overflow: hidden;
   ::v-deep(.link) {
-    color: #409eff;
+    color: var(--main-color);
     cursor: pointer;
     overflow: hidden;
     text-decoration: underline;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  ::v-deep(.el-button) {
-    height: 23px;
-    width: 23px;
+  ::v-deep(.el-button.is-link) {
+    font-weight: normal;
   }
   ::v-deep(.el-button + .el-button) {
-    margin-left: 6px;
+    margin-left: 3px;
   }
   .table-icon-copy {
-    color: #409eff;
+    color: var(--main-color);
     cursor: pointer;
     font-size: 14px;
     margin-left: 5px;

@@ -37,10 +37,11 @@ import draggable from 'vuedraggable'
 import { Document, Sort } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
 import { vuei18n } from '@/plugs'
-import { type ListColumn as Column, type ListState } from '@/type'
+import { type ListColumn as Column, type ListState } from '@/chant'
 
 // props
 const props = defineProps<{
+  lang?: any // 国际化
   modelValue: ListState
 }>()
 // emits
@@ -64,7 +65,7 @@ const state = reactive({
 // computed
 const messages = computed(() => {
   const locale = vuei18n.global.locale.value
-  const lang = vModel.value.lang
+  const lang = props.lang
   return lang ? lang[locale] : {}
 })
 // 空白处点击
@@ -75,7 +76,7 @@ document.addEventListener('click', () => {
 function onShowFilter() {
   state.visible = !state.visible
 }
-// checkbox change
+// change
 function onChange(val: any, column: Column) {
   column.hide = !val
 }

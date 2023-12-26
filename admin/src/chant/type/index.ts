@@ -17,10 +17,12 @@ export type FormColumn = {
   hideInPage?: PageTypeEnum // 在特定页面类型中隐藏
   label?: string // 标签文本
   lineFeed?: boolean // 是否换行
+  min?: number // 最小值,仅type为InputNumber时有效
+  max?: number // 最大值,仅type为InputNumber时有效
   prepend?: string // 输入框前置内容
   prop: string // 字段值
   required?: boolean // 是否必填
-  rows?: number // 输入框行数,仅 type 为'textarea'时有效
+  rows?: number // 输入框行数,仅type为Textarea时有效
   rules?: any[] // 表单验证规则
   selectMultiple?: boolean // select是否多选
   showCustom?: (row: any) => boolean // 自定义显示逻辑
@@ -58,10 +60,8 @@ export type ListColumn = {
 export type ListState = {
   allFlag?: 0 | 1 // 全选
   columns: ListColumn[] // 列表字段
-  dict?: Dict // 字典
   extra: Record<string, any> // 页面额外数据
   keepQuery: Record<string, any> // 持续存在的查询条件
-  lang?: Record<string, any> // 国际化
   list: any[] // 列表数据
   loading: boolean // loading
   query: Record<string, any> // 查询条件
