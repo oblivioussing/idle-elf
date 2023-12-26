@@ -1,5 +1,5 @@
 <template>
-  <chant-form v-model="state" type="add" @ref="former.bindFormInstance">
+  <chant-form v-model="state" type="add" @instance="former.bindInstance">
   </chant-form>
   <chant-form-footer v-model="state" @save="onSave"></chant-form-footer>
 </template>

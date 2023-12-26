@@ -27,7 +27,7 @@
         <chant-button
           v-if="show('edit')"
           :content="t('batch') + tg('button.edit')"
-          :disabled="vModel.selectionList.length === 0"
+          :disabled="vModel.selection.length === 0"
           :icon="Edit"
           @click="onEmit('edit')">
         </chant-button>
@@ -35,7 +35,7 @@
         <chant-button
           v-if="show('delete')"
           :content="t('batch') + tg('button.delete')"
-          :disabled="vModel.selectionList.length === 0"
+          :disabled="vModel.selection.length === 0"
           :icon="Delete"
           type="danger"
           @click="onEmit('delete')">
@@ -53,7 +53,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Delete, Edit, Plus } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
-import { type ListState } from '@/type'
+import { type ListState } from '@/chant'
 import FieldFilter from './FieldFilter.vue'
 
 // props

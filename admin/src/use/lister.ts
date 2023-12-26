@@ -1,3 +1,4 @@
+import type { TableInstance } from 'element-plus'
 import { onActivated, onScopeDispose } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { shiki } from '@/api'
@@ -30,10 +31,15 @@ function useLister() {
     loading: false,
     pages: { pageNum: 1, pageSize: 20 },
     query: {} as Record<string, any>,
-    selectionList: [] as any[],
+    selection: [] as any[],
     total: 0
   }
+  let tableInstance: TableInstance
 
+  // 绑定列表实例
+  function bindInstance(val: TableInstance) {
+    tableInstance = val
+  }
   // created
   function created(
     callback: () => void,
@@ -108,7 +114,7 @@ function useLister() {
   // 获取列表参数
   function getListParams(state: State) {
     return {
-      idList: state.selectionIdList,
+      idList: state.selection.map((item) => item.id),
       allFlag: state.allFlag,
       searchAllForm: getQuery(state)
     }
@@ -149,8 +155,7 @@ function useLister() {
   }
   // 重置
   function reset(state: State) {
-    state.selectionList = []
-    state.selectionRow = {}
+    state.selection = []
     state.query = {}
     state.pages.pageNum = 1
     state.pages.pageSize = 20
@@ -162,13 +167,13 @@ function useLister() {
   }
   // 复制新增
   function copyAdd(state: State) {
-    const query = { id: state.selectionRow.id, pageType: 'copy-add' }
+    const query = { id: '', pageType: 'copy-add' }
     // 页面跳转
     jump('/add', query)
   }
   // 编辑
   function edit(state: State) {
-    const query = { id: state.selectionRow.id }
+    const query = { id: '' }
     // 页面跳转
     jump('/edit', query)
   }
@@ -184,6 +189,7 @@ function useLister() {
 
   return {
     state,
+    bindInstance,
     created,
     getData,
     dataDeal,

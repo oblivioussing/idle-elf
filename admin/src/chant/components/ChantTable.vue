@@ -7,7 +7,6 @@
     :height="state.height || undefined"
     ref="tableRef"
     :row-key="props.rowKey"
-    @row-dblclick="onRowDbClick"
     @row-click="onRowClick"
     @select="onSelect"
     @select-all="onSelectAll">
@@ -131,7 +130,6 @@ import {
   type ListState
 } from '@/chant'
 import { vuei18n } from '@/plugs'
-import { useLister } from '@/use'
 import { base, format } from '@/utils'
 
 // defineExpose
@@ -139,7 +137,7 @@ defineExpose({
   scrollToBottom, // 滚动到底部
   toggleRowSelection // 切换某一行的选中状态
 })
-
+// type
 interface Props {
   columnWidth?: number // 列宽度
   dbEdit?: boolean // 是否双击编辑
@@ -156,11 +154,10 @@ const props = withDefaults(defineProps<Props>(), {
   showSelection: true
 })
 // emits
-const emits = defineEmits(['update:modelValue', 'row-click'])
+const emits = defineEmits(['instance', 'row-click', 'update:modelValue'])
 // use
 const { toClipboard } = useClipboard()
 const { t: tg } = useI18n({ useScope: 'global' })
-const lister = useLister()
 const vModel = useVModel(props, 'modelValue', emits)
 // ref
 const tableRef = ref()
@@ -200,6 +197,8 @@ watch(
 )
 // 初始化
 onMounted(() => {
+  // 实例更新
+  emits('instance', tableRef.value)
   // 列表容器自适应
   tableAdapter()
   // 拖拽
@@ -306,12 +305,6 @@ function onSelectAll(selection: any[]) {
 // 单元格点击
 function onRowClick(row: any) {
   emits('row-click', row)
-}
-// 单元格双击
-function onRowDbClick(row: any) {
-  if (props.dbEdit) {
-    lister.jump('/edit', { id: row.id })
-  }
 }
 // 复制
 async function onCopy(text: string) {

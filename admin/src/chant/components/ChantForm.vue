@@ -155,7 +155,7 @@ const props = defineProps<{
   pageType?: PageTypeEnum // 页面类型
 }>()
 // emits
-const emits = defineEmits(['update:modelValue', 'ref'])
+const emits = defineEmits(['instance', 'update:modelValue'])
 // use
 const { t: tg } = useI18n({ useScope: 'global' })
 const vModel = useVModel(props, 'modelValue', emits)
@@ -187,8 +187,8 @@ const messages = computed(() => {
 })
 // onMounted
 onMounted(() => {
-  // ref更新
-  emits('ref', formRef.value)
+  // 实例更新
+  emits('instance', formRef.value)
   // 初始化
   init()
 })

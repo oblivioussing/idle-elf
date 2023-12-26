@@ -33,8 +33,8 @@ function useFormer() {
   }
   let formInstance: FormInstance
 
-  // 绑定表单ref
-  function bindFormInstance(val: FormInstance) {
+  // 绑定表单实例
+  function bindInstance(val: FormInstance) {
     formInstance = val
   }
   // 初始化
@@ -104,7 +104,7 @@ function useFormer() {
 
   return {
     state,
-    bindFormInstance,
+    bindInstance,
     created,
     getData,
     save
