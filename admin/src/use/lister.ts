@@ -2,7 +2,6 @@ import { onActivated, onScopeDispose } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { shiki } from '@/api'
 import { type ListState as State } from '@/chant'
-import { element } from '@/plugs'
 import { useAppStore } from '@/store'
 import { bus } from '@/utils'
 
@@ -31,7 +30,6 @@ function useLister() {
     loading: false,
     pages: { pageNum: 1, pageSize: 20 },
     query: {} as Record<string, any>,
-    selectionRow: {} as Record<string, any>,
     selectionList: [] as any[],
     total: 0
   }

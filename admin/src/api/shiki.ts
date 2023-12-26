@@ -21,11 +21,9 @@ export enum Method {
 }
 // 返回结果
 type Result = {
-  resultCode: ApiCode
-  resultData: any
-  resultDefaultValue: any
-  resultDict: any
-  resultMsg: string
+  code: ApiCode
+  data: any
+  msg: string
 }
 // 请求配置
 type RequestConfig = {
@@ -229,8 +227,8 @@ class Shiki {
     return result
   }
   // 请求是否成功
-  isSuccess(ret: Result | any): boolean {
-    return [ret?.resultCode, ret].includes(ApiCode.Success)
+  isSuccess(code?: string): boolean {
+    return code === ApiCode.Success
   }
   // fetch请求
   private async fetchRequest(config: RequestConfig) {
@@ -383,21 +381,21 @@ class Shiki {
       return
     }
     // post请求成功显示提示
-    const isSuccess = this.isSuccess(result)
+    const isSuccess = this.isSuccess(result?.code)
     if (isSuccess) {
       if (requestConfig.failTip) {
         return
       }
       if (requestConfig.method === Method.Post) {
         ElMessage.success({
-          message: result?.resultMsg,
+          message: result?.msg,
           duration: 2000,
           showClose: true
         })
       }
       return
     }
-    let messageText = result?.resultMsg
+    let messageText = result?.msg
     if (response) {
       messageText = response.statusText
     }
@@ -413,14 +411,12 @@ class Shiki {
     const responseType = config.responseType
     // 返回code
     if (responseType === ResponseType.Code) {
-      return result?.resultCode
+      return result?.code
     }
     // 返回data
     if (responseType === ResponseType.Data) {
-      const data = result?.resultData
-      const dict = result?.resultDict
-      const defaultValue = result?.resultDefaultValue
-      return { data, dict, defaultValue }
+      const data = result?.data
+      return { data }
     }
     // 返回全部
     return result

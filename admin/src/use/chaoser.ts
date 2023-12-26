@@ -1,6 +1,6 @@
 import { useRoute, useRouter } from 'vue-router'
 import qs from 'qs'
-import { useAppStore } from '../store'
+import { useAppStore } from '@/store'
 
 function useChaoser() {
   const appStore = useAppStore()

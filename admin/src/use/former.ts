@@ -6,6 +6,7 @@ import { type FormColumn as Column } from '@/chant'
 import { bus, core } from '@/utils'
 
 type State = {
+  continueAdd?: boolean
   dict: Record<string, any>
   form: {
     pageElements?: Column[]
@@ -21,6 +22,7 @@ type State = {
 function useFormer() {
   const route = useRoute()
   const state = {
+    continueAdd: false,
     dict: {} as any,
     form: {} as any,
     formLoading: false,
@@ -70,20 +72,30 @@ function useFormer() {
     }
   }
   // 保存
-  async function save(path: string, state: State, params?: any) {
+  async function save(path: string, state: State, config?: { params?: any }) {
     // 表单校验
     const status = await validate()
-    console.log(status)
+    if (!status) {
+      return false
+    }
+    const params = config?.params || state.form
     state.loading = true
-    const code = await shiki?.postCode(path, params || state.form)
+    const code = await shiki?.postCode(path, params)
     state.loading = false
-    if (shiki?.isSuccess(code)) {
-      // 刷新列表
-      refresh()
-      // 关闭页面
-      core.closePage()
+    if (!shiki?.isSuccess(code)) {
+      return false
+    }
+    // 是否继续新增
+    if (state.continueAdd) {
+      state.form = {}
+      formInstance.resetFields()
       return true
     }
+    // 刷新列表
+    refresh()
+    // 关闭页面
+    core.closePage()
+    return true
   }
   // 表单校验
   async function validate() {

@@ -146,7 +146,6 @@ type ModelValue = {
   form: any
   formLoading: boolean
   model?: Column[]
-  loading: boolean
   lang?: any
 }
 // props

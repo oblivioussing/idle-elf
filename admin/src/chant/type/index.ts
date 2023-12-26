@@ -69,8 +69,6 @@ export type ListState = {
     pageNum: number
     pageSize: number
   } // 分页
-  selectionRow: any // 选中的行
-  selectionList: any[] // 选中列表数据
+  selection: any[] // 选中列表数据
   total: number // 总数
-  [key: string]: any
 }

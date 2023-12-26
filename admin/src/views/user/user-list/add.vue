@@ -1,11 +1,11 @@
 <template>
   <chant-form v-model="state" type="add" @ref="former.bindFormInstance">
   </chant-form>
-  <chant-form-footer @save="onSave"></chant-form-footer>
+  <chant-form-footer v-model="state" @save="onSave"></chant-form-footer>
 </template>
 
 <script setup lang="ts" name="user-user-list-add">
-import { reactive, ref } from 'vue'
+import { reactive } from 'vue'
 import { useFormer } from '@/use'
 import { dict, lang, model } from './share'
 
@@ -18,7 +18,6 @@ const state = reactive({
   lang,
   model
 })
-const refTest = ref()
 // 保存
 function onSave() {
   former.save('xx/xxx', state)

@@ -1,6 +1,5 @@
 <template>
   <el-table
-    v-bind="$attrs"
     v-loading="vModel.loading"
     :border="true"
     class="chant-table"
@@ -11,15 +10,14 @@
     @row-dblclick="onRowDbClick"
     @row-click="onRowClick"
     @select="onSelect"
-    @select-all="onSelectAll"
-    @selection-change="onSelectionChange">
+    @select-all="onSelectAll">
     <!-- 复选框 -->
     <el-table-column
       v-if="props.showSelection"
       align="center"
-      type="selection"
-      :selectable="selectable"
       fixed="left"
+      :selectable="selectable"
+      type="selection"
       width="35" />
     <el-table-column
       v-for="item in columnsList"
@@ -196,22 +194,22 @@ const messages = computed(() => {
 watch(
   () => vModel.value.allFlag,
   () => {
-    const tablEl = tableRef.value?.$el as HTMLElement
-    const labelEl = tablEl.querySelector(
-      '.el-table__header-wrapper .el-checkbox'
-    )
-    const spanEl = labelEl?.querySelector('.el-checkbox__input')
-    const inputEl = spanEl?.querySelector(
-      '.el-checkbox__original'
-    ) as InputHTMLAttributes
-    if (vModel.value.allFlag === 1) {
-      labelEl?.classList.add('is-disabled')
-      spanEl?.classList.add('is-disabled')
-    } else {
-      labelEl?.classList.remove('is-disabled')
-      spanEl?.classList.remove('is-disabled')
-    }
-    inputEl.disabled = !!vModel.value.allFlag
+    // const tablEl = tableRef.value?.$el as HTMLElement
+    // const labelEl = tablEl.querySelector(
+    //   '.el-table__header-wrapper .el-checkbox'
+    // )
+    // const spanEl = labelEl?.querySelector('.el-checkbox__input')
+    // const inputEl = spanEl?.querySelector(
+    //   '.el-checkbox__original'
+    // ) as InputHTMLAttributes
+    // if (vModel.value.allFlag === 1) {
+    //   labelEl?.classList.add('is-disabled')
+    //   spanEl?.classList.add('is-disabled')
+    // } else {
+    //   labelEl?.classList.remove('is-disabled')
+    //   spanEl?.classList.remove('is-disabled')
+    // }
+    // inputEl.disabled = !!vModel.value.allFlag
   }
 )
 // 初始化
@@ -292,57 +290,15 @@ function toggleRowSelection(row: any, selected: boolean) {
 }
 // CheckBox是否可勾选
 function selectable() {
-  return !props?.modelValue?.allFlag
-}
-// 勾选处理
-function selectHandle(type: 'checked' | 'remove', index: number, row: any) {
-  const value = vModel.value!
-  const selectionList = value.selectionList
-  if (type === 'checked') {
-    selectionList.push(row)
-  } else {
-    selectionList.splice(index, 1)
-  }
-  value.selectionRow = selectionList[0] || {}
+  return vModel.value.allFlag === 0
 }
 // 勾选数据行
 function onSelect(selection: any[], row: any) {
-  const selectionList = vModel.value!.selectionList
-  const id = props.rowKey
-  const index = selectionList.findIndex((item) => item[id] === row[id])
-  const type =
-    selection.findIndex((item) => item[id] === row[id]) >= 0
-      ? 'checked'
-      : 'remove'
-  selectHandle(type, index, row)
+  vModel.value.selection = selection
 }
 // 手动勾选全选
 function onSelectAll(selection: any[]) {
-  const value = vModel.value!
-  const selectionList = value.selectionList
-  let list: any[] | undefined
-  if (selection.length) {
-    list = selectionList?.concat(selection)
-  } else {
-    list = selectionList?.filter(
-      (item) =>
-        !value.list.find((child) => child[props.rowKey] === item[props.rowKey])
-    )
-  }
-  value.selectionList = base.distinct(list)
-  value.selectionIdList = value.selectionList.map((item) => item[props.rowKey])
-}
-// 选择项发生变化
-function onSelectionChange(selection: any[]) {
-  const value = vModel.value!
-  nextTick(() => {
-    value.selectionList = selection
-    value.selectionIdList = value.selectionList.map(
-      (item) => item[props.rowKey]
-    )
-    value.selectionId = selection[0]?.[props.rowKey]
-    value.selectionRow = selection[0] || {}
-  })
+  vModel.value.selection = selection
 }
 // 单元格点击
 function onRowClick(row: any) {

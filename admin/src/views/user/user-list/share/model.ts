@@ -7,7 +7,6 @@ export default [
   },
   {
     prop: 'age', // 年龄
-    required: true,
     type: FormTypeEnum.InputNumberRange
   },
   {

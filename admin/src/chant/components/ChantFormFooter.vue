@@ -2,7 +2,7 @@
   <div class="chant-form-footer toolbar">
     <div>
       <!-- 继续新增 -->
-      <el-checkbox v-model="state.checked" class="continue">
+      <el-checkbox v-model="vModel.continueAdd" class="continue">
         {{ t('continue') }}
       </el-checkbox>
     </div>
@@ -10,7 +10,10 @@
       <!-- 关闭 -->
       <el-button @click="core.closePage()">{{ tg('button.close') }}</el-button>
       <!-- 保存 -->
-      <el-button type="primary" @click="emits('save')">
+      <el-button
+        :loading="vModel.loading"
+        type="primary"
+        @click="emits('save')">
         {{ tg('button.save') }}
       </el-button>
     </div>
@@ -19,10 +22,20 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useVModel } from '@vueuse/core'
 import { core } from '@/utils'
 
+// type
+type ModelValue = {
+  continueAdd: boolean
+  loading: boolean
+}
+// props
+const props = defineProps<{
+  modelValue: ModelValue // modelValue
+}>()
 // emits
-const emits = defineEmits(['save'])
+const emits = defineEmits(['update:modelValue', 'save'])
 // use
 const { t: tg } = useI18n({ useScope: 'global' })
 const { t } = useI18n({
@@ -35,6 +48,7 @@ const { t } = useI18n({
     }
   }
 })
+const vModel = useVModel(props, 'modelValue', emits)
 // state
 const state = reactive({
   checked: false
