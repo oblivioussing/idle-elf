@@ -194,22 +194,8 @@ const messages = computed(() => {
 watch(
   () => vModel.value.allFlag,
   () => {
-    // const tablEl = tableRef.value?.$el as HTMLElement
-    // const labelEl = tablEl.querySelector(
-    //   '.el-table__header-wrapper .el-checkbox'
-    // )
-    // const spanEl = labelEl?.querySelector('.el-checkbox__input')
-    // const inputEl = spanEl?.querySelector(
-    //   '.el-checkbox__original'
-    // ) as InputHTMLAttributes
-    // if (vModel.value.allFlag === 1) {
-    //   labelEl?.classList.add('is-disabled')
-    //   spanEl?.classList.add('is-disabled')
-    // } else {
-    //   labelEl?.classList.remove('is-disabled')
-    //   spanEl?.classList.remove('is-disabled')
-    // }
-    // inputEl.disabled = !!vModel.value.allFlag
+    // 全选按钮禁用状态
+    allCheckedStatus()
   }
 )
 // 初始化
@@ -226,6 +212,23 @@ onActivated(() => {
   // 拖拽
   sortCreate()
 })
+// 全选按钮禁用状态
+function allCheckedStatus() {
+  const tablEl = tableRef.value?.$el as HTMLElement
+  const labelEl = tablEl.querySelector('.el-table__header-wrapper .el-checkbox')
+  const spanEl = labelEl?.querySelector('.el-checkbox__input')
+  const inputEl = spanEl?.querySelector(
+    '.el-checkbox__original'
+  ) as InputHTMLAttributes
+  if (vModel.value.allFlag === 1) {
+    labelEl?.classList.add('is-disabled')
+    spanEl?.classList.add('is-disabled')
+  } else {
+    labelEl?.classList.remove('is-disabled')
+    spanEl?.classList.remove('is-disabled')
+  }
+  inputEl.disabled = !!vModel.value.allFlag
+}
 // 拖拽
 function sortCreate() {
   const list = vModel.value.list
