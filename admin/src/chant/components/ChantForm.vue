@@ -1,7 +1,7 @@
 <template>
   <div class="chant-form">
     <el-form
-      :label-width="props.labelWidth || '90px'"
+      :label-width="props.labelWidth || '80px'"
       :model="vModel.form"
       ref="formRef">
       <template v-for="item in columnsList" :key="item.prop">
@@ -13,7 +13,7 @@
         <div
           v-else
           class="chant-form-item"
-          :class="{ 'textarea-box': item.type === FormTypeEnum.Textarea }">
+          :class="{ 'whole-box': isWhole(item) }">
           <el-form-item
             :label="translate(item) + ':'"
             :prop="item.prop"
@@ -93,6 +93,11 @@
               :max="item.max"
               :placeholder="translate(item, 'enter')">
             </el-input-number>
+            <!-- upload -->
+            <chant-upload
+              v-else-if="item.type === FormTypeEnum.Upload"
+              :type="item.uploadType">
+            </chant-upload>
             <!-- range -->
             <div
               v-else-if="item.type === FormTypeEnum.InputNumberRange"
@@ -238,6 +243,12 @@ function isDisabled(row: Column) {
   }
   return row.disabled
 }
+// 是否显示一整行
+function isWhole(column: Column) {
+  if (column.type) {
+    return [FormTypeEnum.Textarea, FormTypeEnum.Upload].includes(column.type)
+  }
+}
 // 校验规则
 function rules(column: Column) {
   if (column.required) {
@@ -326,7 +337,7 @@ function translate(column: Column, type?: 'enter' | 'select') {
 @container (min-width: 600px) {
   .chant-form-item {
     width: 50%;
-    &.textarea-box {
+    &.whole-box {
       width: 100%;
     }
   }
@@ -334,7 +345,7 @@ function translate(column: Column, type?: 'enter' | 'select') {
 @container (min-width: 1000px) {
   .chant-form-item {
     width: 33.3333%;
-    &.textarea-box {
+    &.whole-box {
       width: 100%;
       .el-form-item {
         width: 66.6666%;
@@ -345,7 +356,7 @@ function translate(column: Column, type?: 'enter' | 'select') {
 @container (min-width: 1300px) {
   .chant-form-item {
     width: 25%;
-    &.textarea-box {
+    &.whole-box {
       width: 100%;
       .el-form-item {
         width: 50%;

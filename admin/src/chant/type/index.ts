@@ -1,5 +1,5 @@
 import { type Ref } from 'vue'
-import { FormatEnum, FormTypeEnum, PageTypeEnum } from '@/chant'
+import { FormatEnum, FormTypeEnum, PageTypeEnum, UploadTypeEnum } from '@/chant'
 
 export type Dict = Record<string, Record<string, any>>
 
@@ -29,7 +29,8 @@ export type FormColumn = {
   slot?: boolean // 字段内容slot
   title?: string // 标题
   type?: FormTypeEnum // 标签类型
-  valueFormat?: string // 绑定值的格式
+  valueFormat?: string // 绑定值的格式,仅type为Date,Datetime时有效
+  uploadType?: UploadTypeEnum // 文件上传类型,仅type为Upload时有效
 }
 
 export type ListColumn = {

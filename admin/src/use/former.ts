@@ -1,5 +1,5 @@
 import type { FormInstance } from 'element-plus'
-import { onActivated } from 'vue'
+import { getCurrentInstance, onActivated } from 'vue'
 import { useRoute } from 'vue-router'
 import shiki from '@/api/shiki'
 import { type FormColumn as Column } from '@/chant'
@@ -7,33 +7,27 @@ import { bus, core } from '@/utils'
 
 type State = {
   continueAdd?: boolean
-  dict: Record<string, any>
   form: {
     pageElements?: Column[]
     [key: string]: any
   }
   formLoading: boolean
-  lang: Record<string, any>
   loading: boolean
-  model: Column[]
   query: Record<string, any>
 }
 type Config = { type?: 'page' | 'dialog' }
 
-function useFormer(formConfig?: Config) {
+function useFormer(formConfig = { type: 'page' } as Config) {
+  let formInstance: FormInstance
+  const instance = getCurrentInstance()
   const route = useRoute()
   const state = {
     continueAdd: false,
-    dict: {} as any,
     form: {} as any,
     formLoading: false,
-    lang: {},
     loading: false,
-    model: [],
     query: {} as any
   }
-  let formInstance: FormInstance
-
   // 绑定表单实例
   function bindInstance(val: FormInstance) {
     formInstance = val
@@ -65,13 +59,6 @@ function useFormer(formConfig?: Config) {
     state.formLoading = false
     state.form = data
   }
-  // 刷新列表
-  function refresh() {
-    const path = core.getParentPath(route?.path)
-    if (path) {
-      bus.emit(path)
-    }
-  }
   // 保存
   async function save(path: string, state: State, config?: { params?: any }) {
     // 表单校验
@@ -92,12 +79,18 @@ function useFormer(formConfig?: Config) {
       formInstance.resetFields()
       return true
     }
-    if (!formConfig?.type || formConfig?.type === 'page') {
+    if (formConfig.type === 'page') {
       // 刷新列表
-      refresh()
+      const path = core.getParentPath(route?.path)
+      bus.emit(path)
       // 关闭页面
       core.closePage()
     } else {
+      const emitsOptions = (instance as any)?.emitsOptions
+      if (emitsOptions?.hasOwnProperty('update')) {
+        instance?.emit('update')
+      }
+      instance?.emit('update:modelValue', false)
     }
     return true
   }

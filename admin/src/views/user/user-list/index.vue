@@ -11,8 +11,20 @@
   <chant-table-operation
     v-model="state"
     :lang="lang"
-    :options="['add', 'edit', 'delete']"
-    @add="lister.add">
+    :options="['add', 'alter', 'delete']"
+    split-button
+    @add="lister.add"
+    @alter="onAlter"
+    @command="onCommand">
+    <el-button type="primary">拉黑</el-button>
+    <el-button type="danger">禁用</el-button>
+    <!-- 批量修改选项 -->
+    <template #alter-option>
+      <el-dropdown-menu>
+        <el-dropdown-item command="1">姓名</el-dropdown-item>
+        <el-dropdown-item command="2">年龄</el-dropdown-item>
+      </el-dropdown-menu>
+    </template>
   </chant-table-operation>
   <!-- table -->
   <chant-table v-model="state" :dict="dict" :lang="lang">
@@ -32,12 +44,15 @@
     :total="state.total"
     @change="getList">
   </chant-pagination>
+  <!-- 批量修改 -->
+  <batch-alter v-if="state.batchAlter" v-model="state.batchAlter"></batch-alter>
 </template>
 
 <script setup lang="ts" name="user-user-list-index">
 import { reactive } from 'vue'
 import { useLister } from '@/use'
 import { columns, dict, lang } from './share'
+import BatchAlter from './components/BatchAlter.vue' // 批量修改
 
 // use
 const lister = useLister()
@@ -48,7 +63,8 @@ const state = reactive({
   list: [
     { id: 1, name: '张三', age: '10', sex: '0' },
     { id: 2, name: '李四', age: '20', sex: '1' }
-  ]
+  ],
+  batchAlter: false
 })
 // init
 state.query = {
@@ -67,6 +83,14 @@ function getList() {
 }
 // 编辑
 function onEdit() {}
+// 批量修改
+function onAlter() {
+  state.batchAlter = true
+}
+// 批量修改command
+function onCommand(val: any) {
+  console.log(val)
+}
 </script>
 
 <style scoped lang="scss"></style>

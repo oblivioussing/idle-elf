@@ -79,8 +79,7 @@ const userStore = useUserStore()
 // state
 const state = reactive({
   orgs: [] as any[],
-  isCollapse: props.modelValue,
-  noticeVisible: false
+  isCollapse: props.modelValue
 })
 // computed
 const avatarUrl = computed(() => {

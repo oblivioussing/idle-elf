@@ -9,10 +9,10 @@
       @open="onMenuOpen">
       <el-sub-menu v-for="item in menus" :key="item.path" :index="item.path">
         <template #title>
-          <div class="flex-align-center">
+          <el-icon>
             <icon-font :icon="icon(item.meta?.icon)"></icon-font>
-            <div class="p-l-5">{{ title(item.meta) }}</div>
-          </div>
+          </el-icon>
+          <span class="p-l-5">{{ title(item.meta) }}</span>
         </template>
         <el-menu-item-group>
           <el-menu-item
@@ -69,13 +69,16 @@ const state = reactive({
 const menus = computed(() => {
   const routes = router.options.routes
   return routes.filter((item) => {
-    const isIndex = ['/'].includes(item.path)
+    const isIndex = '/' === item.path
+    if (isIndex) {
+      return
+    }
     if (item.children) {
       item.children = item.children.filter((item) => {
         return item.path.indexOf('/index') >= 0
       })
     }
-    return item.children?.length && !isIndex
+    return item.children?.length
   })
 })
 // watch
@@ -112,16 +115,15 @@ function icon(icon?: unknown) {
 
 <style scoped lang="scss">
 .home-nav-menu {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   padding-right: 1px;
   .menu-box {
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: auto;
     flex: 1;
     &.el-menu--collapse {
-      width: inherit;
       & + .version {
         display: none;
       }

@@ -17,9 +17,9 @@ export default {
     tips: {
       copyFail: 'copy fail',
       copySuccess: 'copy success',
-      enter: 'please enter',
+      enter: 'please enter ',
       required: 'can not be null',
-      select: 'please select'
+      select: 'please select '
     },
     unit: {
       minute: 'minute'

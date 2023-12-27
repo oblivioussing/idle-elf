@@ -1,4 +1,8 @@
-import { FormTypeEnum, type FormColumn as Column } from '@/chant'
+import {
+  FormTypeEnum,
+  UploadTypeEnum,
+  type FormColumn as Column
+} from '@/chant'
 
 export default [
   {
@@ -19,6 +23,20 @@ export default [
   {
     prop: 'createTime', // 创建时间
     type: FormTypeEnum.DatetimeRange
+  },
+  {
+    prop: 'avatar', // 头像
+    label: '头像',
+    required: true,
+    type: FormTypeEnum.Upload,
+    uploadType: UploadTypeEnum.SingleImage
+  },
+  {
+    prop: '文件列表', // 文件列表
+    label: '文件列表',
+    required: true,
+    type: FormTypeEnum.Upload,
+    uploadType: UploadTypeEnum.FileList
   },
   {
     prop: 'remark', // 备注

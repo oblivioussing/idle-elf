@@ -10,26 +10,34 @@
       </el-checkbox>
     </div>
     <div class="flex-align-center" ref="groupsRef">
+      <!-- 自定义按钮 -->
       <el-button-group>
         <slot></slot>
       </el-button-group>
-      <!-- 批量修改 -->
-      <el-dropdown v-if="show('edit')">
-        <el-button type="primary">
+      <!-- 批量编辑 -->
+      <div v-if="show('alter')" class="m-l-10">
+        <el-dropdown
+          v-if="slots['alter-option']"
+          :split-button="props.splitButton"
+          type="primary"
+          @click="emits('alter')"
+          @command="emits('command', $event)">
+          <template v-if="props.splitButton">
+            {{ t('batch') + tg('button.alter') }}
+          </template>
+          <el-button v-else type="primary">
+            {{ t('batch') + tg('button.alter') }}
+            <el-icon class="m-l-5"><arrow-down /></el-icon>
+          </el-button>
+          <template #dropdown>
+            <slot name="alter-option"></slot>
+          </template>
+        </el-dropdown>
+        <el-button v-else type="primary" @click="emits('alter')">
           {{ t('batch') + tg('button.alter') }}
-          <el-icon><arrow-down /></el-icon>
         </el-button>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item>Action 1</el-dropdown-item>
-            <el-dropdown-item>Action 2</el-dropdown-item>
-            <el-dropdown-item>Action 3</el-dropdown-item>
-            <el-dropdown-item>Action 4</el-dropdown-item>
-            <el-dropdown-item>Action 5</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-      <!-- button -->
+      </div>
+      <!-- 新增,批量删除 -->
       <div :class="{ 'm-l-10': props.options?.length }">
         <el-button-group>
           <!-- 新增 -->
@@ -38,7 +46,7 @@
             :content="tg('button.add')"
             icon-type="plus"
             type="primary"
-            @click="onEmit('add')">
+            @click="emits('add')">
           </chant-icon-button>
           <!-- 批量删除 -->
           <chant-icon-button
@@ -46,7 +54,7 @@
             :content="t('batch') + tg('button.delete')"
             icon-type="delete"
             type="danger"
-            @click="onEmit('delete')">
+            @click="emits('delete')">
           </chant-icon-button>
         </el-button-group>
       </div>
@@ -61,28 +69,35 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, useSlots } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowDown } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
 import { type ListState } from '@/chant'
-import FieldFilter from './components/FieldFilter.vue'
+import FieldFilter from './FieldFilter.vue'
 
-type Option = 'add' | 'edit' | 'delete'
+type Option = 'add' | 'alter' | 'delete'
 // type
 interface Props {
   lang?: any // 国际化
-  options?: Option[]
-  modelValue: ListState
-  showCheckedAll?: boolean
-  showFilter?: boolean
+  options?: Option[] // 按钮选项
+  modelValue: ListState // modelValue
+  showCheckedAll?: boolean // 是否显示全选
+  showFilter?: boolean // 是否显示过滤按钮
+  splitButton?: boolean // 下拉触发元素呈现为按钮组(仅批量修改按钮生效)
 }
 // props
 const props = withDefaults(defineProps<Props>(), {
   showFilter: true
 })
 // emits
-const emits = defineEmits(['add', 'edit', 'delete', 'update:modelValue'])
+const emits = defineEmits([
+  'add',
+  'alter',
+  'command',
+  'delete',
+  'update:modelValue'
+])
 // use
 const { t: tg } = useI18n({ useScope: 'global' })
 const { t } = useI18n({
@@ -99,14 +114,15 @@ const { t } = useI18n({
     }
   }
 })
+const slots = useSlots()
 const vModel = useVModel(props, 'modelValue', emits)
 // ref
 const groupsRef = ref()
 // onMounted
 onMounted(() => {
-  buttonGroup() // 按钮组
+  // 按钮组
+  buttonGroup()
 })
-// init
 // 按钮组
 function buttonGroup() {
   setTimeout(() => {
@@ -119,10 +135,6 @@ function buttonGroup() {
       }
     })
   }, 100)
-}
-// emit
-function onEmit(type: Option) {
-  emits(type)
 }
 // 显示按钮
 function show(type: Option) {

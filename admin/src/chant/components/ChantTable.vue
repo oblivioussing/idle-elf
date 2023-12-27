@@ -8,8 +8,7 @@
     ref="tableRef"
     :row-key="props.rowKey"
     @row-click="onRowClick"
-    @select="onSelect"
-    @select-all="onSelectAll">
+    @selection-change="onSelectChange">
     <!-- 复选框 -->
     <el-table-column
       v-if="props.showSelection"
@@ -135,14 +134,12 @@ import { base, format } from '@/utils'
 
 // defineExpose
 defineExpose({
-  scrollToBottom, // 滚动到底部
-  toggleRowSelection // 切换某一行的选中状态
+  scrollToBottom // 滚动到底部
 })
 // type
 interface Props {
   columnWidth?: number // 列宽度
   dict?: Dict // 字典
-  dbEdit?: boolean // 是否双击编辑
   heightWild?: boolean // 高度不限制
   lang?: any // 国际化
   modelValue: ListState // modelValue
@@ -152,7 +149,6 @@ interface Props {
 }
 // props
 const props = withDefaults(defineProps<Props>(), {
-  dbEdit: true,
   rowKey: 'id',
   showSelection: true
 })
@@ -289,20 +285,12 @@ function isDatetimeFmt(column: Column) {
 function dictFmt(prop: string, value: any) {
   return props.dict?.[prop]?.[value]
 }
-// 切换某一行的选中状态
-function toggleRowSelection(row: any, selected: boolean) {
-  tableRef.value?.toggleRowSelection(row, selected)
-}
 // CheckBox是否可勾选
 function selectable() {
   return vModel.value.allFlag === 0
 }
-// 勾选数据行
-function onSelect(selection: any[], row: any) {
-  vModel.value.selection = selection
-}
-// 手动勾选全选
-function onSelectAll(selection: any[]) {
+// 选择项发生变化时
+function onSelectChange(selection: any[]) {
   vModel.value.selection = selection
 }
 // 单元格点击
@@ -337,7 +325,7 @@ function translate(column: Column) {
 .chant-table {
   flex: 1;
   overflow: hidden;
-  ::v-deep(.link) {
+  :deep(.link) {
     color: var(--main-color);
     cursor: pointer;
     overflow: hidden;
@@ -345,10 +333,10 @@ function translate(column: Column) {
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  ::v-deep(.el-button.is-link) {
+  :deep(.el-button.is-link) {
     font-weight: normal;
   }
-  ::v-deep(.el-button + .el-button) {
+  :deep(.el-button + .el-button) {
     margin-left: 3px;
   }
   .table-icon-copy {

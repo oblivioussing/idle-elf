@@ -15,10 +15,17 @@ export enum FormTypeEnum {
   Radio = 'radio',
   Select = 'select',
   Textarea = 'textarea',
-  TimePicker = 'timepicker'
+  TimePicker = 'timepicker',
+  Upload = 'upload'
 }
 
 export enum PageTypeEnum {
   Add = 'add',
   Edit = 'edit'
+}
+
+export enum UploadTypeEnum {
+  SingleImage = 'single-image',
+  PictureCard = 'picture-card',
+  FileList = 'file-list'
 }
