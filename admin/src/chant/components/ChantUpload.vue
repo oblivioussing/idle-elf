@@ -1,4 +1,12 @@
 <template>
+  <!-- pure-button -->
+  <el-button
+    v-if="props.type === UploadTypeEnum.PureButton"
+    type="primary"
+    @click="onTrigger">
+    {{ props.buttonText || t('upload') }}
+  </el-button>
+  <!-- upload -->
   <el-upload
     v-model:file-list="state.fileList"
     action="/"
@@ -6,29 +14,43 @@
     class="chant-upload"
     :class="[props.type]"
     :limit="props.limit"
+    :list-type="
+      props.type === UploadTypeEnum.PictureCard ? 'picture-card' : 'text'
+    "
     :multiple="props.multiple"
-    :show-file-list="showFileList">
+    ref="uploadRef"
+    :show-file-list="showFileList"
+    :on-change="onChange"
+    :on-preview="onPreview">
     <!-- file-list -->
     <el-button v-if="props.type === UploadTypeEnum.FileList" type="primary">
-      {{ t('clickUpload') }}
+      {{ t('upload') }}
     </el-button>
+    <!-- picture-card -->
+    <el-icon v-else-if="props.type === UploadTypeEnum.PictureCard">
+      <Plus />
+    </el-icon>
     <!-- single-image -->
-    <template v-if="props.type === UploadTypeEnum.SingleImage">
+    <template v-else-if="props.type === UploadTypeEnum.SingleImage">
       <el-image v-if="state.imageUrl" class="image" :src="state.imageUrl">
       </el-image>
       <el-icon v-else class="uploader-icon"><Plus /></el-icon>
     </template>
   </el-upload>
+  <el-dialog v-model="state.previewVisible" append-to-body>
+    <img class="w-100" :src="state.previewUrl" />
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
+import { computed, nextTick, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Plus } from '@element-plus/icons-vue'
 import { UploadTypeEnum } from '../enum'
 
 // type
 interface Props {
+  buttonText?: string // 按钮文本
   limit?: number // 允许上传文件的最大数量
   multiple?: boolean // 是否支持多选文件
   type: UploadTypeEnum // 文件上传类型
@@ -41,51 +63,99 @@ const props = withDefaults(defineProps<Props>(), {
 const { t } = useI18n({
   messages: {
     en: {
-      clickUpload: 'click upload'
+      upload: 'click upload'
     },
     zh: {
-      clickUpload: '点击上传'
+      upload: '点击上传'
     }
   }
 })
+// ref
+const uploadRef = ref()
 // state
 const state = reactive({
-  imageUrl: '',
-  fileList: []
+  imageUrl: '', // 图片地址
+  fileList: [], // 文件列表
+  render: props.type !== UploadTypeEnum.PureButton, // 是否渲染upload
+  previewUrl: '', // 预览图片地址
+  previewVisible: false // 预览visible
 })
 // computed
 const showFileList = computed(() => {
-  if (props.type === UploadTypeEnum.SingleImage) {
-    return false
-  }
-  return true
+  const status = [UploadTypeEnum.FileList, UploadTypeEnum.PictureCard].includes(
+    props.type
+  )
+  return status
 })
+// file change
+function onChange(row: any) {
+  console.log(row)
+}
+// 按钮出发文件选择
+function onTrigger() {
+  state.render = true
+  nextTick(() => {
+    const el = uploadRef.value.$el as HTMLElement
+    const uploadEL = el.querySelector('.el-upload') as HTMLElement
+    uploadEL?.click()
+  })
+}
+// 预览
+function onPreview(row: any) {
+  if (row.url) {
+    state.previewUrl = row.url
+    state.previewVisible = true
+  }
+}
 </script>
 
 <style lang="scss">
-.chant-upload.single-image {
-  .image {
-    display: block;
-    height: 135px;
-    width: 135px;
+.chant-upload {
+  --picture-size: 100px;
+  container-type: inline-size;
+  flex: 1;
+  &.pure-button {
+    container-type: normal;
+    display: inline-block;
   }
-  .el-upload {
-    border: 1px dashed var(--el-border-color);
-    border-radius: 6px;
-    cursor: pointer;
-    overflow: hidden;
-    position: relative;
-    transition: var(--el-transition-duration-fast);
+  &.single-image {
+    .image {
+      display: block;
+      height: var(--picture-size);
+      width: var(--picture-size);
+    }
+    .el-upload {
+      border: 1px dashed var(--el-border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+      transition: var(--el-transition-duration-fast);
+    }
+    .el-upload:hover {
+      border-color: var(--el-color-primary);
+    }
+    .uploader-icon {
+      color: #8c939d;
+      font-size: 28px;
+      text-align: center;
+      height: var(--picture-size);
+      width: var(--picture-size);
+    }
   }
-  .el-upload:hover {
-    border-color: var(--el-color-primary);
+  &.picture-card {
+    .el-upload-list--picture-card {
+      .el-upload--picture-card,
+      .el-upload-list__item {
+        height: var(--picture-size) !important;
+        width: var(--picture-size) !important;
+      }
+    }
   }
-  .uploader-icon {
-    color: #8c939d;
-    font-size: 28px;
-    text-align: center;
-    height: 135px;
-    width: 135px;
+}
+@container (min-width: 600px) {
+  .el-upload-list--text {
+    width: 45%;
   }
 }
 </style>

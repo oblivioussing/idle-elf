@@ -16,9 +16,10 @@ export type FormColumn = {
   hide?: boolean // 是否隐藏
   hideInPage?: PageTypeEnum // 在特定页面类型中隐藏
   label?: string // 标签文本
-  lineFeed?: boolean // 是否换行
+  limit?: number // 允许上传文件的最大数量
   min?: number // 最小值,仅type为InputNumber时有效
   max?: number // 最大值,仅type为InputNumber时有效
+  multiple?: boolean // 是否支持多选文件
   prepend?: string // 输入框前置内容
   prop: string // 字段值
   required?: boolean // 是否必填

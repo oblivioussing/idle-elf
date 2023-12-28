@@ -96,6 +96,8 @@
             <!-- upload -->
             <chant-upload
               v-else-if="item.type === FormTypeEnum.Upload"
+              :limit="item.limit"
+              :multiple="item.multiple"
               :type="item.uploadType">
             </chant-upload>
             <!-- range -->

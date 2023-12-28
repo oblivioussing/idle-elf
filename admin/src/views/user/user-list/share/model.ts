@@ -34,9 +34,18 @@ export default [
   {
     prop: '文件列表', // 文件列表
     label: '文件列表',
+    multiple: true,
     required: true,
     type: FormTypeEnum.Upload,
     uploadType: UploadTypeEnum.FileList
+  },
+  {
+    prop: '图片列表', // 图片列表
+    label: '图片列表',
+    multiple: true,
+    required: true,
+    type: FormTypeEnum.Upload,
+    uploadType: UploadTypeEnum.PictureCard
   },
   {
     prop: 'remark', // 备注

@@ -18,6 +18,8 @@
     @command="onCommand">
     <el-button type="primary">拉黑</el-button>
     <el-button type="danger">禁用</el-button>
+    <chant-upload button-text="导入" :type="UploadTypeEnum.PureButton">
+    </chant-upload>
     <!-- 批量修改选项 -->
     <template #alter-option>
       <el-dropdown-menu>
@@ -50,6 +52,7 @@
 
 <script setup lang="ts" name="user-user-list-index">
 import { reactive } from 'vue'
+import { UploadTypeEnum } from '@/chant'
 import { useLister } from '@/use'
 import { columns, dict, lang } from './share'
 import BatchAlter from './components/BatchAlter.vue' // 批量修改

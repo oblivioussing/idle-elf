@@ -25,7 +25,8 @@ export enum PageTypeEnum {
 }
 
 export enum UploadTypeEnum {
-  SingleImage = 'single-image',
+  FileList = 'file-list',
   PictureCard = 'picture-card',
-  FileList = 'file-list'
+  PureButton = 'pure-button',
+  SingleImage = 'single-image'
 }
