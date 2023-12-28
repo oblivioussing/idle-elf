@@ -36,6 +36,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { LangEnum } from '@/enum'
 import { useAppStore } from '@/store'
+import IconFont from '../IconFont.vue'
 
 // props
 const props = defineProps<{

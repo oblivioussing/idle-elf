@@ -6,9 +6,12 @@
       :inline="true"
       :label-width="props.labelWidth"
       @keyup.enter="emits('query')">
-      <slot name="search-start"></slot>
+      <slot></slot>
       <!-- 查询条件 -->
-      <el-form-item v-for="item in columnsList" :label="translate(item) + ':'">
+      <el-form-item
+        v-if="vModel"
+        v-for="item in columnsList"
+        :label="translate(item) + ':'">
         <!-- input -->
         <el-input
           v-if="formUtils.isInput(item)"
@@ -82,7 +85,7 @@
           </el-input-number>
         </div>
         <!-- slot -->
-        <slot v-else-if="item.searchSlot" :name="item.prop" :row="item"> </slot>
+        <slot v-else-if="item.searchSlot" :name="item.prop" :row="item"></slot>
       </el-form-item>
       <slot name="search-end"></slot>
     </el-form>
@@ -138,7 +141,7 @@ interface Props {
   dict?: Dict // 字典
   labelWidth?: string // label宽度
   lang?: any // 国际化
-  modelValue: ListState // modelValue
+  modelValue?: ListState // modelValue
   searchOrder?: string[] // 搜索字段顺序
   showFold?: boolean // 显示折叠按钮
   unfold?: boolean // 自动展开搜索条件
@@ -178,9 +181,9 @@ const state = reactive({
 })
 // computed
 const columnsList = computed(() => {
-  const columns = vModel.value.columns
+  const columns = vModel.value?.columns
   const searchOrder = props.searchOrder?.reverse()
-  return columns.reduce((acc: Column[], cur: Column) => {
+  return columns?.reduce((acc: Column[], cur: Column) => {
     const status = !cur.hide && (cur.search || cur.onlySearch)
     if (!status) {
       return acc
@@ -217,12 +220,12 @@ setTimeout(() => {
 }, 1500)
 // 绑定查询条件的值
 function bindQueryValue() {
-  const query = vModel.value.query
-  vModel.value.columns?.forEach((item) => {
+  const query = vModel.value?.query
+  vModel.value?.columns?.forEach((item) => {
     if (formUtils.isDateRange(item)) {
       const start = rangeField(item, 'start')
       const end = rangeField(item, 'end')
-      state.range[item.prop] = [query[start], query[end]]
+      state.range[item.prop] = [query?.[start], query?.[end]]
     }
   })
 }
@@ -239,8 +242,10 @@ function onDateRange(row: Column) {
   if (!value) {
     value = ['', '']
   }
-  vModel.value.query[rangeField(row, 'start')] = value[0]
-  vModel.value.query[rangeField(row, 'end')] = value[1]
+  if (vModel.value) {
+    vModel.value.query[rangeField(row, 'start')] = value[0]
+    vModel.value.query[rangeField(row, 'end')] = value[1]
+  }
   emits('query')
 }
 // 展开/关闭
@@ -276,7 +281,7 @@ function onEmit(type: any) {
 // 清空查询条件
 function reset() {
   state.range = {}
-  for (let item in vModel.value.query) {
+  for (let item in vModel.value?.query) {
     if (!['page', 'size'].includes(item)) {
       vModel.value.query[item] = ''
     }
@@ -306,9 +311,8 @@ function translate(column: Column, type?: 'enter' | 'select') {
 </script>
 
 <style lang="scss">
-$input-width: 165px;
-
 .chant-table-search {
+  --input-width: 165px;
   box-sizing: border-box;
   display: flex;
   height: 48px;
@@ -336,7 +340,7 @@ $input-width: 165px;
     }
     // input
     .el-input {
-      width: $input-width;
+      width: var(--input-width);
       .el-input-group__append,
       .el-input-group__prepend {
         padding: 0 6px;
@@ -344,11 +348,11 @@ $input-width: 165px;
     }
     // input-number
     .el-input-number {
-      width: $input-width;
+      width: var(--input-width);
     }
     // date
     .el-date-editor.el-input {
-      width: $input-width;
+      width: var(--input-width);
     }
     // date range
     .el-date-editor--daterange {

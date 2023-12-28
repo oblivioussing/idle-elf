@@ -70,7 +70,11 @@
           </template>
           <!-- dict -->
           <div v-else-if="item.type === FormTypeEnum.Select">
-            {{ dictFmt(item.prop, row[item.prop]) || '-' }}
+            <el-tag
+              :effect="item.tagType ? 'dark' : 'plain'"
+              :type="item.tagType?.[row[item.prop]]">
+              {{ dictFmt(item.prop, row[item.prop]) }}
+            </el-tag>
           </div>
           <!-- date -->
           <div v-else-if="isDateFmt(item)">
@@ -283,7 +287,7 @@ function isDatetimeFmt(column: Column) {
 }
 // 字典格式化
 function dictFmt(prop: string, value: any) {
-  return props.dict?.[prop]?.[value]
+  return props.dict?.[prop]?.[value] || '-'
 }
 // CheckBox是否可勾选
 function selectable() {

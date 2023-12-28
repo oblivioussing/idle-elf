@@ -63,13 +63,9 @@ const state = reactive({
   ...lister.state,
   columns,
   list: [
-    {
-      id: 1,
-      name: '张三',
-      age: '10',
-      sex: '0'
-    },
-    { id: 2, name: '李四', age: '20', sex: '1' }
+    { id: 1, name: '张三', age: '10', sex: '1', status: '1' },
+    { id: 2, name: '李四', age: '20', sex: '2', status: '2' },
+    { id: 3, name: '王五', age: '21', sex: '2', status: '3' }
   ],
   batchAlter: false
 })

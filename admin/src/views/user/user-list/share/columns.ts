@@ -17,6 +17,17 @@ export default [
     type: FormTypeEnum.Select
   },
   {
+    prop: 'status', // 状态
+    label: '状态',
+    search: true,
+    tagType: {
+      1: 'success',
+      2: 'danger',
+      3: 'warning'
+    },
+    type: FormTypeEnum.Select
+  },
+  {
     prop: 'createTime', // 创建时间
     search: true,
     type: FormTypeEnum.DateRange

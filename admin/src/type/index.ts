@@ -1,5 +1,3 @@
-import { type ListColumn } from '@/chant'
-
 export type Stage = 'dev' | 'test' | 'prod'
 
 export type PageRelation = Record<string, { parent: string }>

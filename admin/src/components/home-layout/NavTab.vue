@@ -46,14 +46,16 @@ import { bus, core, storage } from '@/utils'
 import { useAppStore } from '@/store'
 import { useChaoser } from '@/use'
 
+// type
 type PathMapping = {
   name: string
   path: string
   titleEn: string
   titleZh: string
 }
-
-// chaoser
+// emits
+const emits = defineEmits(['change'])
+// use
 const chaoser = useChaoser()
 // i18n
 const { t } = useI18n({
@@ -96,10 +98,6 @@ const state = reactive({
 bus.on(BusEnum.ClosePage, (path) => {
   path = path || route.path
   onTabRemove(path as string)
-})
-// 监听所有页面关闭
-bus.on(BusEnum.CloseAllPage, () => {
-  onRemoveAll()
 })
 // 监听tabs变化
 watch(
@@ -158,7 +156,7 @@ function busKeeps() {
   let keeps = state.tabs.map((item) => {
     return item.name
   })
-  bus.emit(BusEnum.HomeKeeps, keeps)
+  emits('change', keeps)
 }
 // tab切换
 function onTab(row: any) {

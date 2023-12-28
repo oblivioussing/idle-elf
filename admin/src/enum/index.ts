@@ -1,9 +1,9 @@
 export enum ApiCode {
-  Success = '10', // 成功
-  NoLogin = '11', // 未登录
-  Fail = '12', // 失败
-  ParamError = '13', // 参数错误
-  Exception = '14' // 系统异常
+  Success = '1', // 成功
+  NoLogin = '2', // 未登录
+  Fail = '3', // 失败
+  ParamError = '4', // 参数错误
+  Exception = '5' // 系统异常
 }
 
 export enum BlobTypeEnum {
@@ -15,11 +15,7 @@ export enum BlobTypeEnum {
 }
 
 export enum BusEnum {
-  ClosePage = 'close-page',
-  CloseAllPage = 'close-all-page',
-  HomeKeeps = 'home-keeps',
-  NavMenu = 'nav-menu',
-  Mount = 'mount'
+  ClosePage = 'close-page'
 }
 
 export enum LangEnum {

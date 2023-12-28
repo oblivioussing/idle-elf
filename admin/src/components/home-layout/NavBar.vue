@@ -1,9 +1,15 @@
 <template>
   <div class="home-header">
     <div class="left">
+      <!-- logo -->
       <img src="/image/logo.png" class="logo-ic" />
+      <!-- 项目名 -->
       <div>{{ tg('app.project') }}</div>
-      <img src="./img/ic_menu.png" class="menu-ic" @click="onCollapse" />
+      <!-- 折叠/展开 -->
+      <el-icon @click="onCollapse">
+        <Expand v-if="state.isCollapse" />
+        <Fold v-else />
+      </el-icon>
     </div>
     <div class="right">
       <!-- 语言 -->
@@ -47,16 +53,12 @@
 import { computed, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { CaretBottom } from '@element-plus/icons-vue'
+import { CaretBottom, Expand, Fold } from '@element-plus/icons-vue'
 import { LangEnum, StorageEnum } from '@/enum'
 import { vuei18n } from '@/plugs'
 import { useAppStore, useUserStore } from '@/store'
 import { storage } from '@/utils'
 
-// props
-const props = defineProps<{
-  modelValue: boolean
-}>()
 // emits
 const emits = defineEmits(['update:modelValue'])
 // i18n
@@ -79,7 +81,7 @@ const userStore = useUserStore()
 // state
 const state = reactive({
   orgs: [] as any[],
-  isCollapse: props.modelValue
+  isCollapse: false
 })
 // computed
 const avatarUrl = computed(() => {
@@ -128,11 +130,6 @@ async function onQuit() {
     .logo-ic {
       margin-right: 5px;
       width: 20px;
-    }
-    .menu-ic {
-      margin-left: 5px;
-      cursor: pointer;
-      width: 25px;
     }
   }
   .right {

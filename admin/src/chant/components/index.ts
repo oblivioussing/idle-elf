@@ -16,12 +16,12 @@ const ChantTableOperation = defineAsyncComponent(
 const ChantPagination = defineAsyncComponent(
   () => import('./ChantPagination.vue')
 )
+const ChantPicker = defineAsyncComponent(() => import('./ChantPicker.vue'))
 const ChantTable = defineAsyncComponent(() => import('./ChantTable.vue'))
 const ChantTableSearch = defineAsyncComponent(
   () => import('./ChantTableSearch.vue')
 )
 const ChantUpload = defineAsyncComponent(() => import('./ChantUpload.vue'))
-const IconFont = defineAsyncComponent(() => import('./IconFont.vue'))
 
 function components(app: App<Element>) {
   app.component('ChantButton', ChantButton)
@@ -30,11 +30,11 @@ function components(app: App<Element>) {
   app.component('ChantFormFooter', ChantFormFooter)
   app.component('ChantIconButton', ChantIconButton)
   app.component('ChantPagination', ChantPagination)
+  app.component('ChantPicker', ChantPicker)
   app.component('ChantTable', ChantTable)
   app.component('ChantTableOperation', ChantTableOperation)
   app.component('ChantTableSearch', ChantTableSearch)
   app.component('ChantUpload', ChantUpload)
-  app.component('IconFont', IconFont)
 }
 
 export default components

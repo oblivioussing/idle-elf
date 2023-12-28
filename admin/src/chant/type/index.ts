@@ -1,4 +1,4 @@
-import { type Ref } from 'vue'
+import type { TagProps } from 'element-plus'
 import { FormatEnum, FormTypeEnum, PageTypeEnum, UploadTypeEnum } from '@/chant'
 
 export type Dict = Record<string, Record<string, any>>
@@ -53,7 +53,7 @@ export type ListColumn = {
   search?: boolean // 是否为搜索条件
   searchSlot?: boolean // 搜索条件slot
   slot?: boolean // 字段内容slot
-  tagColor?: Record<string, string> // tag 颜色
+  tagType?: Record<string, TagProps['type']> // 标签类型
   type?: FormTypeEnum // 标签类型
   valueFormat?: string // 绑定值的格式
   width?: number // 对应列的宽度

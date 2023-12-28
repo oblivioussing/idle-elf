@@ -48,11 +48,14 @@ declare module 'vue' {
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     HomeLayout: typeof import('./src/components/home-layout/index.vue')['default']
-    NavBar: typeof import('./src/components/home-layout/components/nav-bar/index.vue')['default']
-    NavMenu: typeof import('./src/components/home-layout/components/NavMenu.vue')['default']
-    NavTab: typeof import('./src/components/home-layout/components/NavTab.vue')['default']
+    IconFont: typeof import('./src/components/IconFont.vue')['default']
+    Index: typeof import('./src/components/home-layout/Index.vue')['default']
+    NavBar: typeof import('./src/components/home-layout/NavBar.vue')['default']
+    NavMenu: typeof import('./src/components/home-layout/NavMenu.vue')['default']
+    NavTab: typeof import('./src/components/home-layout/NavTab.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    UserPicker: typeof import('./src/components/UserPicker.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

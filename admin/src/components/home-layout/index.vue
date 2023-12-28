@@ -9,7 +9,7 @@
       <!-- container -->
       <div class="home-container">
         <!-- tab -->
-        <nav-tab></nav-tab>
+        <nav-tab @change="onChange"></nav-tab>
         <!-- 路由视图 -->
         <router-view #="{ Component }">
           <keep-alive :include="state.keeps">
@@ -25,12 +25,10 @@
 import { computed, reactive } from 'vue'
 import { ElConfigProvider } from 'element-plus'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
-import { BusEnum } from '@/enum'
 import { useAppStore } from '@/store'
-import { bus } from '@/utils'
-import NavBar from './components/nav-bar/index.vue'
-import NavMenu from './components/NavMenu.vue'
-import NavTab from './components/NavTab.vue'
+import NavBar from './NavBar.vue'
+import NavMenu from './NavMenu.vue'
+import NavTab from './NavTab.vue'
 
 // store
 const appStore = useAppStore()
@@ -47,10 +45,10 @@ const locale = computed(() => {
   }
   return map[appStore.state.lang]
 })
-// 监听事件
-bus.on(BusEnum.HomeKeeps, (arr) => {
-  state.keeps = arr as never[]
-})
+// nav tab变化
+function onChange(arr: any) {
+  state.keeps = arr
+}
 </script>
 
 <style scoped lang="scss">
