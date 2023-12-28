@@ -18,8 +18,7 @@
     @command="onCommand">
     <el-button type="primary">拉黑</el-button>
     <el-button type="danger">禁用</el-button>
-    <chant-upload button-text="导入" :type="UploadTypeEnum.PureButton">
-    </chant-upload>
+    <chant-upload :type="UploadTypeEnum.PureButton"></chant-upload>
     <!-- 批量修改选项 -->
     <template #alter-option>
       <el-dropdown-menu>
@@ -64,7 +63,12 @@ const state = reactive({
   ...lister.state,
   columns,
   list: [
-    { id: 1, name: '张三', age: '10', sex: '0' },
+    {
+      id: 1,
+      name: '张三',
+      age: '10',
+      sex: '0'
+    },
     { id: 2, name: '李四', age: '20', sex: '1' }
   ],
   batchAlter: false

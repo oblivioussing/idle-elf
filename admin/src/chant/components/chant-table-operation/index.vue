@@ -6,10 +6,12 @@
         class="all-box"
         @change="onChange">
         <span>{{ t('all') }}:</span>
-        <span class="p-l-5">{{ vModel.total }}{{ t('record') }}</span>
+        <span style="padding-left: 5px">
+          {{ vModel.total }}{{ t('record') }}
+        </span>
       </el-checkbox>
     </div>
-    <div class="flex-align-center" ref="groupsRef">
+    <div class="button-box" ref="groupsRef">
       <!-- 自定义按钮 -->
       <el-button-group>
         <slot></slot>
@@ -27,7 +29,7 @@
           </template>
           <el-button v-else type="primary">
             {{ t('batch') + tg('button.alter') }}
-            <el-icon class="m-l-5"><arrow-down /></el-icon>
+            <el-icon style="margin-left: 5px"><arrow-down /></el-icon>
           </el-button>
           <template #dropdown>
             <slot name="alter-option"></slot>
@@ -156,6 +158,13 @@ function onChange(val: any) {
     font-size: 12px;
     font-weight: normal;
     padding-left: 1px;
+  }
+  .button-box {
+    display: flex;
+    align-items: center;
+  }
+  .m-l-10 {
+    margin-left: 10px;
   }
   :deep(.el-button) {
     height: 28px;

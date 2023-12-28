@@ -12,7 +12,7 @@
           <el-icon>
             <icon-font :icon="icon(item.meta?.icon)"></icon-font>
           </el-icon>
-          <span class="p-l-5">{{ title(item.meta) }}</span>
+          <span style="padding-left: 5px">{{ title(item.meta) }}</span>
         </template>
         <el-menu-item-group>
           <el-menu-item

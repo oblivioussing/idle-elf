@@ -28,7 +28,7 @@
             <img
               src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" />
           </el-avatar>
-          <div class="t-a-c m-l-5">
+          <div class="login-name-box">
             <div>登录名</div>
             <div>姓名</div>
           </div>
@@ -152,6 +152,10 @@ async function onQuit() {
       margin-left: 10px;
       .arrow-down-icon {
         color: #999999;
+      }
+      .login-name-box {
+        margin-left: 5px;
+        text-align: center;
       }
     }
   }

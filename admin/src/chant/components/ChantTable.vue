@@ -30,7 +30,7 @@
         <span>{{ translate(item) }}</span>
       </template>
       <template #="{ row, $index }">
-        <div class="flex-center">
+        <div class="content-box">
           <!-- slot -->
           <slot
             v-if="item.slot"
@@ -85,12 +85,12 @@
             {{ format.money(row[item.prop]) || '-' }}
           </div>
           <!-- value -->
-          <div v-else class="ellipsis-1">
+          <el-text v-else truncated>
             {{ row[item.prop] || '-' }}
             <template v-if="item.append">
               {{ tg(item.append) }}
             </template>
-          </div>
+          </el-text>
           <!-- copy -->
           <el-icon
             v-if="item.copy && row[item.prop]"
@@ -338,6 +338,11 @@ function translate(column: Column) {
   }
   :deep(.el-button + .el-button) {
     margin-left: 3px;
+  }
+  .content-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .table-icon-copy {
     color: var(--main-color);

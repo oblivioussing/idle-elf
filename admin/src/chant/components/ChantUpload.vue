@@ -4,7 +4,7 @@
     v-if="props.type === UploadTypeEnum.PureButton"
     type="primary"
     @click="onTrigger">
-    {{ props.buttonText || t('upload') }}
+    {{ props.buttonText || t('import') }}
   </el-button>
   <!-- upload -->
   <el-upload
@@ -37,13 +37,14 @@
       <el-icon v-else class="uploader-icon"><Plus /></el-icon>
     </template>
   </el-upload>
+  <!-- preview -->
   <el-dialog v-model="state.previewVisible" append-to-body>
-    <img class="w-100" :src="state.previewUrl" />
+    <img style="width: 100%" :src="state.previewUrl" />
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, reactive, ref } from 'vue'
+import { computed, onMounted, nextTick, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Plus } from '@element-plus/icons-vue'
 import { UploadTypeEnum } from '../enum'
@@ -63,9 +64,11 @@ const props = withDefaults(defineProps<Props>(), {
 const { t } = useI18n({
   messages: {
     en: {
+      import: 'import',
       upload: 'click upload'
     },
     zh: {
+      import: '导入',
       upload: '点击上传'
     }
   }
@@ -87,6 +90,23 @@ const showFileList = computed(() => {
   )
   return status
 })
+// onMounted
+onMounted(() => {
+  if (props.type === UploadTypeEnum.PureButton) {
+    // 挪动元素
+    movingElement()
+  }
+})
+// 挪动元素(主要是解决el-button-group样式问题)
+function movingElement() {
+  const uploadEl = uploadRef.value.$el as HTMLElement
+  const parentEl = uploadEl.parentElement
+  const classList = parentEl?.classList
+  const status = classList?.contains('el-button-group')
+  if (status) {
+    parentEl?.parentElement?.appendChild(uploadEl)
+  }
+}
 // file change
 function onChange(row: any) {
   console.log(row)

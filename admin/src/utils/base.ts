@@ -30,31 +30,6 @@ export default {
     }
     return newobj
   },
-  // 是否处于浏览器中
-  inBrowser() {
-    return typeof window !== 'undefined'
-  },
-  // 是否为空
-  isEmpty(data: any, char = true) {
-    if (data === 0) {
-      return false
-    }
-    if (char === false && data === '') {
-      return false
-    }
-    if (!data) {
-      return true
-    }
-    if (typeof data === 'object') {
-      const keys = Object.keys(data)
-      if (!keys.length) {
-        return true
-      }
-    }
-    if (Array.isArray(data) && !data.length) {
-      return true
-    }
-  },
   // 获取url参数
   getUrlParam(url?: string) {
     url = url || window.location.href
@@ -101,18 +76,6 @@ export default {
   checkFileName(arr: string[]) {
     const str = arr.map((name) => `.${name}`).join('|')
     return new RegExp(`(${str})$`)
-  },
-  // 过滤对象空值
-  filterObjectEmpty(params: any, char = true) {
-    if (params?.constructor === Object) {
-      params = this.clone(params)
-      for (let item in params) {
-        if (this.isEmpty(params[item], char)) {
-          Reflect.deleteProperty(params, item)
-        }
-      }
-    }
-    return params
   },
   // 下载根据url
   downloadByUrl(row: { url: string; filename?: string }) {

@@ -1,5 +1,5 @@
 <template>
-  <div class="m-l-10 rel">
+  <div class="field-filter">
     <chant-button
       :content="t('filter')"
       :icon="Document"
@@ -92,60 +92,64 @@ function translate(column: Column) {
 </script>
 
 <style scoped lang="scss">
-.filter {
-  background-color: #ffffff;
-  border-radius: 2px;
-  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.2);
-  font-size: 14px;
-  padding: 5px 0;
-  position: absolute;
-  top: 45px;
-  right: -10px;
-  z-index: 9;
-  .bubble {
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid #ffffff;
+.field-filter {
+  margin-left: 10px;
+  position: relative;
+  .filter {
+    background-color: #ffffff;
+    border-radius: 2px;
+    box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    padding: 5px 0;
     position: absolute;
-    top: -10px;
-    right: 15px;
-    &::before {
-      content: '';
+    top: 45px;
+    right: -10px;
+    z-index: 9;
+    .bubble {
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 10px solid #ffffff;
       position: absolute;
-      top: 0;
-      left: 0;
-      border-left: 11px solid transparent;
-      border-right: 11px solid transparent;
-      border-bottom: 11px solid rgba(0, 0, 0, 0.2);
-      position: absolute;
-      top: -1px;
-      left: -11px;
-      z-index: -1;
-      filter: blur(2px);
+      top: -10px;
+      right: 15px;
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-left: 11px solid transparent;
+        border-right: 11px solid transparent;
+        border-bottom: 11px solid rgba(0, 0, 0, 0.2);
+        position: absolute;
+        top: -1px;
+        left: -11px;
+        z-index: -1;
+        filter: blur(2px);
+      }
+      &::after {
+        background-color: #ffffff;
+        content: '';
+        position: absolute;
+        top: 10px;
+        left: -10px;
+        height: 10px;
+        width: 20px;
+      }
     }
-    &::after {
-      background-color: #ffffff;
-      content: '';
-      position: absolute;
-      top: 10px;
-      left: -10px;
-      height: 10px;
-      width: 20px;
+    .container {
+      max-height: 350px;
+      overflow: auto;
     }
-  }
-  .container {
-    max-height: 350px;
-    overflow: auto;
-  }
-  .item {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-    white-space: nowrap;
-    .handle {
-      cursor: move;
-      margin-right: 10px;
+    .item {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      white-space: nowrap;
+      .handle {
+        cursor: move;
+        margin-right: 10px;
+      }
     }
   }
 }

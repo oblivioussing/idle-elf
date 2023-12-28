@@ -3,6 +3,7 @@ import { getCurrentInstance, onActivated } from 'vue'
 import { useRoute } from 'vue-router'
 import shiki from '@/api/shiki'
 import { type FormColumn as Column } from '@/chant'
+import { ApiCode } from '@/enum'
 import { bus, core } from '@/utils'
 
 type State = {
@@ -70,7 +71,7 @@ function useFormer(formConfig = { type: 'page' } as Config) {
     state.loading = true
     const code = await shiki?.postCode(path, params)
     state.loading = false
-    if (!shiki?.isSuccess(code)) {
+    if (code !== ApiCode.Success) {
       return false
     }
     // 是否继续新增

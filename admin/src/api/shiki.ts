@@ -1,7 +1,6 @@
 import qs from 'qs'
 import { ElMessage } from 'element-plus'
 import { ApiCode, BlobTypeEnum } from '../enum'
-import base from '../utils/base'
 import { useUserStore } from '../store'
 import 'abortcontroller-polyfill/dist/polyfill-patch-fetch'
 
@@ -65,8 +64,6 @@ class Shiki {
       }
     }
   }
-  // 自定义message方法
-  customMessage = (_: string) => {}
 
   // get请求
   async get(url: string, config?: RequestConfig): Promise<any> {
@@ -155,81 +152,6 @@ class Shiki {
     }
     return await this.post(url, config)
   }
-  // 上传文件
-  async upload(
-    url: string,
-    row: {
-      body: FormData
-      timeout: number
-    },
-    tip = true
-  ) {
-    const config = {
-      url,
-      body: row.body,
-      timeout: row.timeout,
-      tip,
-      responseType: ResponseType.All,
-      headers: {}
-    }
-    return await this.post(url, config)
-  }
-  // 下载文件
-  async download(
-    url: string,
-    row: {
-      blobType: BlobTypeEnum
-      filename: string
-      method?: Method
-      params?: {}
-      tip?: boolean
-    },
-    tip = true
-  ) {
-    const config = {
-      method: row.method,
-      params: row.params
-    }
-    const result = await this.getBlob(url, config, tip)
-    if (result) {
-      const { blobType, filename } = row
-      if (result.blob?.size) {
-        base.downloadByBlob({
-          blob: result.blob,
-          blobType: result.contentType || blobType,
-          filename: result.filename || filename
-        })
-      } else {
-        ElMessage.error('blob size为0,导出失败')
-      }
-    }
-  }
-  // 获取blob
-  async getBlob(
-    url: string,
-    row: { method?: Method; params?: {} },
-    tip = true
-  ): Promise<{ filename: string; contentType: BlobTypeEnum; blob: Blob }> {
-    const config = {} as RequestConfig
-    config.url = url
-    config.method = row.method || Method.Post
-    if (config.method === Method.Post) {
-      config.body = row.params
-    } else {
-      config.params = row.params
-    }
-    config.tip = tip
-    config.responseType = ResponseType.Blob
-    config.headers = {
-      'content-type': 'application/json'
-    }
-    const result = await this.fetchRequest(config)
-    return result
-  }
-  // 请求是否成功
-  isSuccess(code?: string): boolean {
-    return code === ApiCode.Success
-  }
   // fetch请求
   private async fetchRequest(config: RequestConfig) {
     const controller = new AbortController()
@@ -248,9 +170,7 @@ class Shiki {
     if (config.method === Method.Get) {
       // 参数拼接在url里面
       if (config.params) {
-        // 过滤空值
-        const rows = base.filterObjectEmpty(config.params)
-        const params = qs.stringify(rows)
+        const params = qs.stringify(config.params)
         config.url = `${config.url}?${params}`
       }
     }
@@ -380,9 +300,7 @@ class Shiki {
     if (requestConfig.tip === false) {
       return
     }
-    // post请求成功显示提示
-    const isSuccess = this.isSuccess(result?.code)
-    if (isSuccess) {
+    if (result?.code === ApiCode.Success) {
       if (requestConfig.failTip) {
         return
       }

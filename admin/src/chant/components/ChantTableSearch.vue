@@ -2,7 +2,7 @@
   <div class="toolbar chant-table-search" ref="searchRef">
     <!-- form -->
     <el-form
-      class="form m-r-10"
+      class="form"
       :inline="true"
       :label-width="props.labelWidth"
       @keyup.enter="emits('query')">
@@ -103,7 +103,7 @@
       </chant-button>
     </template>
     <!-- 查询,刷新 -->
-    <el-button-group class="m-l-10">
+    <el-button-group style="margin-left: 10px">
       <!-- 查询 -->
       <chant-button
         :content="t('query')"
@@ -318,6 +318,7 @@ $input-width: 165px;
   .form {
     flex: 1;
     margin-top: -10px;
+    margin-right: 5px;
     .el-form-item {
       margin: 12px 10px 0 0;
     }

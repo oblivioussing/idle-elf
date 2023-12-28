@@ -26,7 +26,6 @@ function setTitle() {
 
 <style lang="scss">
 @import './style/base.scss';
-@import './style/core.scss';
 @import './style/element.scss';
 @import './style/var.scss';
 </style>
