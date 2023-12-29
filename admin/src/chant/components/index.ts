@@ -10,14 +10,19 @@ const ChantFormFooter = defineAsyncComponent(
 const ChantIconButton = defineAsyncComponent(
   () => import('./ChantIconButton.vue')
 )
-const ChantTableOperation = defineAsyncComponent(
-  () => import('./chant-table-operation/Index.vue')
-)
 const ChantPagination = defineAsyncComponent(
   () => import('./ChantPagination.vue')
 )
-const ChantPicker = defineAsyncComponent(() => import('./ChantPicker.vue'))
+const ChantPickerButton = defineAsyncComponent(
+  () => import('./ChantPickerButton.vue')
+)
 const ChantTable = defineAsyncComponent(() => import('./ChantTable.vue'))
+const ChantTableOperation = defineAsyncComponent(
+  () => import('./chant-table-operation/Index.vue')
+)
+const ChantTablePicker = defineAsyncComponent(
+  () => import('./ChantTablePicker.vue')
+)
 const ChantTableSearch = defineAsyncComponent(
   () => import('./ChantTableSearch.vue')
 )
@@ -30,7 +35,8 @@ function components(app: App<Element>) {
   app.component('ChantFormFooter', ChantFormFooter)
   app.component('ChantIconButton', ChantIconButton)
   app.component('ChantPagination', ChantPagination)
-  app.component('ChantPicker', ChantPicker)
+  app.component('ChantPickerButton', ChantPickerButton)
+  app.component('ChantTablePicker', ChantTablePicker)
   app.component('ChantTable', ChantTable)
   app.component('ChantTableOperation', ChantTableOperation)
   app.component('ChantTableSearch', ChantTableSearch)

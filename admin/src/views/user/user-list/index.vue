@@ -52,6 +52,7 @@
 <script setup lang="ts" name="user-user-list-index">
 import { reactive } from 'vue'
 import { UploadTypeEnum } from '@/chant'
+import { base } from '@/utils'
 import { useLister } from '@/use'
 import { columns, dict, lang } from './share'
 import BatchAlter from './components/BatchAlter.vue' // 批量修改
@@ -61,7 +62,7 @@ const lister = useLister()
 // state
 const state = reactive({
   ...lister.state,
-  columns,
+  columns: columns(),
   list: [
     { id: 1, name: '张三', age: '10', sex: '1', status: '1' },
     { id: 2, name: '李四', age: '20', sex: '2', status: '2' },

@@ -56,8 +56,8 @@ type PathMapping = {
 // emits
 const emits = defineEmits(['change'])
 // use
+const appStore = useAppStore()
 const chaoser = useChaoser()
-// i18n
 const { t } = useI18n({
   messages: {
     en: {
@@ -72,11 +72,8 @@ const { t } = useI18n({
     }
   }
 })
-// router
 const route = useRoute()
 const router = useRouter()
-// store
-const appStore = useAppStore()
 // var
 const indexRaw = {
   name: '/',
@@ -100,14 +97,11 @@ bus.on(BusEnum.ClosePage, (path) => {
   onTabRemove(path as string)
 })
 // 监听tabs变化
-watch(
-  () => [...state.tabs],
-  () => {
-    storage.setSession(StorageEnum.HomeNavTab, state.tabs)
-    // 通知外部keeps发生了变化
-    busKeeps()
-  }
-)
+watch(state.tabs, () => {
+  storage.setSession(StorageEnum.HomeNavTab, state.tabs)
+  // 通知外部keeps发生了变化
+  busKeeps()
+})
 // 监听路由变化
 watch(() => route?.path, routerChange)
 // 初始化
@@ -120,11 +114,6 @@ function routerChange() {
   // 跳转的路由存在于tabs中
   if (index > -1) {
     state.path = path
-    return
-  }
-  // 排除的页面
-  const excludeList = ['/404', '/login']
-  if (excludeList.includes(route.path)) {
     return
   }
   // meta

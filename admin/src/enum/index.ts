@@ -28,5 +28,6 @@ export enum StorageEnum {
   HomeNavTab = 'hom-nav-tab',
   PageRelation = 'page-relation',
   RouterQuery = 'router-query',
+  TableFilter = 'table-filter',
   User = 'user'
 }

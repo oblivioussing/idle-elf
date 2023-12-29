@@ -11,6 +11,7 @@
       <el-form-item
         v-if="vModel"
         v-for="item in columnsList"
+        :key="item.prop"
         :label="translate(item) + ':'">
         <!-- input -->
         <el-input

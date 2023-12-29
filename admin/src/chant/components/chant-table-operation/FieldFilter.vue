@@ -6,7 +6,7 @@
       type="primary"
       @click.stop="onShowFilter">
     </chant-button>
-    <div v-show="state.visible" class="filter" @click.stop>
+    <div v-show="state.visible" class="fly-box" @click.stop>
       <div class="bubble"></div>
       <draggable
         v-bind="{ animation: 200 }"
@@ -26,6 +26,12 @@
           </div>
         </template>
       </draggable>
+      <!-- 保存 -->
+      <div class="save-box">
+        <el-button type="primary" @click="onSave">{{
+          tg('button.save')
+        }}</el-button>
+      </div>
     </div>
   </div>
 </template>
@@ -33,11 +39,14 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 import draggable from 'vuedraggable'
 import { Document, Sort } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
-import { vuei18n } from '@/plugs'
 import { type ListColumn as Column, type ListState } from '@/chant'
+import { StorageEnum } from '@/enum'
+import { vuei18n } from '@/plugs'
+import { storage } from '@/utils'
 
 // props
 const props = defineProps<{
@@ -47,6 +56,7 @@ const props = defineProps<{
 // emits
 const emits = defineEmits(['update:modelValue'])
 // use
+const { t: tg } = useI18n({ useScope: 'global' })
 const { t } = useI18n({
   messages: {
     en: {
@@ -57,6 +67,7 @@ const { t } = useI18n({
     }
   }
 })
+const route = useRoute()
 const vModel = useVModel(props, 'modelValue', emits)
 // state
 const state = reactive({
@@ -72,6 +83,19 @@ const messages = computed(() => {
 document.addEventListener('click', () => {
   state.visible = false
 })
+// init
+filterStorageFiled() // 过滤缓存的字段
+// 过滤缓存的字段
+function filterStorageFiled() {
+  const obj = storage.getLocal(StorageEnum.TableFilter)
+  const list = obj?.[route.path] as string[]
+  list?.forEach((item: string) => {
+    const row = vModel.value.columns.find((column) => column.prop === item)
+    if (row) {
+      row.hide = true
+    }
+  })
+}
 // 显示字段过滤
 function onShowFilter() {
   state.visible = !state.visible
@@ -79,6 +103,15 @@ function onShowFilter() {
 // change
 function onChange(val: any, column: Column) {
   column.hide = !val
+}
+// 保存
+function onSave() {
+  let columns = vModel.value.columns.filter((item) => {
+    return item.hide
+  })
+  const list = columns.map((item) => item.prop)
+  storage.setLocal(StorageEnum.TableFilter, { [route.path]: list })
+  state.visible = false
 }
 // 翻译
 function translate(column: Column) {
@@ -95,7 +128,7 @@ function translate(column: Column) {
 .field-filter {
   margin-left: 10px;
   position: relative;
-  .filter {
+  .fly-box {
     background-color: #ffffff;
     border-radius: 2px;
     box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.2);
@@ -150,6 +183,13 @@ function translate(column: Column) {
         cursor: move;
         margin-right: 10px;
       }
+    }
+  }
+  .save-box {
+    padding-right: 10px;
+    text-align: right;
+    :deep(.el-button) {
+      height: 24px;
     }
   }
 }

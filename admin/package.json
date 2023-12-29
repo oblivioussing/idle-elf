@@ -16,7 +16,7 @@
     "@vueuse/core": "^10.3.0",
     "abortcontroller-polyfill": "^1.7.5",
     "dayjs": "^1.11.9",
-    "element-plus": "^2.3.8",
+    "element-plus": "^2.4.4",
     "mitt": "^3.0.1",
     "pinia": "^2.1.4",
     "qs": "^6.11.2",
