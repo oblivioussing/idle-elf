@@ -24,6 +24,7 @@ const emits = defineEmits(['update:modelValue'])
 // use
 const vModel = useVModel(props, 'modelValue', emits)
 </script>
+
 <style lang="scss">
 .chant-dialog {
   box-sizing: border-box;

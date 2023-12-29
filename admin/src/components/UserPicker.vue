@@ -10,7 +10,8 @@
     :columns="columns()"
     :dict="dict"
     :lang="lang"
-    title="用户">
+    title="用户"
+    @change="onChange">
   </chant-table-picker>
 </template>
 
@@ -30,6 +31,10 @@ const emits = defineEmits(['update:id', 'update:text'])
 const { id, text } = useVModels(props, emits)
 // ref
 const visible = ref(false)
+// change
+function onChange(row: any) {
+  text.value = row.name
+}
 </script>
 
 <style scoped lang="scss"></style>

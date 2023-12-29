@@ -4,7 +4,7 @@
       v-model="state"
       :dict="dict"
       :lang="lang"
-      :model="model"
+      :model="model()"
       @instance="former.bindInstance">
     </chant-form>
     <template #footer>

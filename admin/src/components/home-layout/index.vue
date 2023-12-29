@@ -54,7 +54,7 @@ function onChange(arr: any) {
 <style scoped lang="scss">
 .home-body {
   display: flex;
-  height: calc(100vh - 45px);
+  flex: 1;
   .home-container {
     display: flex;
     flex-direction: column;

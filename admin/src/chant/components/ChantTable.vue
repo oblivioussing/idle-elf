@@ -7,7 +7,6 @@
     :height="state.height || undefined"
     ref="tableRef"
     :row-key="props.rowKey"
-    @row-click="onRowClick"
     @selection-change="onSelectChange">
     <!-- 复选框 -->
     <el-table-column
@@ -157,7 +156,7 @@ const props = withDefaults(defineProps<Props>(), {
   showSelection: true
 })
 // emits
-const emits = defineEmits(['instance', 'row-click', 'update:modelValue'])
+const emits = defineEmits(['instance', 'update:modelValue'])
 // use
 const { toClipboard } = useClipboard()
 const { t: tg } = useI18n({ useScope: 'global' })
@@ -296,10 +295,6 @@ function selectable() {
 // 选择项发生变化时
 function onSelectChange(selection: any[]) {
   vModel.value.selection = selection
-}
-// 单元格点击
-function onRowClick(row: any) {
-  emits('row-click', row)
 }
 // 复制
 async function onCopy(text: string) {

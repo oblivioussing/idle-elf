@@ -1,6 +1,7 @@
 <template>
   <chant-dialog
     v-model="vModel"
+    append-to-body
     class="chant-table-picker"
     :title="props.title"
     :width="props.width || '70%'">
@@ -19,7 +20,9 @@
           v-model="state"
           class="picker-table"
           :dict="props.dict"
-          :lang="props.lang">
+          :lang="props.lang"
+          :show-selection="false"
+          @row-click="onRowClick">
         </chant-table>
         <!-- pagination -->
         <chant-pagination
@@ -48,7 +51,7 @@ const props = defineProps<{
   width?: string | number
 }>()
 // emits
-const emits = defineEmits(['update:modelValue'])
+const emits = defineEmits(['change', 'update:modelValue'])
 // use
 const vModel = useVModel(props, 'modelValue', emits)
 // use
@@ -56,14 +59,22 @@ const lister = useLister()
 // state
 const state = reactive({
   ...lister.state,
-  columns: props.columns
+  columns: createColumns()
 })
-for (let i = 0; i < 20; i++) {
-  state.list.push({ id: i, name: i })
-}
 // 获取列表
 function getList() {
   // lister.getData('xx/xxx', state)
+}
+// 生成columns
+function createColumns() {
+  const index = props.columns?.findIndex((item) => item.prop === 'operate')
+  index > -1 && props.columns?.splice(index, 1)
+  return props.columns
+}
+// 行点击
+function onRowClick(row: any) {
+  emits('change', row)
+  vModel.value = false
 }
 </script>
 
@@ -78,12 +89,15 @@ function getList() {
     overflow: hidden;
     padding: 0 15px;
   }
-}
-.column-box {
-  flex: 1;
-  .column-item {
+  .column-box {
     flex: 1;
-    overflow: hidden !important;
+    .column-item {
+      flex: 1;
+      overflow: hidden !important;
+    }
+  }
+  .picker-table {
+    cursor: pointer;
   }
 }
 </style>
