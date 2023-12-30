@@ -1,5 +1,5 @@
 <template>
-  <div class="toolbar">
+  <div class="toolbar chant-pagination">
     <el-pagination
       background
       :current-page="state.pageNum"
@@ -52,12 +52,12 @@ function onSize(size: number) {
 </script>
 
 <style scoped lang="scss">
-.toolbar {
+.chant-pagination {
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
   margin-top: 5px;
-  padding: 10px 5px;
-  .el-pagination {
-    justify-content: center;
-  }
 }
 </style>

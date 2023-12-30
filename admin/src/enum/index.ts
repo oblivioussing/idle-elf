@@ -6,7 +6,7 @@ export enum ApiCode {
   Exception = '5' // 系统异常
 }
 
-export enum BlobTypeEnum {
+export enum ContentTypeEnum {
   Audio = 'audio/wav',
   Excel = 'application/vnd.ms-excel',
   Text = 'text/javascript',

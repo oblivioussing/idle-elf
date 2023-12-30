@@ -6,8 +6,10 @@
     placeholder="用户">
   </chant-picker-button>
   <chant-table-picker
+    v-if="visible"
     v-model="visible"
     :columns="columns()"
+    :columns-set="['name']"
     :dict="dict"
     :lang="lang"
     title="用户"

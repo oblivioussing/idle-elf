@@ -129,17 +129,12 @@ import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowDown, ArrowUp, Refresh, Search } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
-import {
-  formUtils,
-  type ListColumn as Column,
-  type Dict,
-  type ListState
-} from '@/chant'
+import { formUtils, type ListColumn as Column, type ListState } from '@/chant'
 import { FormTypeEnum } from '@/chant'
 import { vuei18n } from '@/plugs'
 
 interface Props {
-  dict?: Dict // 字典
+  dict?: any // 字典
   labelWidth?: string // label宽度
   lang?: any // 国际化
   modelValue?: ListState // modelValue

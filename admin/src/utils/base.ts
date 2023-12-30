@@ -1,4 +1,4 @@
-import { BlobTypeEnum } from '../enum'
+import { ContentTypeEnum } from '../enum'
 
 export default {
   // 去除空白字符
@@ -97,7 +97,7 @@ export default {
   // 下载根据blob
   downloadByBlob(row: {
     blob: Blob
-    blobType: BlobTypeEnum
+    blobType: ContentTypeEnum
     filename: string
   }) {
     const blob = new Blob([row.blob], { type: row.blobType })

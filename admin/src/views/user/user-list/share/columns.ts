@@ -37,13 +37,6 @@ export default () => {
       prop: 'updateTime', // 更新时间
       search: true,
       type: FormTypeEnum.DatetimeRange
-    },
-    {
-      prop: 'operate', // 操作
-      label: 'common.operate',
-      fixed: 'right',
-      slot: true,
-      width: 120
     }
   ] as Column[]
 }

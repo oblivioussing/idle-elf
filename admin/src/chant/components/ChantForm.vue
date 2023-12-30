@@ -144,7 +144,6 @@ import {
   formUtils,
   FormTypeEnum,
   PageTypeEnum,
-  type Dict,
   type FormColumn as Column
 } from '@/chant'
 import { vuei18n } from '@/plugs'
@@ -156,7 +155,7 @@ type ModelValue = {
 }
 // props
 const props = defineProps<{
-  dict?: Dict // 字典
+  dict?: any // 字典
   labelWidth?: string // label宽度
   lang?: any // 国际化
   model?: Column[] // model

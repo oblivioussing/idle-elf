@@ -186,6 +186,10 @@ function useLister() {
   }
   // 删除
   async function remove(path: string, state: State) {}
+  // 切换某一行的选中状态
+  function toggleRowSelection(row: any, selected: boolean) {
+    tableInstance.toggleRowSelection(row, selected)
+  }
 
   return {
     state,
@@ -201,7 +205,8 @@ function useLister() {
     edit,
     jump,
     remove,
-    getListParams
+    getListParams,
+    toggleRowSelection
   }
 }
 

@@ -11,9 +11,6 @@ export default {
       delete: 'delete',
       save: 'save'
     },
-    common: {
-      operate: 'operate'
-    },
     tips: {
       copyFail: 'copy fail',
       copySuccess: 'copy success',
@@ -36,9 +33,6 @@ export default {
       edit: '编辑',
       delete: '删除',
       save: '保存'
-    },
-    common: {
-      operate: '操作'
     },
     tips: {
       copyFail: '复制失败',

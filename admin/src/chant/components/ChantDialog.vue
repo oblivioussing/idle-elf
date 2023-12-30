@@ -41,7 +41,7 @@ const vModel = useVModel(props, 'modelValue', emits)
   }
   .el-dialog__footer {
     box-sizing: border-box;
-    padding-top: 5px;
+    padding-top: 10px;
     padding-bottom: 15px;
   }
 }

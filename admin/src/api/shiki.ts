@@ -1,6 +1,6 @@
 import qs from 'qs'
 import { ElMessage } from 'element-plus'
-import { ApiCode, BlobTypeEnum } from '../enum'
+import { ApiCode, ContentTypeEnum } from '../enum'
 import { useUserStore } from '../store'
 import 'abortcontroller-polyfill/dist/polyfill-patch-fetch'
 
@@ -19,7 +19,7 @@ export enum Method {
   Delete = 'DELETE'
 }
 // 返回结果
-type Result = {
+export type Result = {
   code: ApiCode
   data: any
   msg: string
@@ -27,8 +27,8 @@ type Result = {
 // 请求配置
 type RequestConfig = {
   url?: string
-  params?: object | boolean
-  body?: object | string
+  params?: any | boolean
+  body?: any | string
   timeout?: number
   method?: Method
   headers?: HeadersInit
@@ -72,18 +72,13 @@ class Shiki {
     }
     config.url = url
     config.method = Method.Get
-    // params不可能是boolean值,如果是则说明他代表tip
-    if (typeof config.params === 'boolean') {
-      config.tip = config.params
-      delete config.params
-    }
     // 发送http请求
     return await this.fetchRequest(config)
   }
   // get请求(返回code)
   async getCode(
     url: string,
-    params?: object | boolean,
+    params?: any,
     row?: { tip?: boolean; failTip?: boolean }
   ): Promise<any> {
     const config = {
@@ -98,7 +93,7 @@ class Shiki {
   // get请求(返回结果)
   async getData(
     url: string,
-    params?: object | boolean,
+    params?: any,
     row?: { tip?: boolean; failTip?: boolean }
   ): Promise<any> {
     const config = {
@@ -125,7 +120,7 @@ class Shiki {
   // post请求(返回code)
   async postCode(
     url: string,
-    body?: object,
+    body?: any,
     row?: { tip?: boolean; failTip?: boolean }
   ): Promise<any> {
     const config = {
@@ -140,7 +135,7 @@ class Shiki {
   // post请求(返回结果)
   async postData(
     url: string,
-    body?: object,
+    body?: any,
     row?: { tip?: boolean; failTip?: boolean }
   ): Promise<any> {
     const config = {
@@ -164,8 +159,6 @@ class Shiki {
       ...config.headers,
       token: userStore.token
     }
-    // 业务处理
-    this.businessDeal(config)
     // get
     if (config.method === Method.Get) {
       // 参数拼接在url里面
@@ -180,55 +173,43 @@ class Shiki {
         this.timeoutSetting(timeout, controller),
         this.fetchSend(config, signal)
       ])
+      // contentType
+      const contentType = response.headers.get('content-type')
+      console.log(contentType)
       // 返回blob
-      if (config.responseType === ResponseType.Blob) {
-        const status = response.status
-        if (status !== 200) {
-          return null
-        }
-        const headers = response.headers
-        let contentType = headers.get('content-type')?.split(';') as any
-        contentType = contentType && contentType[0]
-        let json
-        // 如果返回的结果中包含resultMsg说明请求已经报错
-        if (contentType === BlobTypeEnum.Json) {
-          json = await response.json()
-          if (json.resultMsg) {
-            ElMessage.error(json.resultMsg)
-            return null
-          }
-        }
-        const filename = decodeURI(headers.get('filename') || '')
-        let blob
-        if (contentType === BlobTypeEnum.Json) {
-          blob = new Blob([JSON.stringify(json)])
-        } else {
-          blob = await response.blob()
-        }
-        return { contentType: contentType || '', filename, blob }
-      }
-      // 返回json
-      return await this.reponseJson(config, response)
+      // if (config.responseType === ResponseType.Blob) {
+      //   const status = response.status
+      //   if (status !== 200) {
+      //     return null
+      //   }
+      //   const headers = response.headers
+      //   let contentType = headers.get('content-type')?.split(';') as any
+      //   contentType = contentType && contentType[0]
+      //   let json
+      //   // 如果返回的结果中包含resultMsg说明请求已经报错
+      //   if (contentType === BlobTypeEnum.Json) {
+      //     json = await response.json()
+      //     if (json.resultMsg) {
+      //       ElMessage.error(json.resultMsg)
+      //       return null
+      //     }
+      //   }
+      //   const filename = decodeURI(headers.get('filename') || '')
+      //   let blob
+      //   if (contentType === BlobTypeEnum.Json) {
+      //     blob = new Blob([JSON.stringify(json)])
+      //   } else {
+      //     blob = await response.blob()
+      //   }
+      //   return { contentType: contentType || '', filename, blob }
+      // }
+      // // 返回json
+      // return await this.reponseJson(config, response)
     } catch (error) {
       console.error(error)
       // 消息提示
       this.message({ requestConfig: config, error: error as Error })
       // TODO: 上报错误日志
-    }
-  }
-  // 业务处理
-  private businessDeal(config: RequestConfig) {
-    if (config.method === Method.Post) {
-      const body = config.body as any
-      if (!body) {
-        return
-      }
-      if (body.allFlag === 0) {
-        Reflect.deleteProperty(body, 'allFlag')
-        Reflect.deleteProperty(body, 'searchAllForm')
-      } else if (body.allFlag === 1) {
-        Reflect.deleteProperty(body, 'idList')
-      }
     }
   }
   // 返回json
@@ -341,5 +322,4 @@ class Shiki {
   }
 }
 
-export { type Result, Shiki }
 export default new Shiki()

@@ -7,8 +7,8 @@
     @query="getList"
     @refresh="lister.refresh(getList, state)">
   </chant-table-search>
-  <!-- operation -->
-  <chant-table-operation
+  <!-- operate -->
+  <chant-table-operate
     v-model="state"
     :lang="lang"
     :options="['add', 'alter', 'delete']"
@@ -26,18 +26,20 @@
         <el-dropdown-item command="2">年龄</el-dropdown-item>
       </el-dropdown-menu>
     </template>
-  </chant-table-operation>
+  </chant-table-operate>
   <!-- table -->
   <chant-table v-model="state" :dict="dict" :lang="lang">
     <!-- 操作 -->
-    <template #operate>
-      <!-- 编辑 -->
-      <el-button link type="primary" @click="onEdit">编辑</el-button>
-      <!-- 复制 -->
-      <el-button link type="primary" @click="onEdit">复制</el-button>
-      <!-- 删除 -->
-      <el-button link type="danger" @click="onEdit">删除</el-button>
-    </template>
+    <chant-column-operate :width="120">
+      <template #="{ row }">
+        <!-- 编辑 -->
+        <el-button link type="primary" @click="onEdit">编辑</el-button>
+        <!-- 复制 -->
+        <el-button link type="primary" @click="onEdit">复制</el-button>
+        <!-- 删除 -->
+        <el-button link type="danger" @click="onEdit">删除</el-button>
+      </template>
+    </chant-column-operate>
   </chant-table>
   <!-- pagination -->
   <chant-pagination
@@ -52,7 +54,6 @@
 <script setup lang="ts" name="user-user-list-index">
 import { reactive } from 'vue'
 import { UploadTypeEnum } from '@/chant'
-import { base } from '@/utils'
 import { useLister } from '@/use'
 import { columns, dict, lang } from './share'
 import BatchAlter from './components/BatchAlter.vue' // 批量修改
@@ -70,12 +71,6 @@ const state = reactive({
   ],
   batchAlter: false
 })
-// init
-state.query = {
-  name: '张三',
-  createTimeStart: new Date().getTime(),
-  createTimeEnd: new Date().getTime()
-}
 // created
 lister.created(() => {
   // 获取列表
@@ -83,7 +78,7 @@ lister.created(() => {
 })
 // 获取列表
 function getList() {
-  // lister.getData('xx/xxx', state)
+  lister.getData('xx/xxx', state)
 }
 // 编辑
 function onEdit() {}

@@ -1,36 +1,34 @@
 <template>
   <el-table
-    v-loading="vModel.loading"
+    v-loading="vModel?.loading || false"
     :border="true"
     class="chant-table"
-    :data="vModel.list"
+    :data="vModel?.list || props.list"
     :height="state.height || undefined"
     ref="tableRef"
-    :row-key="props.rowKey"
+    :row-key="(row) => row[props.rowKey]"
     @selection-change="onSelectChange">
     <!-- 复选框 -->
     <el-table-column
       v-if="props.showSelection"
       align="center"
       fixed="left"
+      :reserve-selection="props.reserveSelection"
       :selectable="selectable"
       type="selection"
       width="35" />
     <el-table-column
-      v-for="item in columnsList"
-      v-bind="item"
-      :align="'center'"
-      :fixed="item.fixed"
+      v-for="item in availableColumns"
       :key="item.prop"
+      align="center"
+      :fixed="item.fixed"
+      :label="translate(item)"
       :min-width="item.width || columnWidth || 144"
       show-overflow-tooltip
       sortable>
-      <template #header>
-        <span>{{ translate(item) }}</span>
-      </template>
       <template #="{ row, $index }">
         <div class="content-box">
-          <!-- slot -->
+          <!-- prop slot -->
           <slot
             v-if="item.slot"
             :index="$index"
@@ -104,6 +102,8 @@
         </div>
       </template>
     </el-table-column>
+    <!-- slot -->
+    <slot></slot>
   </el-table>
 </template>
 
@@ -128,7 +128,6 @@ import Sortable from 'sortablejs'
 import {
   FormatEnum,
   FormTypeEnum,
-  type Dict,
   type ListColumn as Column,
   type ListState
 } from '@/chant'
@@ -141,11 +140,14 @@ defineExpose({
 })
 // type
 interface Props {
+  columns?: Column[] // 列表字段
   columnWidth?: number // 列宽度
-  dict?: Dict // 字典
+  dict?: any // 字典
   heightWild?: boolean // 高度不限制
   lang?: any // 国际化
-  modelValue: ListState // modelValue
+  list?: any[] // 列表数据
+  modelValue?: ListState // modelValue
+  reserveSelection?: boolean // 数据刷新后是否保留选项
   rowKey?: string // 行数据的key
   showSelection?: boolean // 显示勾选框
   sort?: boolean // 行是否可以拖动
@@ -173,8 +175,8 @@ window.addEventListener('resize', () => {
   tableAdapter()
 })
 // computed
-const columnsList = computed(() => {
-  return vModel.value.columns?.filter((item) => {
+const availableColumns = computed(() => {
+  return columns.value?.filter((item) => {
     if (item.onlySearch) {
       return false
     }
@@ -184,14 +186,20 @@ const columnsList = computed(() => {
     return true
   })
 })
+const columns = computed(() => {
+  return vModel.value?.columns || props.columns
+})
 const messages = computed(() => {
   const locale = vuei18n.global.locale.value
   const lang = props.lang
   return lang ? lang[locale] : {}
 })
+const list = computed(() => {
+  return vModel.value?.list || props.list
+})
 // watch
 watch(
-  () => vModel.value.allFlag,
+  () => vModel.value?.allFlag,
   () => {
     // 全选按钮禁用状态
     allCheckedStatus()
@@ -221,32 +229,33 @@ function allCheckedStatus() {
   const inputEl = spanEl?.querySelector(
     '.el-checkbox__original'
   ) as InputHTMLAttributes
-  if (vModel.value.allFlag === 1) {
+  if (vModel.value?.allFlag === 1) {
     labelEl?.classList.add('is-disabled')
     spanEl?.classList.add('is-disabled')
   } else {
     labelEl?.classList.remove('is-disabled')
     spanEl?.classList.remove('is-disabled')
   }
-  inputEl.disabled = !!vModel.value.allFlag
+  inputEl.disabled = !!vModel.value?.allFlag
 }
 // 拖拽
 function sortCreate() {
-  const list = vModel.value.list
-  if (!props.sort || !list?.length) {
+  if (!props.sort || !list.value?.length) {
     return
   }
   const el = tableRef.value?.$el.querySelector('.el-table__body > tbody')
   Sortable.create(el, {
     onEnd: (event: any) => {
-      const data = base.clone(list)
+      const data = base.clone(list.value)
       const item = data?.splice(event.oldIndex, 1)[0]
       data?.splice(event.newIndex, 0, item)
       data?.forEach((item, index) => {
         item.serialNo = index + 1
       })
-      vModel.value.list = data as any[]
-      emits('update:modelValue', vModel.value)
+      if (vModel.value) {
+        vModel.value.list = data as any[]
+        emits('update:modelValue', vModel.value)
+      }
     }
   })
 }
@@ -290,11 +299,13 @@ function dictFmt(prop: string, value: any) {
 }
 // CheckBox是否可勾选
 function selectable() {
-  return vModel.value.allFlag === 0
+  return vModel.value?.allFlag === 0
 }
 // 选择项发生变化时
 function onSelectChange(selection: any[]) {
-  vModel.value.selection = selection
+  if (vModel.value) {
+    vModel.value.selection = selection
+  }
 }
 // 复制
 async function onCopy(text: string) {

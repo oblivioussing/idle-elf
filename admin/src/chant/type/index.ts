@@ -1,8 +1,6 @@
 import type { TagProps } from 'element-plus'
 import { FormatEnum, FormTypeEnum, PageTypeEnum, UploadTypeEnum } from '@/chant'
 
-export type Dict = Record<string, Record<string, any>>
-
 export type FormColumn = {
   append?: string // 输入框后置内容
   clearable?: boolean // 是否可清空
