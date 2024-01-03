@@ -1,4 +1,5 @@
 import { customAlphabet } from 'nanoid'
+
 import { decrypt } from './crypto'
 
 // 创建id
