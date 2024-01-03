@@ -3,13 +3,15 @@ import { reactive } from 'vue'
 import { StorageEnum } from '../enum'
 import { storage } from '../utils'
 
-export type User = {
-  token: string
-}
+export type User = {}
 
+const token = storage.getLocal(StorageEnum.Token) || ''
 const user: User = storage.getLocal(StorageEnum.User) || {}
 
 export const useUserStore = defineStore('user', () => {
-  const state = reactive(user)
-  return state
+  const state = reactive({
+    token,
+    user
+  })
+  return { state }
 })

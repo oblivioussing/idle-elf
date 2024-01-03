@@ -48,7 +48,8 @@
     @change="getList">
   </chant-pagination>
   <!-- 批量修改 -->
-  <batch-alter v-if="state.batchAlter" v-model="state.batchAlter"></batch-alter>
+  <batch-alter v-if="state.batchAlterVisible" v-model="state.batchAlterVisible">
+  </batch-alter>
 </template>
 
 <script setup lang="ts" name="user-user-list-index">
@@ -64,12 +65,7 @@ const lister = useLister()
 const state = reactive({
   ...lister.state,
   columns: columns(),
-  list: [
-    { id: 1, name: '张三', age: '10', sex: '1', status: '1' },
-    { id: 2, name: '李四', age: '20', sex: '2', status: '2' },
-    { id: 3, name: '王五', age: '21', sex: '2', status: '3' }
-  ],
-  batchAlter: false
+  batchAlterVisible: false
 })
 // created
 lister.created(() => {
@@ -78,13 +74,13 @@ lister.created(() => {
 })
 // 获取列表
 function getList() {
-  lister.getData('xx/xxx', state)
+  lister.getData('user/list', state)
 }
 // 编辑
 function onEdit() {}
 // 批量修改
 function onAlter() {
-  state.batchAlter = true
+  state.batchAlterVisible = true
 }
 // 批量修改command
 function onCommand(val: any) {

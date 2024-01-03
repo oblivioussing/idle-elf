@@ -13,6 +13,7 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter()
   )
+  app.enableCors()
   app.setGlobalPrefix('/idle-elf/')
   app.useGlobalFilters(new GlobalExceptionFilter(), new HttpExceptionFilter())
   app.useGlobalInterceptors(new TransformInterceptor())

@@ -1,7 +1,7 @@
 export enum ApiCode {
   Success = '1', // 成功
-  NoLogin = '2', // 未登录
-  Fail = '3', // 失败
+  Fail = '2', // 失败
+  AuthFailed = '3', // 权限校验失败
   ParamError = '4', // 参数错误
   Exception = '5' // 系统异常
 }
@@ -29,5 +29,6 @@ export enum StorageEnum {
   PageRelation = 'page-relation',
   RouterQuery = 'router-query',
   TableFilter = 'table-filter',
+  Token = 'token',
   User = 'user'
 }

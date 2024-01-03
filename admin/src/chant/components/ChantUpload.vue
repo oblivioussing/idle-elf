@@ -1,9 +1,6 @@
 <template>
   <!-- pure-button -->
-  <el-button
-    v-if="props.type === UploadTypeEnum.PureButton"
-    type="primary"
-    @click="onTrigger">
+  <el-button v-if="isPureButton" type="primary" @click="onTrigger">
     {{ props.buttonText || t('import') }}
   </el-button>
   <!-- upload -->
@@ -44,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, nextTick, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Plus } from '@element-plus/icons-vue'
 import { UploadTypeEnum } from '../enum'
@@ -73,13 +70,14 @@ const { t } = useI18n({
     }
   }
 })
+// var
+const isPureButton = props.type === UploadTypeEnum.PureButton
 // ref
 const uploadRef = ref()
 // state
 const state = reactive({
   imageUrl: '', // 图片地址
   fileList: [], // 文件列表
-  render: props.type !== UploadTypeEnum.PureButton, // 是否渲染upload
   previewUrl: '', // 预览图片地址
   previewVisible: false // 预览visible
 })
@@ -92,7 +90,7 @@ const showFileList = computed(() => {
 })
 // onMounted
 onMounted(() => {
-  if (props.type === UploadTypeEnum.PureButton) {
+  if (isPureButton) {
     // 挪动元素
     movingElement()
   }
@@ -113,12 +111,9 @@ function onChange(row: any) {
 }
 // 按钮出发文件选择
 function onTrigger() {
-  state.render = true
-  nextTick(() => {
-    const el = uploadRef.value.$el as HTMLElement
-    const uploadEL = el.querySelector('.el-upload') as HTMLElement
-    uploadEL?.click()
-  })
+  const el = uploadRef.value.$el as HTMLElement
+  const uploadEL = el.querySelector('.el-upload') as HTMLElement
+  uploadEL?.click()
 }
 // 预览
 function onPreview(row: any) {

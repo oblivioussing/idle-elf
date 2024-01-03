@@ -12,7 +12,7 @@ export default [
   // 首页
   {
     path: '/',
-    component: () => import('@/components/home-layout/index.vue'),
+    component: () => import('@/components/home-layout/Index.vue'),
     children: [
       {
         path: '/',

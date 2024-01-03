@@ -1,21 +1,10 @@
 import type { TableInstance } from 'element-plus'
-import { onActivated, onScopeDispose } from 'vue'
+import { nextTick, onActivated, onScopeDispose } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { shiki } from '@/api'
 import { type ListState as State } from '@/chant'
 import { useAppStore } from '@/store'
 import { bus } from '@/utils'
-
-type Data = {
-  pageElements?: []
-  pageData: []
-  extra: {}
-  totalRecord: number
-  [key: string]: any
-}
-type Result = {
-  data?: Data
-}
 
 function useLister() {
   const appStore = useAppStore()
@@ -90,21 +79,36 @@ function useLister() {
       custom?: boolean
     }
   ) {
-    state.list = []
     const query = getQuery(state)
     if (config?.limit !== false) {
       Object.assign(query, state.pages)
     }
     state.loading = true
-    const ret: Result = await shiki?.getData(path, query)
+    const { data } = await shiki?.get(path, query)
     // 返回数据
     if (config?.custom) {
       state.loading = false
-      return ret?.data
+      return data
     }
     // 数据处理
-    const status = dataDeal(state, ret?.data, config?.limit)
-    return status
+    dataDeal(state, data, config?.limit)
+  }
+  // 数据处理
+  function dataDeal(state: State, data?: any, limit?: boolean) {
+    if (data) {
+      if (limit !== false) {
+        state.list = data?.list || []
+        state.total = data?.total || 0
+      } else {
+        state.list = data as any
+      }
+      state.extra = data?.extra || {}
+    } else {
+      state.list = []
+    }
+    nextTick(() => {
+      state.loading = false
+    })
   }
   // 获取查询参数
   function getQuery(state: State) {
@@ -116,22 +120,7 @@ function useLister() {
     return {
       idList: state.selection.map((item) => item.id),
       allFlag: state.allFlag,
-      searchAllForm: getQuery(state)
-    }
-  }
-  // 数据处理
-  function dataDeal(state: State, data?: Data, limit?: boolean) {
-    state.loading = false
-    if (data) {
-      if (limit !== false) {
-        state.list = data?.list || []
-        state.total = data?.total || 0
-      } else {
-        state.list = data as any
-      }
-      // extra
-      state.extra = data?.extra || {}
-      return true
+      search: getQuery(state)
     }
   }
   // 事件监听
@@ -196,7 +185,6 @@ function useLister() {
     bindInstance,
     created,
     getData,
-    dataDeal,
     query,
     refresh,
     reset,

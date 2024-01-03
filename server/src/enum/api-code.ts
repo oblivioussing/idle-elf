@@ -1,7 +1,7 @@
 export enum ApiCode {
-  Success = '10', // 成功
-  NoLogin = '11', // 未登录
-  Fail = '12', // 失败
-  ParamError = '13', // 参数错误
-  Exception = '14' // 系统异常
+  Success = '1', // 成功
+  Fail = '2', // 失败
+  AuthFailed = '3', // 权限校验失败
+  ParamError = '4', // 参数错误
+  Exception = '5' // 系统异常
 }

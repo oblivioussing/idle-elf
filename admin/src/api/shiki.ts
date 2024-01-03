@@ -1,56 +1,24 @@
-import qs from 'qs'
 import { ElMessage } from 'element-plus'
 import { ApiCode, ContentTypeEnum } from '../enum'
-import { useUserStore } from '../store'
 import 'abortcontroller-polyfill/dist/polyfill-patch-fetch'
+import Ryougi, { type RequestConfig } from './ryougi'
 
-// 返回类型枚举
-enum ResponseType {
-  Code,
-  Data,
-  All,
-  Blob
-}
-// 请求方法
-export enum Method {
-  Get = 'GET',
-  Post = 'POST',
-  Put = 'PUT',
-  Delete = 'DELETE'
-}
-// 返回结果
-export type Result = {
-  code: ApiCode
-  data: any
-  msg: string
-}
-// 请求配置
-type RequestConfig = {
-  url?: string
-  params?: any | boolean
-  body?: any | string
-  timeout?: number
-  method?: Method
-  headers?: HeadersInit
-  responseType?: ResponseType
-  tip?: boolean
+type Config = {
+  successTip?: boolean
   failTip?: boolean
 }
-// 消息提示配置
-type MessageConfig = {
-  requestConfig: RequestConfig
-  response?: Response
-  result?: Result
-  error?: Error
+export type Result = {
+  code?: ApiCode
+  data?: any
+  msg?: string
 }
 
 class Shiki {
+  private ryougi = new Ryougi()
   // 请求拦截器
   private requestInterceptors: Function[] = []
   // 响应拦截器
   private responseInterceptors: Function[] = []
-  // 基础请求url
-  baseurl = '/'
   // 拦截器
   interceptors = {
     request: {
@@ -65,260 +33,68 @@ class Shiki {
     }
   }
 
+  constructor() {
+    const apiUrl = import.meta.env.VITE_API_URL
+    this.ryougi.baseurl = apiUrl
+  }
+
   // get请求
-  async get(url: string, config?: RequestConfig): Promise<any> {
+  async get(url: string, params?: any, config?: Config) {
+    const requestConfig: RequestConfig = { url, params, method: 'GET' }
     if (!config) {
-      config = {} as RequestConfig
+      config = { successTip: false, failTip: true }
     }
-    config.url = url
-    config.method = Method.Get
-    // 发送http请求
-    return await this.fetchRequest(config)
-  }
-  // get请求(返回code)
-  async getCode(
-    url: string,
-    params?: any,
-    row?: { tip?: boolean; failTip?: boolean }
-  ): Promise<any> {
-    const config = {
-      url,
-      params,
-      tip: row?.tip === false ? false : true,
-      failTip: row?.failTip,
-      responseType: ResponseType.Code
-    }
-    return await this.get(url, config)
-  }
-  // get请求(返回结果)
-  async getData(
-    url: string,
-    params?: any,
-    row?: { tip?: boolean; failTip?: boolean }
-  ): Promise<any> {
-    const config = {
-      url,
-      params,
-      tip: row?.tip === false ? false : true,
-      failTip: row?.failTip,
-      responseType: ResponseType.Data
-    }
-    return await this.get(url, config)
+    const result = await this.request(requestConfig, config)
+    return result
   }
   // post请求
-  async post(url: string, config: RequestConfig): Promise<any> {
-    config.url = url
-    config.method = Method.Post
-    if (!config.headers) {
-      config.headers = {
-        'content-type': 'application/json'
-      }
+  async post(url: string, body?: any, config?: Config) {
+    const requestConfig: RequestConfig = { url, body, method: 'POST' }
+    if (!config) {
+      config = { successTip: true, failTip: true }
     }
-    // 发送http请求
-    return await this.fetchRequest(config)
-  }
-  // post请求(返回code)
-  async postCode(
-    url: string,
-    body?: any,
-    row?: { tip?: boolean; failTip?: boolean }
-  ): Promise<any> {
-    const config = {
-      url,
-      body,
-      tip: row?.tip === false ? false : true,
-      failTip: row?.failTip,
-      responseType: ResponseType.Code
-    }
-    return await this.post(url, config)
-  }
-  // post请求(返回结果)
-  async postData(
-    url: string,
-    body?: any,
-    row?: { tip?: boolean; failTip?: boolean }
-  ): Promise<any> {
-    const config = {
-      url,
-      body,
-      tip: row?.tip === false ? false : true,
-      failTip: row?.failTip,
-      responseType: ResponseType.Data
-    }
-    return await this.post(url, config)
+    const result = await this.request(requestConfig, config)
+    return result
   }
   // fetch请求
-  private async fetchRequest(config: RequestConfig) {
-    const controller = new AbortController()
-    const signal = controller.signal
-    const timeout = config.timeout || 60 * 1000
-    // token
-    const userStore = useUserStore()
-    // header设置
-    config.headers = {
-      ...config.headers,
-      token: userStore.token
-    }
-    // get
-    if (config.method === Method.Get) {
-      // 参数拼接在url里面
-      if (config.params) {
-        const params = qs.stringify(config.params)
-        config.url = `${config.url}?${params}`
-      }
-    }
-    // fetch
-    try {
-      let response = await Promise.race([
-        this.timeoutSetting(timeout, controller),
-        this.fetchSend(config, signal)
-      ])
-      // contentType
-      const contentType = response.headers.get('content-type')
-      console.log(contentType)
-      // 返回blob
-      // if (config.responseType === ResponseType.Blob) {
-      //   const status = response.status
-      //   if (status !== 200) {
-      //     return null
-      //   }
-      //   const headers = response.headers
-      //   let contentType = headers.get('content-type')?.split(';') as any
-      //   contentType = contentType && contentType[0]
-      //   let json
-      //   // 如果返回的结果中包含resultMsg说明请求已经报错
-      //   if (contentType === BlobTypeEnum.Json) {
-      //     json = await response.json()
-      //     if (json.resultMsg) {
-      //       ElMessage.error(json.resultMsg)
-      //       return null
-      //     }
-      //   }
-      //   const filename = decodeURI(headers.get('filename') || '')
-      //   let blob
-      //   if (contentType === BlobTypeEnum.Json) {
-      //     blob = new Blob([JSON.stringify(json)])
-      //   } else {
-      //     blob = await response.blob()
-      //   }
-      //   return { contentType: contentType || '', filename, blob }
-      // }
-      // // 返回json
-      // return await this.reponseJson(config, response)
-    } catch (error) {
-      console.error(error)
-      // 消息提示
-      this.message({ requestConfig: config, error: error as Error })
-      // TODO: 上报错误日志
-    }
-  }
-  // 返回json
-  private async reponseJson(config: RequestConfig, response: Response) {
-    let result = {} as Result
-    const requestConfig = config
-    if (response.status === 200) {
-      response = await response.json()
-      // 结果转化
-      result = response as any
-      // 响应拦截器
-      this.responseInterceptors.forEach((callback) => {
-        response = callback(response)
-      })
-      this.message({ requestConfig, result })
-    } else {
-      this.message({ requestConfig, response })
-    }
-    // 返回结果处理
-    const data = await this.responseProcess(result, config)
-    return data
-  }
-  // 超时设置
-  private timeoutSetting(
-    timeout: number,
-    controller: AbortController
-  ): Promise<Response> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(new Response('timeout', { status: 504, statusText: 'timeout' }))
-        controller.abort()
-      }, timeout)
-    })
-  }
-  // fetch实际发出请求
-  private async fetchSend(
-    config: RequestConfig,
-    signal: AbortSignal
-  ): Promise<Response> {
-    let body = config.body as any
-    const headers = config.headers as any
-    if (headers && headers['content-type'] === 'application/json') {
-      body = JSON.stringify(body)
-    }
-    // 请求配置
-    let requestInit: RequestInit = {
-      signal,
-      mode: 'cors',
-      method: config.method,
-      headers,
-      body
-    }
+  private async request(requestConfig: RequestConfig, config?: Config) {
     // 请求拦截器
     this.requestInterceptors.forEach((callback) => {
-      requestInit = callback(requestInit)
+      requestConfig = callback(requestConfig)
     })
-    // 请求地址拼接
-    let url = config.url || ''
-    if (url.indexOf('http') !== 0) {
-      url = `${this.baseurl}${url}`
+    let response = await this.ryougi.request(requestConfig)
+    let result = {} as Result
+    if (response?.status !== 200) {
+      this.message('error', response?.statusText, config)
+      return result
     }
-    let response = await fetch(url, requestInit)
-    return response
-  }
-  // 消息提示
-  private message(config: MessageConfig) {
-    const { requestConfig, result, response, error } = config
-    // tip为false不提示
-    if (requestConfig.tip === false) {
-      return
+    const headers = response?.headers
+    const contentType = headers?.get('content-type')?.split(';')[0]
+    // json
+    if (contentType === ContentTypeEnum.Json) {
+      result = await response?.json()
+      // 响应拦截器
+      this.responseInterceptors.forEach((callback) => {
+        result = callback(result)
+      })
+      const type = result.code === ApiCode.Success ? 'success' : 'error'
+      this.message(type, result.msg, config)
     }
-    if (result?.code === ApiCode.Success) {
-      if (requestConfig.failTip) {
-        return
-      }
-      if (requestConfig.method === Method.Post) {
-        ElMessage.success({
-          message: result?.msg,
-          duration: 2000,
-          showClose: true
-        })
-      }
-      return
-    }
-    let messageText = result?.msg
-    if (response) {
-      messageText = response.statusText
-    }
-    if (error) {
-      messageText = `${error.name}: ${error.message}`
-    }
-
-    ElMessage.closeAll()
-    ElMessage.error({ message: messageText, duration: 2000, showClose: true })
-  }
-  // 返回结果处理
-  private responseProcess(result: Result, config: RequestConfig): any {
-    const responseType = config.responseType
-    // 返回code
-    if (responseType === ResponseType.Code) {
-      return result?.code
-    }
-    // 返回data
-    if (responseType === ResponseType.Data) {
-      const data = result?.data
-      return { data }
-    }
-    // 返回全部
     return result
+  }
+
+  // 消息提示
+  private message(
+    type: 'success' | 'error',
+    message?: string,
+    config?: Config
+  ) {
+    const successStatus = type === 'success' && config?.successTip
+    const errorStatus = type === 'error' && config?.failTip
+    if (successStatus || errorStatus) {
+      ElMessage.closeAll()
+      ElMessage({ type, message, duration: 3000, showClose: true })
+    }
   }
 }
 

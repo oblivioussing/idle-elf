@@ -1,1 +1,1 @@
-export { default as shiki, Method, type Result } from './shiki'
+export { default as shiki, type Result } from './shiki'

@@ -26,14 +26,14 @@ export class AuthGuard implements CanActivate {
     // token
     const token = request.headers.token
     if (!token) {
-      result.code = ApiCode.NoLogin
+      result.code = ApiCode.AuthFailed
       result.msg = '请先登陆'
       response.status(200).send(result)
       return false
     }
     const uid = base.getUidByToken(token)
     if (!uid) {
-      result.code = ApiCode.NoLogin
+      result.code = ApiCode.AuthFailed
       result.msg = '权限校验失败,请重新登陆'
       response.status(200).send(result)
       return false
@@ -43,7 +43,7 @@ export class AuthGuard implements CanActivate {
       // 重置token过期时间
       this.redisService.expire(uid, 60 * 60 * 24 * 30)
     } else {
-      result.code = ApiCode.NoLogin
+      result.code = ApiCode.AuthFailed
       result.msg = '登陆失效,请重新登陆'
       response.status(200).send(result)
       return false

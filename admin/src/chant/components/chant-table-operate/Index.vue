@@ -128,10 +128,10 @@ onMounted(() => {
 // 按钮组
 function buttonGroup() {
   setTimeout(() => {
-    const groups = groupsRef.value.querySelectorAll(
+    const groups = groupsRef.value?.querySelectorAll(
       '.el-button-group'
     ) as NodeListOf<Element>
-    groups.forEach((item) => {
+    groups?.forEach((item) => {
       if (item.children.length === 1) {
         item.removeAttribute('class')
       }
