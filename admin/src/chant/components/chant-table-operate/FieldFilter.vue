@@ -6,20 +6,21 @@
       type="primary"
       @click.stop="onShowFilter">
     </chant-button>
-    <div v-show="state.visible" class="fly-box" @click.stop>
+    <div v-if="state.visible" class="fly-box" @click.stop>
       <div class="bubble"></div>
       <draggable
         v-bind="{ animation: 200 }"
+        v-model="vModel.columns"
         class="container"
-        item-key="prop"
-        :list="vModel.columns">
+        item-key="prop">
         <template #item="{ element }">
-          <div v-if="element.prop !== 'operate'" class="item">
+          <div class="item">
             <el-icon class="handle">
               <Sort></Sort>
             </el-icon>
             <el-checkbox
               :checked="!element.hide"
+              :value="!element.hide"
               @change="onChange($event, element)">
               {{ translate(element) }}
             </el-checkbox>
@@ -28,6 +29,9 @@
       </draggable>
       <!-- 保存 -->
       <div class="btn-box">
+        <el-button @click="onReset">
+          {{ t('default') }}
+        </el-button>
         <el-button type="primary" @click="onSave">
           {{ tg('button.save') }}
         </el-button>
@@ -46,7 +50,7 @@ import { useVModel } from '@vueuse/core'
 import { type ListColumn as Column, type ListState } from '@/chant'
 import { StorageEnum } from '@/enum'
 import { vuei18n } from '@/plugs'
-import { storage } from '@/utils'
+import { base, storage } from '@/utils'
 
 // props
 const props = defineProps<{
@@ -60,15 +64,19 @@ const { t: tg } = useI18n({ useScope: 'global' })
 const { t } = useI18n({
   messages: {
     en: {
+      default: 'default',
       filter: 'filter'
     },
     zh: {
+      default: '默认',
       filter: '过滤'
     }
   }
 })
 const route = useRoute()
 const vModel = useVModel(props, 'modelValue', emits)
+// var
+const columnsBackups = base.clone(props.modelValue.columns)
 // state
 const state = reactive({
   visible: false
@@ -84,17 +92,22 @@ document.addEventListener('click', () => {
   state.visible = false
 })
 // init
-filterStorageFiled() // 过滤缓存的字段
-// 过滤缓存的字段
-function filterStorageFiled() {
+getStorageColumns() // 获取缓存columns
+// 获取缓存columns
+function getStorageColumns() {
   const obj = storage.getLocal(StorageEnum.TableFilter)
-  const list = obj?.[route.path] as string[]
-  list?.forEach((item: string) => {
-    const row = vModel.value.columns.find((column) => column.prop === item)
-    if (row) {
-      row.hide = true
-    }
-  })
+  const list = obj?.[route.path] as Column[]
+  const columns = vModel.value.columns
+  if (list?.length) {
+    list.forEach((item, index) => {
+      const row = columns.find((column) => column.prop === item.prop)
+      if (row) {
+        row.hide = item.hide
+        list[index] = row
+      }
+    })
+    vModel.value.columns = list
+  }
 }
 // 显示字段过滤
 function onShowFilter() {
@@ -104,13 +117,23 @@ function onShowFilter() {
 function onChange(val: any, column: Column) {
   column.hide = !val
 }
+// 默认
+function onReset() {
+  const obj = storage.getLocal(StorageEnum.TableFilter)
+  if (obj) {
+    Reflect.deleteProperty(obj, route.path)
+    storage.setLocal(StorageEnum.TableFilter, obj)
+  }
+  vModel.value.columns = base.clone(columnsBackups)
+  state.visible = false
+}
 // 保存
 function onSave() {
-  let columns = vModel.value.columns.filter((item) => {
-    return item.hide
+  const columns = vModel.value.columns.map((item) => {
+    const { prop, hide } = item
+    return { prop, hide }
   })
-  const list = columns.map((item) => item.prop)
-  storage.setLocal(StorageEnum.TableFilter, { [route.path]: list })
+  storage.setLocal(StorageEnum.TableFilter, { [route.path]: columns })
   state.visible = false
 }
 // 翻译
@@ -186,10 +209,10 @@ function translate(column: Column) {
     }
   }
   .btn-box {
+    display: flex;
     padding: 0 10px;
     :deep(.el-button) {
       height: 24px;
-      width: 100%;
     }
   }
 }
