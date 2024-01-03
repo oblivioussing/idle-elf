@@ -27,10 +27,10 @@
         </template>
       </draggable>
       <!-- 保存 -->
-      <div class="save-box">
-        <el-button type="primary" @click="onSave">{{
-          tg('button.save')
-        }}</el-button>
+      <div class="btn-box">
+        <el-button type="primary" @click="onSave">
+          {{ tg('button.save') }}
+        </el-button>
       </div>
     </div>
   </div>
@@ -185,11 +185,11 @@ function translate(column: Column) {
       }
     }
   }
-  .save-box {
-    padding-right: 10px;
-    text-align: right;
+  .btn-box {
+    padding: 0 10px;
     :deep(.el-button) {
       height: 24px;
+      width: 100%;
     }
   }
 }

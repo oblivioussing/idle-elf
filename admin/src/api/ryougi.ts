@@ -21,26 +21,6 @@ class Ryougi {
     const controller = new AbortController()
     const signal = controller.signal
     const timeout = config.timeout || 10 * 1000
-    const { method, headers } = config
-    // header
-    if (!headers) {
-      config.headers = {}
-    }
-    // get
-    if (method === 'GET') {
-      // 参数拼接在url里面
-      if (config.params) {
-        const params = qs.stringify(config.params)
-        config.url = `${config.url}?${params}`
-      }
-    }
-    // post
-    if (method === 'POST') {
-      const contentType = headers?.['content-type']
-      if (!contentType) {
-        config.headers!['content-type'] = 'application/json'
-      }
-    }
     // fetch
     try {
       const response = await Promise.race([
@@ -60,8 +40,8 @@ class Ryougi {
   ): Promise<Response> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(new Response('timeout', { status: 504, statusText: 'timeout' }))
         controller.abort()
+        resolve(new Response('timeout', { status: 504, statusText: 'timeout' }))
       }, timeout)
     })
   }
@@ -70,21 +50,33 @@ class Ryougi {
     config: RequestConfig,
     signal: AbortSignal
   ): Promise<Response> {
-    let body = config.body
-    const contentType = config.headers?.['content-type']
-    if (contentType === ContentTypeEnum.Json) {
-      body = JSON.stringify(body)
-    }
+    let { url, headers = {}, body } = config
     // 请求地址拼接
-    let url = config.url || ''
-
     if (!url.includes('http')) {
       url = `${this.baseurl}${url}`
+    }
+    // get
+    if (config.method === 'GET') {
+      // 参数拼接在url里面
+      if (config.params) {
+        const params = qs.stringify(config.params)
+        config.url = `${config.url}?${params}`
+      }
+    }
+    // post
+    if (config.method === 'POST') {
+      if (!headers['content-type']) {
+        headers['content-type'] = ContentTypeEnum.Json
+      }
+    }
+    // 序列化JSON字符串
+    if (headers['content-type'] === ContentTypeEnum.Json) {
+      body = JSON.stringify(body)
     }
     // 请求配置
     let requestInit: RequestInit = {
       body,
-      headers: config.headers,
+      headers,
       method: config.method,
       mode: 'cors',
       signal

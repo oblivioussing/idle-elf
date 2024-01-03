@@ -57,7 +57,7 @@ class Shiki {
     return result
   }
   // fetch请求
-  private async request(requestConfig: RequestConfig, config?: Config) {
+  async request(requestConfig: RequestConfig, config?: Config) {
     // 请求拦截器
     this.requestInterceptors.forEach((callback) => {
       requestConfig = callback(requestConfig)
@@ -82,7 +82,6 @@ class Shiki {
     }
     return result
   }
-
   // 消息提示
   private message(
     type: 'success' | 'error',
