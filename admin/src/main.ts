@@ -7,6 +7,7 @@ import { vuei18n } from './plugs'
 import router from './router'
 // element css
 import 'element-plus/theme-chalk/el-message.css'
+import 'element-plus/theme-chalk/el-message-box.css'
 // shiki 拦截器
 import './api/interceptor'
 

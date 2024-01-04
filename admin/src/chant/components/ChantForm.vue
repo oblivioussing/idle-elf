@@ -71,7 +71,7 @@
               :disabled="isDisabled(item)"
               :placeholder="translate(item, 'select')"
               :type="columnType(item.type)"
-              :value-format="item.valueFormat || 'x'">
+              :value-format="item.valueFormat">
             </el-date-picker>
             <!-- daterange,datetimerange -->
             <el-date-picker
@@ -81,7 +81,7 @@
               :start-placeholder="translate(item)"
               :end-placeholder="translate(item)"
               :type="columnType(item.type)"
-              :value-format="item.valueFormat || 'x'"
+              :value-format="item.valueFormat"
               @change="onDateRange(item)">
             </el-date-picker>
             <!-- input-number -->

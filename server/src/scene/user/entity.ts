@@ -12,5 +12,6 @@ export const UserEntity: User = {
   nickname: '', // 昵称
   password: '', // 密码
   phone: '', // 手机号
+  status: '', // 状态
   updateTime: new Date() // 更新时间
 }

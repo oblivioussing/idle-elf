@@ -20,6 +20,17 @@ const former = useFormer()
 const state = reactive({
   ...former.state
 })
+// create
+former.created(() => {
+  if (state.pageType === 'copy-add') {
+    // 获取详情
+    getDetail()
+  }
+}, state)
+// 获取详情
+function getDetail() {
+  former.getData('user/detail', state)
+}
 // 保存
 function onSave() {
   former.save('xx/xxx', state)

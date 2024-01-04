@@ -48,6 +48,7 @@ export type ListColumn = {
   onlySearch?: boolean // 只作为搜索条件
   prepend?: string // 输入框前置内容
   prop: string // 字段值
+  required?: boolean // 是否必填,仅在搜索条件中生效
   search?: boolean // 是否为搜索条件
   searchSlot?: boolean // 搜索条件slot
   slot?: boolean // 字段内容slot

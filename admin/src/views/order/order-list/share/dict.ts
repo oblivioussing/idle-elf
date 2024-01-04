@@ -1,6 +1,6 @@
 export default {
   // 性别
-  gender: {
+  sex: {
     1: '女',
     2: '男'
   },

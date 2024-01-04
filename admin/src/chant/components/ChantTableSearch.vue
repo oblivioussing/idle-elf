@@ -5,14 +5,19 @@
       class="form"
       :inline="true"
       :label-width="props.labelWidth"
-      @keyup.enter="emits('query')">
+      :model="vModel?.query"
+      ref="formRef"
+      @keyup.enter="onSubmit('query')">
       <slot></slot>
       <!-- 查询条件 -->
       <el-form-item
         v-if="vModel"
         v-for="item in columnsList"
         :key="item.prop"
-        :label="translate(item) + ':'">
+        :label="translate(item) + ':'"
+        :prop="item.prop"
+        :required="item.required"
+        :rules="[{ required: item.required, message: '' }]">
         <!-- input -->
         <el-input
           v-if="formUtils.isInput(item)"
@@ -55,7 +60,7 @@
           :start-placeholder="translate(item)"
           :end-placeholder="translate(item)"
           :type="columnType(item.type)"
-          :value-format="item.valueFormat || 'x'"
+          :value-format="item.valueFormat"
           @change="emits('query')">
         </el-date-picker>
         <!-- daterange,datetimerange -->
@@ -66,7 +71,7 @@
           :start-placeholder="translate(item)"
           :end-placeholder="translate(item)"
           :type="columnType(item.type)"
-          :value-format="item.valueFormat || 'x'"
+          :value-format="item.valueFormat"
           @change="onDateRange(item)">
         </el-date-picker>
         <!-- range -->
@@ -112,23 +117,24 @@
       <chant-button
         :content="t('query')"
         :icon="Search"
-        @click="onEmit('query')">
+        @click="onSubmit('query')">
       </chant-button>
       <!-- 刷新 -->
       <chant-button
         :content="t('refresh')"
         :icon="Refresh"
-        @click="onEmit('refresh')">
+        @click="onSubmit('refresh')">
       </chant-button>
     </el-button-group>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import type { FormInstance } from 'element-plus'
+import { computed, onMounted, onScopeDispose, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowDown, ArrowUp, Refresh, Search } from '@element-plus/icons-vue'
-import { useVModel } from '@vueuse/core'
+import { useThrottleFn, useVModel } from '@vueuse/core'
 import { formUtils, type ListColumn as Column, type ListState } from '@/chant'
 import { FormTypeEnum } from '@/chant'
 import { vuei18n } from '@/plugs'
@@ -150,6 +156,7 @@ const props = withDefaults(defineProps<Props>(), {
 // emits
 const emits = defineEmits(['query', 'refresh', 'update:modelValue'])
 // use
+const resizeThrottle = useThrottleFn(containerAuto, 1000)
 const { t: tg } = useI18n({ useScope: 'global' })
 const { t } = useI18n({
   messages: {
@@ -169,6 +176,7 @@ const { t } = useI18n({
 })
 const vModel = useVModel(props, 'modelValue', emits)
 // ref
+const formRef = ref<FormInstance>()
 const searchRef = ref()
 // state
 const state = reactive({
@@ -204,16 +212,21 @@ watch(columnsList, () => {
     containerAuto()
   }, 300)
 })
-// resize
-window.addEventListener('resize', () => {
+// onMounted
+onMounted(() => {
+  // resize
+  window.addEventListener('resize', resizeThrottle)
+  // 绑定查询条件的值
+  bindQueryValue()
   // 容器高度自适应
-  containerAuto()
+  setTimeout(() => {
+    containerAuto()
+  }, 1500)
 })
-// init
-bindQueryValue() // 绑定查询条件的值
-setTimeout(() => {
-  containerAuto() // 容器高度自适应
-}, 1500)
+// onScopeDispose
+onScopeDispose(() => {
+  window.removeEventListener('resize', resizeThrottle)
+})
 // 绑定查询条件的值
 function bindQueryValue() {
   const query = vModel.value?.query
@@ -273,6 +286,17 @@ function onEmit(type: any) {
     reset()
   }
   emits(type)
+}
+// 提交
+async function onSubmit(type: 'query' | 'refresh') {
+  try {
+    const status = await formRef.value?.validate()
+    if (status) {
+      onEmit(type)
+    }
+  } catch (error) {
+    console.error(error)
+  }
 }
 // 清空查询条件
 function reset() {

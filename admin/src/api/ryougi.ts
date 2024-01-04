@@ -60,7 +60,7 @@ class Ryougi {
       // 参数拼接在url里面
       if (config.params) {
         const params = qs.stringify(config.params)
-        config.url = `${config.url}?${params}`
+        url = `${url}?${params}`
       }
     }
     // post

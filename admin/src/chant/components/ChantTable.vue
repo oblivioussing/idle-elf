@@ -249,9 +249,6 @@ function sortCreate() {
       const data = base.clone(list.value)
       const item = data?.splice(event.oldIndex, 1)[0]
       data?.splice(event.newIndex, 0, item)
-      data?.forEach((item, index) => {
-        item.serialNo = index + 1
-      })
       if (vModel.value) {
         vModel.value.list = data as any[]
         emits('update:modelValue', vModel.value)

@@ -30,7 +30,7 @@
       <!-- 保存 -->
       <div class="btn-box">
         <el-button @click="onReset">
-          {{ t('default') }}
+          {{ t('reset') }}
         </el-button>
         <el-button type="primary" @click="onSave">
           {{ tg('button.save') }}
@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
+import { computed, onMounted, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import draggable from 'vuedraggable'
@@ -64,11 +64,11 @@ const { t: tg } = useI18n({ useScope: 'global' })
 const { t } = useI18n({
   messages: {
     en: {
-      default: 'default',
+      reset: 'reset',
       filter: 'filter'
     },
     zh: {
-      default: '默认',
+      reset: '重置',
       filter: '过滤'
     }
   }
@@ -87,12 +87,24 @@ const messages = computed(() => {
   const lang = props.lang
   return lang ? lang[locale] : {}
 })
-// 空白处点击
-document.addEventListener('click', () => {
-  state.visible = false
+// watch
+watch(
+  () => state.visible,
+  () => {
+    if (state.visible) {
+      // 空白处点击
+      document.addEventListener('click', blankClick)
+    } else {
+      // 移除点击事件
+      document.removeEventListener('click', blankClick)
+    }
+  }
+)
+// onMounted
+onMounted(() => {
+  // 获取缓存columns
+  getStorageColumns()
 })
-// init
-getStorageColumns() // 获取缓存columns
 // 获取缓存columns
 function getStorageColumns() {
   const obj = storage.getLocal(StorageEnum.TableFilter)
@@ -108,6 +120,10 @@ function getStorageColumns() {
     })
     vModel.value.columns = list
   }
+}
+// 空白区点击
+function blankClick() {
+  state.visible = false
 }
 // 显示字段过滤
 function onShowFilter() {

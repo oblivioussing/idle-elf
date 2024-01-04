@@ -12,10 +12,12 @@
     v-model="state"
     :lang="lang"
     :options="['add', 'alter', 'delete']"
+    show-checked-all
     split-button
     @add="lister.add"
     @alter="onAlter"
-    @command="onCommand">
+    @command="onCommand"
+    @delete="onBatchDelete">
     <el-button type="primary">拉黑</el-button>
     <el-button type="danger">禁用</el-button>
     <chant-upload :type="UploadTypeEnum.PureButton"></chant-upload>
@@ -33,11 +35,15 @@
     <chant-column-operate :width="120">
       <template #="{ row }">
         <!-- 编辑 -->
-        <el-button link type="primary" @click="onEdit">编辑</el-button>
+        <el-button link type="primary" @click="lister.edit(row)">
+          编辑
+        </el-button>
         <!-- 复制 -->
-        <el-button link type="primary" @click="onEdit">复制</el-button>
+        <el-button link type="primary" @click="lister.copyAdd(row)">
+          复制
+        </el-button>
         <!-- 删除 -->
-        <el-button link type="danger" @click="onEdit">删除</el-button>
+        <el-button link type="danger" @click="onDelete(row)">删除</el-button>
       </template>
     </chant-column-operate>
   </chant-table>
@@ -76,8 +82,14 @@ lister.created(() => {
 function getList() {
   lister.getData('user/list', state)
 }
-// 编辑
-function onEdit() {}
+// 批量删除
+function onBatchDelete() {
+  lister.batchRemove('xx/xx', state)
+}
+// 删除
+function onDelete({ id }: any) {
+  lister.remove('user/delete', state, { id })
+}
 // 批量修改
 function onAlter() {
   state.batchAlterVisible = true

@@ -1,11 +1,6 @@
 import { ContentTypeEnum } from '../enum'
 
 export default {
-  // 去除空白字符
-  spaceDel(val: string) {
-    const reg = new RegExp('\\s', 'g')
-    return val.replace(reg, '')
-  },
   // 对象数组去重
   distinct(arr: any[], field = 'id') {
     const res = new Map()
@@ -30,19 +25,13 @@ export default {
     }
     return newobj
   },
-  // 获取url参数
-  getUrlParam(url?: string) {
-    url = url || window.location.href
-    const urlObject = {} as Record<string, any>
-    if (/\?/.test(url)) {
-      const urlString = url.substring(url.indexOf('?') + 1)
-      const urlArray = urlString.split('&')
-      for (let i = 0, len = urlArray.length; i < len; i++) {
-        const urlItem = urlArray[i]
-        const item = urlItem.split('=')
-        urlObject[item[0]] = item[1]
-      }
-      return urlObject
+  // 是否为空对象
+  isEmptyObject(data: object) {
+    if (typeof data === 'object') {
+      const keys = Object.keys(data)
+      return keys.length === 0
+    } else {
+      return true
     }
   },
   // 动态加载js文件
@@ -67,15 +56,6 @@ export default {
         resolve()
       })
     })
-  },
-  // 获取文件名
-  getFileName(path: string) {
-    return path.replace(/(.*\/)*([^.]+).*/g, '$2')
-  },
-  // 文件拓展名
-  checkFileName(arr: string[]) {
-    const str = arr.map((name) => `.${name}`).join('|')
-    return new RegExp(`(${str})$`)
   },
   // 下载根据url
   downloadByUrl(row: { url: string; filename?: string }) {

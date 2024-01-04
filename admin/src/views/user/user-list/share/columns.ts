@@ -3,17 +3,18 @@ import { FormTypeEnum, type ListColumn as Column } from '@/chant'
 export default () => {
   return [
     {
-      prop: 'name', // 姓名
-      copy: true,
+      prop: 'loginName',
+      label: '用户名',
       search: true
     },
     {
-      prop: 'age', // 年龄
-      search: true,
-      type: FormTypeEnum.InputNumber
+      prop: 'name',
+      label: '姓名',
+      search: true
     },
     {
-      prop: 'sex', // 性别
+      prop: 'gender',
+      label: '性别',
       search: true,
       type: FormTypeEnum.Select
     },
@@ -29,12 +30,35 @@ export default () => {
       type: FormTypeEnum.Select
     },
     {
-      prop: 'createTime', // 创建时间
-      search: true,
-      type: FormTypeEnum.DateRange
+      prop: 'email',
+      label: '邮箱',
+      search: true
     },
     {
-      prop: 'updateTime', // 更新时间
+      prop: 'nickname',
+      label: '昵称',
+      search: true
+    },
+    {
+      prop: 'password',
+      label: '手机号',
+      search: true
+    },
+    {
+      prop: 'birthday',
+      label: '生日',
+      search: true,
+      type: FormTypeEnum.Date
+    },
+    {
+      prop: 'createTime',
+      label: '创建时间',
+      search: true,
+      type: FormTypeEnum.DatetimeRange
+    },
+    {
+      prop: 'updateTime',
+      label: '更新时间',
       search: true,
       type: FormTypeEnum.DatetimeRange
     }

@@ -27,6 +27,7 @@ function useFormer(formConfig = { type: 'page' } as Config) {
     form: {} as any,
     formLoading: false,
     loading: false,
+    pageType: '' as 'copy-add' | undefined,
     query: {} as any
   }
   // 绑定表单实例
@@ -34,12 +35,10 @@ function useFormer(formConfig = { type: 'page' } as Config) {
     formInstance = val
   }
   // 初始化
-  function created(
-    callback: () => void,
-    state?: { query: Record<string, any> }
-  ) {
+  function created(callback: () => void, state?: any) {
     if (state) {
       state.query = route?.query
+      state.pageType = state.query?.pageType
     }
     callback()
     // onActivated
@@ -49,6 +48,7 @@ function useFormer(formConfig = { type: 'page' } as Config) {
       }
       if (JSON.stringify(state.query) !== JSON.stringify(route.query)) {
         state.query = route?.query
+        state.pageType = state.query?.pageType
         callback()
       }
     })
@@ -56,9 +56,9 @@ function useFormer(formConfig = { type: 'page' } as Config) {
   // 获取数据
   async function getData(path: string, state: State) {
     state.formLoading = true
-    const { data } = await shiki?.getData(path, state.query)
+    const { data } = await shiki?.get(path, state.query)
     state.formLoading = false
-    state.form = data
+    state.form = data || {}
   }
   // 保存
   async function save(path: string, state: State, config?: { params?: any }) {
@@ -69,7 +69,7 @@ function useFormer(formConfig = { type: 'page' } as Config) {
     }
     const params = config?.params || state.form
     state.loading = true
-    const code = await shiki?.postCode(path, params)
+    const { code } = await shiki?.post(path, params)
     state.loading = false
     if (code !== ApiCode.Success) {
       return false
@@ -97,7 +97,13 @@ function useFormer(formConfig = { type: 'page' } as Config) {
   }
   // 表单校验
   async function validate() {
-    return await formInstance.validate()
+    let status
+    try {
+      status = await formInstance.validate()
+    } catch (error) {
+      console.error(error)
+    }
+    return status
   }
 
   return {

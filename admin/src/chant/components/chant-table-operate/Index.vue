@@ -13,13 +13,14 @@
     </div>
     <div class="button-box" ref="groupsRef">
       <!-- 自定义按钮 -->
-      <el-button-group>
+      <el-button-group :disabled="vModel.selection.length === 0">
         <slot></slot>
       </el-button-group>
       <!-- 批量编辑 -->
       <div v-if="show('alter')" class="m-l-10">
         <el-dropdown
           v-if="slots['alter-option']"
+          :disabled="!isSelected"
           :split-button="props.splitButton"
           type="primary"
           @click="emits('alter')"
@@ -54,6 +55,7 @@
           <chant-icon-button
             v-if="show('delete')"
             :content="t('batch') + tg('button.delete')"
+            :disabled="!isSelected"
             icon-type="delete"
             type="danger"
             @click="emits('delete')">
@@ -71,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, useSlots } from 'vue'
+import { computed, onMounted, ref, useSlots } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowDown } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
@@ -120,6 +122,10 @@ const slots = useSlots()
 const vModel = useVModel(props, 'modelValue', emits)
 // ref
 const groupsRef = ref()
+// computed
+const isSelected = computed(() => {
+  return vModel.value.selection.length > 0 || vModel.value.allFlag === 1
+})
 // onMounted
 onMounted(() => {
   // 按钮组

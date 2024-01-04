@@ -4,13 +4,13 @@ export default {
   // 日期
   date(val: string) {
     if (val) {
-      return dayjs(parseInt(val)).format('YYYY-MM-DD')
+      return dayjs(val).format('YYYY-MM-DD')
     }
   },
   // 日期时间
-  datetime(val: string | number) {
+  datetime(val: string) {
     if (val) {
-      return dayjs(Number(val)).format('YYYY-MM-DD HH:mm:ss')
+      return dayjs(val).format('YYYY-MM-DD HH:mm:ss')
     }
   },
   // 金额

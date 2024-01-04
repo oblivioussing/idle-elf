@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
-import storage from '../utils/storage'
 import { LangEnum, StorageEnum } from '../enum'
+import storage from '../utils/storage'
 import { type PageRelation } from '../type'
 
 // 语言
