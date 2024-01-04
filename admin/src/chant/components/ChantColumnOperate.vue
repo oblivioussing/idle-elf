@@ -5,7 +5,9 @@
     :label="t('operate')"
     :width="props.width">
     <template #="{ row, $index }">
-      <slot :index="$index" :row="row"></slot>
+      <div class="column-operate">
+        <slot :index="$index" :row="row"></slot>
+      </div>
     </template>
   </el-table-column>
 </template>
@@ -30,4 +32,9 @@ const { t } = useI18n({
 })
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.column-operate {
+  display: flex;
+  align-items: center;
+}
+</style>

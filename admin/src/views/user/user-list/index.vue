@@ -18,21 +18,16 @@
     @alter="onAlter"
     @command="onCommand"
     @delete="onBatchDelete">
-    <el-button type="primary">拉黑</el-button>
-    <el-button type="danger">禁用</el-button>
-    <chant-upload :type="UploadTypeEnum.PureButton"></chant-upload>
     <!-- 批量修改选项 -->
     <template #alter-option>
-      <el-dropdown-menu>
-        <el-dropdown-item command="1">姓名</el-dropdown-item>
-        <el-dropdown-item command="2">年龄</el-dropdown-item>
-      </el-dropdown-menu>
+      <el-dropdown-item command="1">姓名</el-dropdown-item>
+      <el-dropdown-item command="2">年龄</el-dropdown-item>
     </template>
   </chant-table-operate>
   <!-- table -->
   <chant-table v-model="state" :dict="dict" :lang="lang">
     <!-- 操作 -->
-    <chant-column-operate :width="120">
+    <chant-column-operate :width="150">
       <template #="{ row }">
         <!-- 编辑 -->
         <el-button link type="primary" @click="lister.edit(row)">
@@ -44,6 +39,11 @@
         </el-button>
         <!-- 删除 -->
         <el-button link type="danger" @click="onDelete(row)">删除</el-button>
+        <!-- 更多 -->
+        <chant-more-dropdown @command="onCommand">
+          <el-dropdown-item command="1">action1</el-dropdown-item>
+          <el-dropdown-item command="2">action2</el-dropdown-item>
+        </chant-more-dropdown>
       </template>
     </chant-column-operate>
   </chant-table>
@@ -60,7 +60,6 @@
 
 <script setup lang="ts" name="user-user-list-index">
 import { reactive } from 'vue'
-import { UploadTypeEnum } from '@/chant'
 import { useLister } from '@/use'
 import { columns, dict, lang } from './share'
 import BatchAlter from './components/BatchAlter.vue' // 批量修改

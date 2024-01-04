@@ -2,12 +2,13 @@
   <el-tabs
     v-model="state.path"
     class="nav-tab"
+    ref="tabRef"
     type="card"
     @tab-click="onTab"
     @tab-remove="onTabRemove">
     <el-tab-pane
-      v-for="(item, index) in state.tabs"
-      :key="index"
+      v-for="item in state.tabs"
+      :key="item.path"
       :closable="item.path !== '/'"
       :name="item.path">
       <template #label>
@@ -38,13 +39,15 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+// @ts-ignore
+import Sortable from 'sortablejs'
+import { onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { BusEnum, LangEnum, StorageEnum } from '@/enum'
-import { bus, core, storage } from '@/utils'
 import { useAppStore } from '@/store'
 import { useChaoser } from '@/use'
+import { base, bus, core, storage } from '@/utils'
 
 // type
 type PathMapping = {
@@ -86,6 +89,7 @@ const tabs = (storage.getSession(StorageEnum.HomeNavTab) || [
 ]) as PathMapping[]
 // ref
 const dropdownRef = ref()
+const tabRef = ref()
 // state
 const state = reactive({
   path: route?.path,
@@ -104,9 +108,13 @@ watch(state.tabs, () => {
 })
 // 监听路由变化
 watch(() => route?.path, routerChange)
-// 初始化
-routerChange() // 路由变化
-busKeeps() // 通知外部keeps发生了变化
+// onMounted
+onMounted(() => {
+  // 路由变化
+  routerChange()
+  // 通知外部keeps发生了变化
+  busKeeps()
+})
 // 路由变化
 function routerChange() {
   const path = route?.path

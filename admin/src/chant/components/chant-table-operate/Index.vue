@@ -33,7 +33,9 @@
             <el-icon style="margin-left: 5px"><arrow-down /></el-icon>
           </el-button>
           <template #dropdown>
-            <slot name="alter-option"></slot>
+            <el-dropdown-menu>
+              <slot name="alter-option"></slot>
+            </el-dropdown-menu>
           </template>
         </el-dropdown>
         <el-button v-else type="primary" @click="emits('alter')">
