@@ -2,8 +2,7 @@
   <chant-form
     v-model="state"
     :dict="dict"
-    :lang="lang"
-    :model="model()"
+    :columns="columns()"
     @instance="former.bindInstance">
   </chant-form>
   <chant-form-footer v-model="state" @save="onSave"></chant-form-footer>
@@ -12,7 +11,7 @@
 <script setup lang="ts" name="user-user-list-add">
 import { reactive } from 'vue'
 import { useFormer } from '@/use'
-import { dict, lang, model } from './share'
+import { columns, dict } from './share'
 
 // use
 const former = useFormer()
@@ -22,7 +21,7 @@ const state = reactive({
 })
 // create
 former.created(() => {
-  if (state.pageType === 'copy-add') {
+  if (state.copyAddFlag === '1') {
     // 获取详情
     getDetail()
   }

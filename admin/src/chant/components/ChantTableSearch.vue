@@ -12,7 +12,7 @@
       <!-- 查询条件 -->
       <el-form-item
         v-if="vModel"
-        v-for="item in columnsList"
+        v-for="item in availableColumns"
         :key="item.prop"
         :label="translate(item) + ':'"
         :prop="item.prop"
@@ -33,14 +33,14 @@
         </el-input>
         <!-- input-number -->
         <el-input-number
-          v-else-if="item.type === FormTypeEnum.InputNumber"
+          v-else-if="item.type === 'input-number'"
           v-model="vModel.query[item.prop]"
           controls-position="right"
           :placeholder="translate(item, 'enter')">
         </el-input-number>
         <!-- select -->
         <el-select
-          v-else-if="item.type === FormTypeEnum.Select"
+          v-else-if="item.type === 'select'"
           v-model="vModel.query[item.prop]"
           :clearable="item.clearable !== false"
           :placeholder="translate(item, 'select')"
@@ -51,32 +51,25 @@
             :value="key">
           </el-option>
         </el-select>
-        <!-- date,datetime -->
-        <el-date-picker
-          v-else-if="formUtils.isDate(item)"
-          v-model="vModel.query[item.prop]"
+        <!-- date-picker -->
+        <!-- <el-date-picker
+          v-else-if="item.type === 'date-picker'"
+          v-model="
+            formUtils.isDateRange(item)
+              ? state.range[item.prop]
+              : vModel.query[item.prop]
+          "
           :clearable="item.clearable !== false"
           :placeholder="translate(item, 'select')"
           :start-placeholder="translate(item)"
           :end-placeholder="translate(item)"
-          :type="columnType(item.type)"
+          :type="columnType(item.datepickerType)"
           :value-format="item.valueFormat"
           @change="emits('query')">
-        </el-date-picker>
-        <!-- daterange,datetimerange -->
-        <el-date-picker
-          v-else-if="formUtils.isDateRange(item)"
-          v-model="state.range[item.prop]"
-          :clearable="item.clearable !== false"
-          :start-placeholder="translate(item)"
-          :end-placeholder="translate(item)"
-          :type="columnType(item.type)"
-          :value-format="item.valueFormat"
-          @change="onDateRange(item)">
-        </el-date-picker>
+        </el-date-picker> -->
         <!-- range -->
         <div
-          v-else-if="item.type === FormTypeEnum.InputNumberRange"
+          v-else-if="item.type === ElementTypeEnum.InputNumberRange"
           class="input-range">
           <el-input-number
             v-model="vModel.query[rangeField(item, 'start')]"
@@ -126,10 +119,9 @@
 import type { FormInstance } from 'element-plus'
 import { computed, onMounted, onScopeDispose, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ArrowDown, ArrowUp, Refresh, Search } from '@element-plus/icons-vue'
+import { ArrowDown, ArrowUp, Search } from '@element-plus/icons-vue'
 import { useThrottleFn, useVModel } from '@vueuse/core'
 import { formUtils, type ListColumn as Column, type ListState } from '@/chant'
-import { FormTypeEnum } from '@/chant'
 import { vuei18n } from '@/plugs'
 
 interface Props {
@@ -177,7 +169,7 @@ const state = reactive({
   range: {} as any
 })
 // computed
-const columnsList = computed(() => {
+const availableColumns = computed(() => {
   const columns = vModel.value?.columns
   const searchOrder = props.searchOrder?.reverse()
   return columns?.reduce((acc: Column[], cur: Column) => {
@@ -199,7 +191,7 @@ const messages = computed(() => {
   return lang ? lang[locale] : {}
 })
 // watch
-watch(columnsList, () => {
+watch(availableColumns, () => {
   setTimeout(() => {
     // 容器高度自适应
     containerAuto()
@@ -237,8 +229,8 @@ function rangeField(column: Column, type: 'start' | 'end') {
   const key = `dynamic${suffix}` as 'dynamicStart' | 'dynamicEnd'
   return column[key] || `${column.prop}${suffix}`
 }
-// 日期范围选择
-function onDateRange(row: Column) {
+// date-picker change
+function onDateChange(row: Column) {
   const prop = row.prop
   let value = state.range[prop]
   if (!value) {
@@ -301,7 +293,7 @@ function reset() {
   }
 }
 // type类型转化
-function columnType(type?: FormTypeEnum) {
+function columnType(type?: ElementTypeEnum) {
   return type as any
 }
 // 翻译

@@ -1,15 +1,10 @@
 <template>
   <!-- search -->
-  <chant-table-search
-    v-model="state"
-    :dict="dict"
-    :lang="lang"
-    @query="getList">
+  <chant-table-search v-model="state" :dict="dict" @query="getList">
   </chant-table-search>
   <!-- operate -->
   <chant-table-operate
     v-model="state"
-    :lang="lang"
     :options="['add', 'alter', 'delete']"
     show-checked-all
     split-button
@@ -24,7 +19,7 @@
     </template>
   </chant-table-operate>
   <!-- table -->
-  <chant-table v-model="state" :dict="dict" :lang="lang">
+  <chant-table v-model="state" :dict="dict">
     <!-- 操作 -->
     <chant-column-operate :width="140">
       <template #="{ row }">
@@ -58,7 +53,7 @@
 <script setup lang="ts" name="user-user-list-index">
 import { reactive } from 'vue'
 import { useLister } from '@/use'
-import { columns, dict, lang } from './share'
+import { columns, dict } from './share'
 import BatchAlter from './components/BatchAlter.vue' // 批量修改
 
 // use

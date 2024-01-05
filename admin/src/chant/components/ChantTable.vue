@@ -47,7 +47,7 @@
             </el-input>
             <!-- select -->
             <el-select
-              v-else-if="item.type === FormTypeEnum.Select"
+              v-else-if="item.type === ElementTypeEnum.Select"
               v-model="row[item.prop]"
               :placeholder="translate(item)">
               <el-option
@@ -59,14 +59,14 @@
             </el-select>
             <!-- input-number -->
             <el-input-number
-              v-else-if="item.type === FormTypeEnum.InputNumber"
+              v-else-if="item.type === ElementTypeEnum.InputNumber"
               v-model="row[item.prop]"
               controls-position="right"
               :placeholder="translate(item)">
             </el-input-number>
           </template>
           <!-- dict -->
-          <div v-else-if="item.type === FormTypeEnum.Select">
+          <div v-else-if="item.type === ElementTypeEnum.Select">
             <el-tag
               :effect="item.tagType ? 'dark' : 'plain'"
               :type="item.tagType?.[row[item.prop]]">
@@ -127,7 +127,7 @@ import { useVModel } from '@vueuse/core'
 import Sortable from 'sortablejs'
 import {
   FormatEnum,
-  FormTypeEnum,
+  ElementTypeEnum,
   type ListColumn as Column,
   type ListState
 } from '@/chant'
@@ -177,10 +177,8 @@ window.addEventListener('resize', () => {
 // computed
 const availableColumns = computed(() => {
   return columns.value?.filter((item) => {
-    if (item.onlySearch) {
-      return false
-    }
-    if (item.hide) {
+    const hideInList = item.hideInPage?.includes('list')
+    if (item.onlySearch || item.hide || hideInList) {
       return false
     }
     return true
@@ -277,16 +275,14 @@ function tableAdapter() {
 // 是否date格式化
 function isDateFmt(column: Column) {
   if (column.type) {
-    return [FormTypeEnum.Date, FormTypeEnum.DateRange].includes(column.type)
+    return [ElementTypeEnum.Date].includes(column.type)
   }
   return false
 }
 // 是否datetime格式化
 function isDatetimeFmt(column: Column) {
   if (column.type) {
-    return [FormTypeEnum.Datetime, FormTypeEnum.DatetimeRange].includes(
-      column.type
-    )
+    return [ElementTypeEnum.Datetime].includes(column.type)
   }
   return false
 }

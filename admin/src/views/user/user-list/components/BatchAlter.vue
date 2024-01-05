@@ -3,8 +3,7 @@
     <chant-form
       v-model="state"
       :dict="dict"
-      :lang="lang"
-      :model="model()"
+      :columns="columns()"
       @instance="former.bindInstance">
     </chant-form>
     <template #footer>
@@ -23,7 +22,7 @@ import { reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useVModel } from '@vueuse/core'
 import { useFormer } from '@/use'
-import { dict, lang, model } from '../share'
+import { columns, dict } from '../share'
 
 // props
 const props = defineProps<{

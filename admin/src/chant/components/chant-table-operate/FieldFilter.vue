@@ -14,7 +14,7 @@
         class="container"
         item-key="prop">
         <template #item="{ element }">
-          <div class="item">
+          <div v-if="show(element)" class="item">
             <el-icon class="handle">
               <Sort></Sort>
             </el-icon>
@@ -151,6 +151,10 @@ function onSave() {
   })
   storage.setLocal(StorageEnum.TableFilter, { [route.path]: columns })
   state.visible = false
+}
+// 是否显示
+function show(column: Column) {
+  return !column.hideInPage?.includes('list')
 }
 // 翻译
 function translate(column: Column) {

@@ -2,34 +2,25 @@ import type { FormInstance } from 'element-plus'
 import { getCurrentInstance, onActivated } from 'vue'
 import { useRoute } from 'vue-router'
 import shiki from '@/api/shiki'
-import { type FormColumn as Column } from '@/chant'
+import { type FormState as State } from '@/chant'
 import { ApiCode } from '@/enum'
 import { bus, core } from '@/utils'
 
-type State = {
-  continueAdd?: boolean
-  form: {
-    pageElements?: Column[]
-    [key: string]: any
-  }
-  formLoading: boolean
-  loading: boolean
-  query: Record<string, any>
-}
 type Config = { type?: 'page' | 'dialog' }
 
-function useFormer(formConfig = { type: 'page' } as Config) {
+function useFormer(config = { type: 'page' } as Config) {
   let formInstance: FormInstance
   const instance = getCurrentInstance()
   const route = useRoute()
   const state = {
     continueAdd: false,
+    copyAddFlag: '0' as '0' | '1',
     form: {} as any,
     formLoading: false,
     loading: false,
-    pageType: '' as 'copy-add' | undefined,
     query: {} as any
   }
+
   // 绑定表单实例
   function bindInstance(val: FormInstance) {
     formInstance = val
@@ -61,13 +52,13 @@ function useFormer(formConfig = { type: 'page' } as Config) {
     state.form = data || {}
   }
   // 保存
-  async function save(path: string, state: State, config?: { params?: any }) {
+  async function save(path: string, state: State, row?: { params?: any }) {
     // 表单校验
     const status = await validate()
     if (!status) {
       return false
     }
-    const params = config?.params || state.form
+    const params = row?.params || state.form
     state.loading = true
     const { code } = await shiki?.post(path, params)
     state.loading = false
@@ -80,7 +71,7 @@ function useFormer(formConfig = { type: 'page' } as Config) {
       formInstance.resetFields()
       return true
     }
-    if (formConfig.type === 'page') {
+    if (config.type === 'page') {
       // 刷新列表
       const path = core.getParentPath(route?.path)
       bus.emit(path)

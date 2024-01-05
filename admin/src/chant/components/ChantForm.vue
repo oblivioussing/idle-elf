@@ -4,7 +4,7 @@
       :label-width="props.labelWidth || '80px'"
       :model="vModel.form"
       ref="formRef">
-      <template v-for="item in columnsList" :key="item.prop">
+      <template v-for="item in availableColumns" :key="item.prop">
         <!-- divider -->
         <el-divider v-if="item.title" content-position="left">
           {{ translate(item) }}
@@ -35,7 +35,7 @@
             </el-input>
             <!-- select -->
             <el-select
-              v-else-if="item.type === FormTypeEnum.Select"
+              v-else-if="item.type === ElementTypeEnum.Select"
               v-model="vModel.form[item.prop]"
               :clearable="item.clearable !== false"
               :multiple="item.selectMultiple"
@@ -57,7 +57,7 @@
             </slot>
             <!-- timepicker -->
             <el-time-picker
-              v-else-if="item.type === FormTypeEnum.TimePicker"
+              v-else-if="item.type === ElementTypeEnum.TimePicker"
               v-model="vModel.form[item.prop]"
               :clearable="item.clearable !== false"
               :placeholder="translate(item, 'select')"
@@ -86,7 +86,7 @@
             </el-date-picker>
             <!-- input-number -->
             <el-input-number
-              v-else-if="item.type === FormTypeEnum.InputNumber"
+              v-else-if="item.type === ElementTypeEnum.InputNumber"
               v-model="vModel.form[item.prop]"
               controls-position="right"
               :min="item.min"
@@ -95,14 +95,14 @@
             </el-input-number>
             <!-- upload -->
             <chant-upload
-              v-else-if="item.type === FormTypeEnum.Upload"
+              v-else-if="item.type === ElementTypeEnum.Upload"
               :limit="item.limit"
               :multiple="item.multiple"
               :type="item.uploadType">
             </chant-upload>
             <!-- range -->
             <div
-              v-else-if="item.type === FormTypeEnum.InputNumberRange"
+              v-else-if="item.type === ElementTypeEnum.InputNumberRange"
               class="input-range">
               <el-input-number
                 v-model="vModel.form[rangeField(item, 'start')]"
@@ -118,7 +118,7 @@
             </div>
             <!-- radio -->
             <el-radio-group
-              v-else-if="item.type === FormTypeEnum.Radio"
+              v-else-if="item.type === ElementTypeEnum.Radio"
               v-model="vModel.form[item.prop]"
               :disabled="isDisabled(item)"
               :placeholder="translate(item, 'select')">
@@ -142,9 +142,9 @@ import { useI18n } from 'vue-i18n'
 import { useVModel } from '@vueuse/core'
 import {
   formUtils,
-  FormTypeEnum,
-  PageTypeEnum,
-  type FormColumn as Column
+  ElementTypeEnum,
+  type FormColumn as Column,
+  type PageType
 } from '@/chant'
 import { vuei18n } from '@/plugs'
 
@@ -158,9 +158,9 @@ const props = defineProps<{
   dict?: any // 字典
   labelWidth?: string // label宽度
   lang?: any // 国际化
-  model?: Column[] // model
+  columns?: Column[] // model
   modelValue: ModelValue // modelValue
-  pageType?: PageTypeEnum // 页面类型
+  pageType?: PageType // 页面类型
 }>()
 // emits
 const emits = defineEmits(['instance', 'update:modelValue'])
@@ -174,12 +174,12 @@ const state = reactive({
   range: {} as any
 })
 // computed
-const columnsList = computed(() => {
-  return props.model?.filter((item) => {
+const availableColumns = computed(() => {
+  return props.columns?.filter((item) => {
     if (item.hide) {
       return false
     }
-    if (item.hideInPage && item.hideInPage === props.pageType) {
+    if (item.hideInPage?.includes(props.pageType!)) {
       return false
     }
     if (item.showCustom) {
@@ -202,7 +202,7 @@ onMounted(() => {
 })
 // 初始化
 function init() {
-  props.model?.forEach((item) => {
+  props.columns?.forEach((item) => {
     // date range
     if (formUtils.isDateRange(item)) {
       const start = rangeField(item, 'start')
@@ -218,7 +218,7 @@ function init() {
   })
 }
 // type类型转化
-function columnType(type?: FormTypeEnum) {
+function columnType(type?: ElementTypeEnum) {
   return type as any
 }
 // daterange赋值
@@ -247,7 +247,9 @@ function isDisabled(row: Column) {
 // 是否显示一整行
 function isWhole(column: Column) {
   if (column.type) {
-    return [FormTypeEnum.Textarea, FormTypeEnum.Upload].includes(column.type)
+    return [ElementTypeEnum.Textarea, ElementTypeEnum.Upload].includes(
+      column.type
+    )
   }
 }
 // 校验规则

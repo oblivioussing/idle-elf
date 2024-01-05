@@ -11,24 +11,22 @@
     class="chant-upload"
     :class="[props.type]"
     :limit="props.limit"
-    :list-type="
-      props.type === UploadTypeEnum.PictureCard ? 'picture-card' : 'text'
-    "
+    :list-type="props.type === 'picture-card' ? 'picture-card' : 'text'"
     :multiple="props.multiple"
     ref="uploadRef"
     :show-file-list="showFileList"
     :on-change="onChange"
     :on-preview="onPreview">
     <!-- file-list -->
-    <el-button v-if="props.type === UploadTypeEnum.FileList" type="primary">
+    <el-button v-if="props.type === 'file-list'" type="primary">
       {{ t('upload') }}
     </el-button>
     <!-- picture-card -->
-    <el-icon v-else-if="props.type === UploadTypeEnum.PictureCard">
+    <el-icon v-else-if="props.type === 'picture-card'">
       <Plus />
     </el-icon>
     <!-- single-image -->
-    <template v-else-if="props.type === UploadTypeEnum.SingleImage">
+    <template v-else-if="props.type === 'single-image'">
       <el-image v-if="state.imageUrl" class="image" :src="state.imageUrl">
       </el-image>
       <el-icon v-else class="uploader-icon"><Plus /></el-icon>
@@ -44,19 +42,20 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Plus } from '@element-plus/icons-vue'
-import { UploadTypeEnum } from '../enum'
+import { type UploadType } from '@/chant'
 
 // type
 interface Props {
   buttonText?: string // 按钮文本
   limit?: number // 允许上传文件的最大数量
   multiple?: boolean // 是否支持多选文件
-  type: UploadTypeEnum // 文件上传类型
+  type: UploadType // 文件上传类型
 }
 // props
 const props = withDefaults(defineProps<Props>(), {
-  type: UploadTypeEnum.SingleImage
+  type: 'pure-button'
 })
+
 // use
 const { t } = useI18n({
   messages: {
@@ -71,7 +70,7 @@ const { t } = useI18n({
   }
 })
 // var
-const isPureButton = props.type === UploadTypeEnum.PureButton
+const isPureButton = props.type === 'pure-button'
 // ref
 const uploadRef = ref()
 // state
@@ -83,9 +82,8 @@ const state = reactive({
 })
 // computed
 const showFileList = computed(() => {
-  const status = [UploadTypeEnum.FileList, UploadTypeEnum.PictureCard].includes(
-    props.type
-  )
+  const list: UploadType[] = ['file-list', 'picture-card']
+  const status = list.includes(props.type)
   return status
 })
 // onMounted

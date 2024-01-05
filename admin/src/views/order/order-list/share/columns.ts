@@ -1,22 +1,22 @@
-import { FormTypeEnum, type ListColumn as Column } from '@/chant'
+import { ElementTypeEnum, type Column } from '@/chant'
 
 export default () => {
   return [
     {
-      prop: 'name', // 姓名
-      copy: true,
-      required: true,
+      prop: 'loginName',
+      label: '用户名',
       search: true
     },
     {
-      prop: 'age', // 年龄
-      search: true,
-      type: FormTypeEnum.InputNumber
+      prop: 'name',
+      label: '姓名',
+      search: true
     },
     {
-      prop: 'sex', // 性别
+      prop: 'gender',
+      label: '性别',
       search: true,
-      type: FormTypeEnum.Select
+      type: ElementTypeEnum.Select
     },
     {
       prop: 'status', // 状态
@@ -27,17 +27,65 @@ export default () => {
         2: 'danger',
         3: 'warning'
       },
-      type: FormTypeEnum.Select
+      type: ElementTypeEnum.Select
     },
     {
-      prop: 'createTime', // 创建时间
-      search: true,
-      type: FormTypeEnum.DateRange
+      prop: 'email',
+      label: '邮箱',
+      search: true
     },
     {
-      prop: 'updateTime', // 更新时间
+      prop: 'nickname',
+      label: '昵称',
+      search: true
+    },
+    {
+      prop: 'password',
+      label: '手机号',
+      search: true
+    },
+    {
+      prop: 'birthday',
+      label: '生日',
       search: true,
-      type: FormTypeEnum.DatetimeRange
+      type: ElementTypeEnum.Date
+    },
+    {
+      prop: 'createTime',
+      label: '创建时间',
+      hideInPage: ['add', 'edit'],
+      range: true,
+      search: true,
+      type: ElementTypeEnum.Datetime
+    },
+    {
+      prop: 'updateTime',
+      label: '更新时间',
+      hideInPage: ['add', 'edit'],
+      range: true,
+      search: true,
+      type: ElementTypeEnum.Datetime
+    },
+    {
+      prop: 'avatar',
+      label: '头像',
+      hideInPage: ['list'],
+      type: ElementTypeEnum.Upload,
+      uploadType: 'single-image'
+    },
+    {
+      prop: 'photoList',
+      label: '照片墙',
+      hideInPage: ['list'],
+      type: ElementTypeEnum.Upload,
+      uploadType: 'picture-card'
+    },
+    {
+      prop: 'fileList',
+      label: '文件列表',
+      hideInPage: ['list'],
+      type: ElementTypeEnum.Upload,
+      uploadType: 'file-list'
     }
   ] as Column[]
 }
