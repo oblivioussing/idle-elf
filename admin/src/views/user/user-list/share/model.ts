@@ -11,6 +11,10 @@ export default () => {
       label: '用户名'
     },
     {
+      prop: 'password',
+      label: '密码'
+    },
+    {
       prop: 'name',
       label: '姓名'
     },
@@ -33,7 +37,7 @@ export default () => {
       label: '昵称'
     },
     {
-      prop: 'password',
+      prop: 'phone',
       label: '手机号'
     },
     {

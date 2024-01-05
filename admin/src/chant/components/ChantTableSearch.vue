@@ -95,35 +95,28 @@
       </el-form-item>
       <slot name="search-end"></slot>
     </el-form>
-    <template v-if="props.showFold">
-      <!-- 展开搜索 -->
-      <chant-button
-        v-if="state.arrow === 'down'"
-        :content="t('spread')"
-        :icon="ArrowDown"
-        @click="onCollapse('up')">
-      </chant-button>
-      <!-- 关闭搜索 -->
-      <chant-button
-        v-if="state.arrow === 'up'"
-        :content="t('fold')"
-        :icon="ArrowUp"
-        @click="onCollapse('down')">
-      </chant-button>
-    </template>
-    <!-- 查询,刷新 -->
-    <el-button-group style="margin-left: 10px">
+    <el-button-group>
+      <template v-if="props.showFold">
+        <!-- 展开搜索 -->
+        <chant-button
+          v-if="state.arrow === 'down'"
+          :content="t('spread')"
+          :icon="ArrowDown"
+          @click="onCollapse('up')">
+        </chant-button>
+        <!-- 关闭搜索 -->
+        <chant-button
+          v-if="state.arrow === 'up'"
+          :content="t('fold')"
+          :icon="ArrowUp"
+          @click="onCollapse('down')">
+        </chant-button>
+      </template>
       <!-- 查询 -->
       <chant-button
         :content="t('query')"
         :icon="Search"
         @click="onSubmit('query')">
-      </chant-button>
-      <!-- 刷新 -->
-      <chant-button
-        :content="t('refresh')"
-        :icon="Refresh"
-        @click="onSubmit('refresh')">
       </chant-button>
     </el-button-group>
   </div>
@@ -154,7 +147,7 @@ const props = withDefaults(defineProps<Props>(), {
   unfold: false // 自动展开搜索条件
 })
 // emits
-const emits = defineEmits(['query', 'refresh', 'update:modelValue'])
+const emits = defineEmits(['query', 'update:modelValue'])
 // use
 const resizeThrottle = useThrottleFn(containerAuto, 1000)
 const { t: tg } = useI18n({ useScope: 'global' })

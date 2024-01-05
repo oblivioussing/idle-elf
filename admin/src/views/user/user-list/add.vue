@@ -33,7 +33,7 @@ function getDetail() {
 }
 // 保存
 function onSave() {
-  former.save('xx/xxx', state)
+  former.save('user/add', state)
 }
 </script>
 

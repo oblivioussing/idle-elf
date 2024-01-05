@@ -13,6 +13,12 @@ import { LoginVali, RegisterVali, UpdateVali } from './validator'
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  // 新增
+  @Post('add')
+  async add(@Body() user: RegisterVali) {
+    const result = await this.userService.add(user as User)
+    return result
+  }
   // 详情
   @Get('detail')
   async detail(@Query('id') id: string) {

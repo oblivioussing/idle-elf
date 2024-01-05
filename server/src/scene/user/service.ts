@@ -1,6 +1,7 @@
+import * as bcrypt from 'bcrypt'
 import { Injectable } from '@nestjs/common'
 import { PrismaClient, User } from '@prisma/client'
-import * as bcrypt from 'bcrypt'
+import { ApiCode } from '@/enum'
 import { RedisService } from '@/module/redis/service'
 import { PageData, Result } from '@/share'
 import { Page } from '@/type'
@@ -13,6 +14,16 @@ const prisma = new PrismaClient()
 export class UserService {
   constructor(private redisService: RedisService) {}
 
+  // 新增
+  async add(user: User): Promise<Result> {
+    const result = await this.register(user)
+    if (result.code === ApiCode.Success) {
+      result.msg = '用户新增成功'
+    } else {
+      result.msg = '用户新增失败'
+    }
+    return result
+  }
   // 详情
   async detail(id: string): Promise<Result<User>> {
     const result = new Result<User>()

@@ -4,8 +4,7 @@
     v-model="state"
     :dict="dict"
     :lang="lang"
-    @query="getList"
-    @refresh="lister.refresh(getList, state)">
+    @query="getList">
   </chant-table-search>
   <!-- operate -->
   <chant-table-operate
@@ -27,18 +26,16 @@
   <!-- table -->
   <chant-table v-model="state" :dict="dict" :lang="lang">
     <!-- 操作 -->
-    <chant-column-operate :width="150">
+    <chant-column-operate :width="140">
       <template #="{ row }">
         <!-- 编辑 -->
-        <el-button link type="primary" @click="lister.edit(row)">
-          编辑
-        </el-button>
+        <chant-button link @click="lister.edit(row)">编辑</chant-button>
         <!-- 复制 -->
-        <el-button link type="primary" @click="lister.copyAdd(row)">
-          复制
-        </el-button>
+        <chant-button link @click="lister.copyAdd(row)">复制</chant-button>
         <!-- 删除 -->
-        <el-button link type="danger" @click="onDelete(row)">删除</el-button>
+        <chant-button link type="danger" @click="onDelete(row)">
+          删除
+        </chant-button>
         <!-- 更多 -->
         <chant-more-dropdown @command="onCommand">
           <el-dropdown-item command="1">action1</el-dropdown-item>

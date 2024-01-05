@@ -55,7 +55,7 @@ function useLister() {
   }
   // 复制新增
   function copyAdd(row: any) {
-    const query = { id: row.id, pageType: 'copy-add' }
+    const query = { id: row.id, 'copy-add-flag': '1' }
     // 页面跳转
     jump('/add', query)
   }
@@ -183,11 +183,6 @@ function useLister() {
       bus.emit(route.path)
     }
   }
-  // 刷新
-  function refresh(method: Function, state: State) {
-    state.query = {}
-    method()
-  }
   // 删除
   function remove(path: string, state: State, params: any) {
     operate(path, state, {
@@ -241,7 +236,6 @@ function useLister() {
     isSelected,
     jump,
     operate,
-    refresh,
     remove,
     toggleRowSelection
   }

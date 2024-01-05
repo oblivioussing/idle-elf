@@ -33,10 +33,10 @@ export class LoginVali {
 // 注册
 export class RegisterVali extends Base {
   // 用户名
-  @IsNotEmpty({ message: '登录名不能为空' })
+  @IsDefined({ message: '登录名不能为空' })
   loginName: string
   // 密码
-  @IsNotEmpty({ message: '密码不能为空' })
+  @IsDefined({ message: '密码不能为空' })
   password: string
   // 电话号码
   @IsDefined({ message: '电话号码不能为空' })
