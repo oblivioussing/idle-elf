@@ -1,5 +1,4 @@
 import type { DatePickType, TagProps } from 'element-plus'
-import { FormatEnum } from '@/chant'
 
 type BaseColumn = {
   append?: string // 输入框后置内容
@@ -9,7 +8,7 @@ type BaseColumn = {
   dynamicStart?: string // 范围选择start字段
   dynamicEnd?: string // 动态范围选择end字段
   hide?: boolean // 是否隐藏
-  hideInPage?: PageType[] // 在特定页面类型中隐藏
+  hideInPages?: PageType[] // 在特定页面类型中隐藏
   inputType?: 'password' | 'text' | 'textarea'
   label?: string // 标签文本
   prepend?: string // 输入框前置内容
@@ -19,17 +18,6 @@ type BaseColumn = {
   type?: ElementType // 元素类型
   valueFormat?: string // 绑定值的格式,仅type为date-picker时有效
 }
-export type Column = BaseColumn & FormColumn & ListColumn
-
-export type ElementType =
-  | 'date-picker'
-  | 'input'
-  | 'input-number'
-  | 'input-number-range'
-  | 'radio'
-  | 'select'
-  | 'time-picker'
-  | 'upload'
 
 export type FormColumn = {
   change?: (row: any) => void // 值变更事件
@@ -52,18 +40,35 @@ export type ListColumn = {
   copy?: boolean // 是否可以复制
   editable?: boolean // 是否可编辑
   fixed?: 'left' | 'right' // 列是否固定在左侧或者右侧
-  format?: FormatEnum // 格式化
+  format?: 'money' // 格式化
   like?: boolean // 是否为模糊查询
   onlySearch?: boolean // 只作为搜索条件
   search?: boolean // 是否为搜索条件
+  searchDatepickerType?: DatePickType // date-picker显示类型,仅type为date-picker时有效
   searchSlot?: boolean // 搜索条件slot
   tagType?: Record<string, TagProps['type']> // tag类型
   width?: number // 对应列的宽度
 } & BaseColumn
 
+export type Column = BaseColumn & FormColumn & ListColumn
+
+export type ElementType =
+  | 'date-picker'
+  | 'input'
+  | 'input-number'
+  | 'input-number-range'
+  | 'radio'
+  | 'select'
+  | 'time-picker'
+  | 'upload'
+
+export type Lang = {
+  en: Record<string, string>
+  zh: Record<string, string>
+}
+
 export type FormState = {
   continueAdd?: boolean
-  copyAddFlag?: '0' | '1'
   form: any
   formLoading: boolean
   loading: boolean

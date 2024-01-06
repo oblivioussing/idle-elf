@@ -41,20 +41,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, watch } from 'vue'
+import { onMounted, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import draggable from 'vuedraggable'
 import { Document, Sort } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
-import { type ListColumn as Column, type ListState } from '@/chant'
+import type { Lang, ListColumn as Column, ListState } from '@/chant'
 import { StorageEnum } from '@/enum'
-import { vuei18n } from '@/plugs'
 import { base, storage } from '@/utils'
 
 // props
 const props = defineProps<{
-  lang?: any // 国际化
+  lang?: Lang // 国际化
   modelValue: ListState
 }>()
 // emits
@@ -64,10 +63,12 @@ const { t: tg } = useI18n({ useScope: 'global' })
 const { t } = useI18n({
   messages: {
     en: {
+      ...props.lang?.en,
       reset: 'reset',
       filter: 'filter'
     },
     zh: {
+      ...props.lang?.zh,
       reset: '重置',
       filter: '过滤'
     }
@@ -80,12 +81,6 @@ const columnsBackups = base.clone(props.modelValue.columns)
 // state
 const state = reactive({
   visible: false
-})
-// computed
-const messages = computed(() => {
-  const locale = vuei18n.global.locale.value
-  const lang = props.lang
-  return lang ? lang[locale] : {}
 })
 // watch
 watch(
@@ -154,7 +149,7 @@ function onSave() {
 }
 // 是否显示
 function show(column: Column) {
-  return !column.hideInPage?.includes('list')
+  return !column.hideInPages?.includes('list')
 }
 // 翻译
 function translate(column: Column) {
@@ -163,7 +158,7 @@ function translate(column: Column) {
   if (pattern.test(label)) {
     return label
   }
-  return messages.value[label]
+  return t(label)
 }
 </script>
 

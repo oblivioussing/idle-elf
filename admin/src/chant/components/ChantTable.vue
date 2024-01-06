@@ -3,7 +3,7 @@
     v-loading="vModel?.loading || false"
     :border="true"
     class="chant-table"
-    :data="vModel?.list || props.list"
+    :data="list"
     :height="state.height || undefined"
     ref="tableRef"
     :row-key="(row) => row[props.rowKey]"
@@ -47,7 +47,7 @@
             </el-input>
             <!-- select -->
             <el-select
-              v-else-if="item.type === ElementTypeEnum.Select"
+              v-else-if="item.type === 'select'"
               v-model="row[item.prop]"
               :placeholder="translate(item)">
               <el-option
@@ -59,38 +59,22 @@
             </el-select>
             <!-- input-number -->
             <el-input-number
-              v-else-if="item.type === ElementTypeEnum.InputNumber"
+              v-else-if="item.type === 'input-number'"
               v-model="row[item.prop]"
               controls-position="right"
               :placeholder="translate(item)">
             </el-input-number>
           </template>
-          <!-- dict -->
-          <div v-else-if="item.type === ElementTypeEnum.Select">
-            <el-tag
-              :effect="item.tagType ? 'dark' : 'plain'"
-              :type="item.tagType?.[row[item.prop]]">
-              {{ dictFmt(item.prop, row[item.prop]) }}
-            </el-tag>
-          </div>
-          <!-- date -->
-          <div v-else-if="isDateFmt(item)">
-            {{ format.date(row[item.prop]) || '-' }}
-          </div>
-          <!-- datetime -->
-          <div v-else-if="isDatetimeFmt(item)">
-            {{ format.datetime(row[item.prop]) || '-' }}
-          </div>
-          <!-- 金额 -->
-          <div v-else-if="item.format === FormatEnum.Money">
-            {{ format.money(row[item.prop]) || '-' }}
-          </div>
-          <!-- value -->
+          <!-- tag -->
+          <el-tag
+            v-else-if="item.type === 'select'"
+            :effect="item.tagType ? 'dark' : 'plain'"
+            :type="item.tagType?.[row[item.prop]]">
+            {{ dictFmt(item.prop, row[item.prop]) }}
+          </el-tag>
+          <!-- text -->
           <el-text v-else truncated>
-            {{ row[item.prop] || '-' }}
-            <template v-if="item.append">
-              {{ tg(item.append) }}
-            </template>
+            {{ valueFmt(item, row[item.prop]) }}
           </el-text>
           <!-- copy -->
           <el-icon
@@ -108,7 +92,10 @@
 </template>
 
 <script setup lang="ts">
+import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
+// @ts-ignore
+import Sortable from 'sortablejs'
 import {
   computed,
   nextTick,
@@ -123,15 +110,7 @@ import { useI18n } from 'vue-i18n'
 import useClipboard from 'vue-clipboard3'
 import { DocumentCopy } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
-// @ts-ignore
-import Sortable from 'sortablejs'
-import {
-  FormatEnum,
-  ElementTypeEnum,
-  type ListColumn as Column,
-  type ListState
-} from '@/chant'
-import { vuei18n } from '@/plugs'
+import type { Lang, ListColumn as Column, ListState } from '@/chant'
 import { base, format } from '@/utils'
 
 // defineExpose
@@ -144,7 +123,7 @@ interface Props {
   columnWidth?: number // 列宽度
   dict?: any // 字典
   heightWild?: boolean // 高度不限制
-  lang?: any // 国际化
+  lang?: Lang // 国际化
   list?: any[] // 列表数据
   modelValue?: ListState // modelValue
   reserveSelection?: boolean // 数据刷新后是否保留选项
@@ -162,6 +141,7 @@ const emits = defineEmits(['instance', 'update:modelValue'])
 // use
 const { toClipboard } = useClipboard()
 const { t: tg } = useI18n({ useScope: 'global' })
+const { t } = useI18n({ messages: props?.lang })
 const vModel = useVModel(props, 'modelValue', emits)
 // ref
 const tableRef = ref()
@@ -177,7 +157,7 @@ window.addEventListener('resize', () => {
 // computed
 const availableColumns = computed(() => {
   return columns.value?.filter((item) => {
-    const hideInList = item.hideInPage?.includes('list')
+    const hideInList = item.hideInPages?.includes('list')
     if (item.onlySearch || item.hide || hideInList) {
       return false
     }
@@ -186,11 +166,6 @@ const availableColumns = computed(() => {
 })
 const columns = computed(() => {
   return vModel.value?.columns || props.columns
-})
-const messages = computed(() => {
-  const locale = vuei18n.global.locale.value
-  const lang = props.lang
-  return lang ? lang[locale] : {}
 })
 const list = computed(() => {
   return vModel.value?.list || props.list
@@ -272,19 +247,27 @@ function tableAdapter() {
     state.height = el?.offsetHeight
   })
 }
-// 是否date格式化
-function isDateFmt(column: Column) {
-  if (column.type) {
-    return [ElementTypeEnum.Date].includes(column.type)
+// value格式化
+function valueFmt(column: Column, value: any) {
+  if (!value) {
+    return '-'
   }
-  return false
-}
-// 是否datetime格式化
-function isDatetimeFmt(column: Column) {
-  if (column.type) {
-    return [ElementTypeEnum.Datetime].includes(column.type)
+  // date
+  if (column.datepickerType) {
+    const map = {
+      date: 'YYYY-MM-DD',
+      datetime: 'YYYY-MM-DD HH:mm:ss'
+    } as any
+    const template = map[column.datepickerType]
+    return dayjs(value).format(template)
   }
-  return false
+  // money
+  if (column.format === 'money') {
+    return format.money(value)
+  }
+  // append
+  const append = column.append ? tg(column.append) : ''
+  return value + append
 }
 // 字典格式化
 function dictFmt(prop: string, value: any) {
@@ -317,10 +300,7 @@ function translate(column: Column) {
   if (pattern.test(label)) {
     return label
   }
-  if (label.indexOf('.') >= 0) {
-    return tg(label)
-  }
-  return messages.value[label]
+  return t(label)
 }
 </script>
 

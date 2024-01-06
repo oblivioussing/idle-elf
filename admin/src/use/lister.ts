@@ -74,6 +74,7 @@ function useLister() {
       }
       // onActivated
       onActivated(() => {
+        // 路由参数是否变化
         const status = _isRouterQueryModify(state)
         if (status) {
           _reset(state)

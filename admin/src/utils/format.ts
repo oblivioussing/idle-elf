@@ -1,18 +1,4 @@
-import dayjs from 'dayjs'
-
 export default {
-  // 日期
-  date(val: string) {
-    if (val) {
-      return dayjs(val).format('YYYY-MM-DD')
-    }
-  },
-  // 日期时间
-  datetime(val: string) {
-    if (val) {
-      return dayjs(val).format('YYYY-MM-DD HH:mm:ss')
-    }
-  },
   // 金额
   money(val: string | number) {
     if (val) {

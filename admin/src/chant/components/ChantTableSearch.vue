@@ -20,7 +20,7 @@
         :rules="[{ required: item.required, message: '' }]">
         <!-- input -->
         <el-input
-          v-if="formUtils.isInput(item)"
+          v-if="!item.type || item.type === 'input'"
           v-model="vModel.query[item.like ? item.prop + 'Like' : item.prop]"
           :clearable="item.clearable !== false"
           :placeholder="translate(item, 'enter')">
@@ -52,25 +52,30 @@
           </el-option>
         </el-select>
         <!-- date-picker -->
-        <!-- <el-date-picker
-          v-else-if="item.type === 'date-picker'"
-          v-model="
-            formUtils.isDateRange(item)
-              ? state.range[item.prop]
-              : vModel.query[item.prop]
-          "
-          :clearable="item.clearable !== false"
-          :placeholder="translate(item, 'select')"
-          :start-placeholder="translate(item)"
-          :end-placeholder="translate(item)"
-          :type="columnType(item.datepickerType)"
-          :value-format="item.valueFormat"
-          @change="emits('query')">
-        </el-date-picker> -->
-        <!-- range -->
-        <div
-          v-else-if="item.type === ElementTypeEnum.InputNumberRange"
-          class="input-range">
+        <template v-else-if="item.type === 'date-picker'">
+          <el-date-picker
+            v-if="isDateRange(item)"
+            v-model="state.range[item.prop]"
+            :clearable="item.clearable !== false"
+            :placeholder="translate(item, 'select')"
+            :start-placeholder="translate(item)"
+            :end-placeholder="translate(item)"
+            :type="item.searchDatepickerType || item.datepickerType"
+            :value-format="item.valueFormat"
+            @change="onDateRangeChange(item)">
+          </el-date-picker>
+          <el-date-picker
+            v-else
+            v-model="vModel.query[item.prop]"
+            :clearable="item.clearable !== false"
+            :placeholder="translate(item, 'select')"
+            :type="item.searchDatepickerType || item.datepickerType"
+            :value-format="item.valueFormat"
+            @change="emits('query')">
+          </el-date-picker>
+        </template>
+        <!-- input-number-range -->
+        <div v-else-if="item.type === 'input-number-range'" class="input-range">
           <el-input-number
             v-model="vModel.query[rangeField(item, 'start')]"
             controls-position="right"
@@ -86,25 +91,22 @@
         <!-- slot -->
         <slot v-else-if="item.searchSlot" :name="item.prop" :row="item"></slot>
       </el-form-item>
-      <slot name="search-end"></slot>
     </el-form>
     <el-button-group>
-      <template v-if="props.showFold">
-        <!-- 展开搜索 -->
-        <chant-button
-          v-if="state.arrow === 'down'"
-          :content="t('spread')"
-          :icon="ArrowDown"
-          @click="onCollapse('up')">
-        </chant-button>
-        <!-- 关闭搜索 -->
-        <chant-button
-          v-if="state.arrow === 'up'"
-          :content="t('fold')"
-          :icon="ArrowUp"
-          @click="onCollapse('down')">
-        </chant-button>
-      </template>
+      <!-- 展开搜索 -->
+      <chant-button
+        v-if="state.arrow === 'down'"
+        :content="t('spread')"
+        :icon="ArrowDown"
+        @click="onCollapse('up')">
+      </chant-button>
+      <!-- 关闭搜索 -->
+      <chant-button
+        v-if="state.arrow === 'up'"
+        :content="t('fold')"
+        :icon="ArrowUp"
+        @click="onCollapse('down')">
+      </chant-button>
       <!-- 查询 -->
       <chant-button
         :content="t('query')"
@@ -121,37 +123,37 @@ import { computed, onMounted, onScopeDispose, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowDown, ArrowUp, Search } from '@element-plus/icons-vue'
 import { useThrottleFn, useVModel } from '@vueuse/core'
-import { formUtils, type ListColumn as Column, type ListState } from '@/chant'
-import { vuei18n } from '@/plugs'
+import {
+  formUtils,
+  type Lang,
+  type ListColumn as Column,
+  type ListState
+} from '@/chant'
 
-interface Props {
+// props
+const props = defineProps<{
   dict?: any // 字典
   labelWidth?: string // label宽度
-  lang?: any // 国际化
+  lang?: Lang // 国际化
   modelValue?: ListState // modelValue
   searchOrder?: string[] // 搜索字段顺序
-  showFold?: boolean // 显示折叠按钮
   unfold?: boolean // 自动展开搜索条件
-}
-// props
-const props = withDefaults(defineProps<Props>(), {
-  showFold: true, // 显示折叠按钮
-  unfold: false // 自动展开搜索条件
-})
+}>()
 // emits
 const emits = defineEmits(['query', 'update:modelValue'])
 // use
-const resizeThrottle = useThrottleFn(containerAuto, 1000)
 const { t: tg } = useI18n({ useScope: 'global' })
 const { t } = useI18n({
   messages: {
     en: {
+      ...props.lang?.en,
       spread: 'spread search',
       fold: 'fold fold',
       query: 'query',
       refresh: 'refresh'
     },
     zh: {
+      ...props.lang?.zh,
       spread: '展开搜索',
       fold: '折叠搜索',
       query: '查询',
@@ -159,6 +161,7 @@ const { t } = useI18n({
     }
   }
 })
+const resizeThrottle = useThrottleFn(containerAuto, 1000)
 const vModel = useVModel(props, 'modelValue', emits)
 // ref
 const formRef = ref<FormInstance>()
@@ -184,11 +187,6 @@ const availableColumns = computed(() => {
     !row && acc.push(cur)
     return acc
   }, [])
-})
-const messages = computed(() => {
-  const locale = vuei18n.global.locale.value
-  const lang = props?.lang
-  return lang ? lang[locale] : {}
 })
 // watch
 watch(availableColumns, () => {
@@ -216,41 +214,12 @@ onScopeDispose(() => {
 function bindQueryValue() {
   const query = vModel.value?.query
   vModel.value?.columns?.forEach((item) => {
-    if (formUtils.isDateRange(item)) {
+    if (isDateRange(item)) {
       const start = rangeField(item, 'start')
       const end = rangeField(item, 'end')
       state.range[item.prop] = [query?.[start], query?.[end]]
     }
   })
-}
-// range start
-function rangeField(column: Column, type: 'start' | 'end') {
-  const suffix = type.replace(/^\S/, (s) => s.toUpperCase())
-  const key = `dynamic${suffix}` as 'dynamicStart' | 'dynamicEnd'
-  return column[key] || `${column.prop}${suffix}`
-}
-// date-picker change
-function onDateChange(row: Column) {
-  const prop = row.prop
-  let value = state.range[prop]
-  if (!value) {
-    value = ['', '']
-  }
-  if (vModel.value) {
-    vModel.value.query[rangeField(row, 'start')] = value[0]
-    vModel.value.query[rangeField(row, 'end')] = value[1]
-  }
-  emits('query')
-}
-// 展开/关闭
-function onCollapse(type: 'down' | 'up') {
-  state.arrow = type
-  if (type === 'down') {
-    searchRef.value.style.height = '48px'
-  } else {
-    // 容器高度自适应
-    containerAuto()
-  }
 }
 // 容器高度自适应
 function containerAuto() {
@@ -264,37 +233,50 @@ function containerAuto() {
     }, 0)
   }
 }
-// emit
-function onEmit(type: any) {
-  if (type === 'refresh') {
-    // 清空查询条件
-    reset()
+// 是否为date range
+function isDateRange(column: Column) {
+  const dateType = column.searchDatepickerType || column.datepickerType
+  return formUtils.isDateRange(dateType)
+}
+// range field
+function rangeField(column: Column, type: 'start' | 'end') {
+  const suffix = type.replace(/^\S/, (s) => s.toUpperCase())
+  if (column.dynamicStart || column.dynamicEnd) {
+    const key = `dynamic${suffix}` as 'dynamicStart' | 'dynamicEnd'
+    return column[key]!
   }
-  emits(type)
+  return `${column.prop}${suffix}`
+}
+// 展开/关闭
+function onCollapse(type: 'down' | 'up') {
+  state.arrow = type
+  if (type === 'down') {
+    searchRef.value.style.height = '48px'
+  } else {
+    // 容器高度自适应
+    containerAuto()
+  }
+}
+// 日期范围选择
+function onDateRangeChange(column: Column) {
+  let value = state.range[column.prop]
+  if (!value) {
+    value = ['', '']
+  }
+  if (vModel.value) {
+    vModel.value.query[rangeField(column, 'start')] = value[0]
+    vModel.value.query[rangeField(column, 'end')] = value[1]
+  }
+  emits('query')
 }
 // 提交
-async function onSubmit(type: 'query' | 'refresh') {
+async function onSubmit(type: 'query') {
   try {
     const status = await formRef.value?.validate()
-    if (status) {
-      onEmit(type)
-    }
+    status && emits(type)
   } catch (error) {
     console.error(error)
   }
-}
-// 清空查询条件
-function reset() {
-  state.range = {}
-  for (let item in vModel.value?.query) {
-    if (!['page', 'size'].includes(item)) {
-      vModel.value.query[item] = ''
-    }
-  }
-}
-// type类型转化
-function columnType(type?: ElementTypeEnum) {
-  return type as any
 }
 // 翻译
 function translate(column: Column, type?: 'enter' | 'select') {
@@ -311,7 +293,7 @@ function translate(column: Column, type?: 'enter' | 'select') {
   if (label.indexOf('.') >= 0) {
     return tips + tg(label)
   }
-  return tips + messages.value[label]
+  return tips + t(label)
 }
 </script>
 

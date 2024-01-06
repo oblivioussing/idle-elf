@@ -19,7 +19,7 @@ export default () => {
       type: 'select'
     },
     {
-      prop: 'status', // 状态
+      prop: 'status',
       label: '状态',
       search: true,
       tagType: {
@@ -41,6 +41,12 @@ export default () => {
     },
     {
       prop: 'password',
+      label: '密码',
+      hideInPages: ['list'],
+      inputType: 'password'
+    },
+    {
+      prop: 'phone',
       label: '手机号',
       search: true
     },
@@ -48,20 +54,21 @@ export default () => {
       prop: 'birthday',
       label: '生日',
       search: true,
-      type: 'date'
+      type: 'date-picker'
     },
     {
       prop: 'createTime',
       label: '创建时间',
-      hideInPage: ['add', 'edit'],
+      hideInPages: ['add', 'edit'],
       search: true,
+      searchDatepickerType: 'datetimerange',
       type: 'date-picker',
       datepickerType: 'datetime'
     },
     {
       prop: 'updateTime',
       label: '更新时间',
-      hideInPage: ['add', 'edit'],
+      hideInPages: ['add', 'edit'],
       search: true,
       type: 'date-picker',
       datepickerType: 'datetime'
@@ -69,21 +76,21 @@ export default () => {
     {
       prop: 'avatar',
       label: '头像',
-      hideInPage: ['list'],
+      hideInPages: ['list'],
       type: 'upload',
       uploadType: 'single-image'
     },
     {
       prop: 'photoList',
       label: '照片墙',
-      hideInPage: ['list'],
+      hideInPages: ['list'],
       type: 'upload',
       uploadType: 'picture-card'
     },
     {
       prop: 'fileList',
       label: '文件列表',
-      hideInPage: ['list'],
+      hideInPages: ['list'],
       type: 'upload',
       uploadType: 'file-list'
     }

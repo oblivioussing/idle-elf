@@ -20,7 +20,7 @@
             :rules="rules(item)">
             <!-- input -->
             <el-input
-              v-if="formUtils.isInput(item)"
+              v-if="!item.type || item.type === 'input'"
               v-model="vModel.form[item.prop]"
               :clearable="item.clearable !== false"
               :placeholder="translate(item, 'enter')"
@@ -35,7 +35,7 @@
             </el-input>
             <!-- select -->
             <el-select
-              v-else-if="item.type === ElementTypeEnum.Select"
+              v-else-if="item.type === 'select'"
               v-model="vModel.form[item.prop]"
               :clearable="item.clearable !== false"
               :multiple="item.selectMultiple"
@@ -57,36 +57,37 @@
             </slot>
             <!-- timepicker -->
             <el-time-picker
-              v-else-if="item.type === ElementTypeEnum.TimePicker"
+              v-else-if="item.type === 'time-picker'"
               v-model="vModel.form[item.prop]"
               :clearable="item.clearable !== false"
               :placeholder="translate(item, 'select')"
               :value-format="item.valueFormat || 'HH:mm:ss'">
             </el-time-picker>
-            <!-- date,datetime -->
-            <el-date-picker
-              v-else-if="formUtils.isDate(item)"
-              v-model="vModel.form[item.prop]"
-              :clearable="item.clearable !== false"
-              :disabled="isDisabled(item)"
-              :placeholder="translate(item, 'select')"
-              :type="columnType(item.type)"
-              :value-format="item.valueFormat">
-            </el-date-picker>
-            <!-- daterange,datetimerange -->
-            <el-date-picker
-              v-else-if="formUtils.isDateRange(item)"
-              v-model="state.range[item.prop]"
-              :clearable="item.clearable !== false"
-              :start-placeholder="translate(item)"
-              :end-placeholder="translate(item)"
-              :type="columnType(item.type)"
-              :value-format="item.valueFormat"
-              @change="onDateRange(item)">
-            </el-date-picker>
+            <!-- date-picker -->
+            <template v-else-if="item.type === 'date-picker'">
+              <el-date-picker
+                v-if="formUtils.isDateRange(item.datepickerType)"
+                v-model="state.range[item.prop]"
+                :clearable="item.clearable !== false"
+                :placeholder="translate(item, 'select')"
+                :start-placeholder="translate(item)"
+                :end-placeholder="translate(item)"
+                :type="item.datepickerType"
+                :value-format="item.valueFormat"
+                @change="onDateRangeChange(item)">
+              </el-date-picker>
+              <el-date-picker
+                v-else
+                v-model="vModel.form[item.prop]"
+                :clearable="item.clearable !== false"
+                :placeholder="translate(item, 'select')"
+                :type="item.datepickerType"
+                :value-format="item.valueFormat">
+              </el-date-picker>
+            </template>
             <!-- input-number -->
             <el-input-number
-              v-else-if="item.type === ElementTypeEnum.InputNumber"
+              v-else-if="item.type === 'input-number'"
               v-model="vModel.form[item.prop]"
               controls-position="right"
               :min="item.min"
@@ -95,14 +96,14 @@
             </el-input-number>
             <!-- upload -->
             <chant-upload
-              v-else-if="item.type === ElementTypeEnum.Upload"
+              v-else-if="item.type === 'upload'"
               :limit="item.limit"
               :multiple="item.multiple"
               :type="item.uploadType">
             </chant-upload>
             <!-- range -->
             <div
-              v-else-if="item.type === ElementTypeEnum.InputNumberRange"
+              v-else-if="item.type === 'input-number-range'"
               class="input-range">
               <el-input-number
                 v-model="vModel.form[rangeField(item, 'start')]"
@@ -118,7 +119,7 @@
             </div>
             <!-- radio -->
             <el-radio-group
-              v-else-if="item.type === ElementTypeEnum.Radio"
+              v-else-if="item.type === 'radio'"
               v-model="vModel.form[item.prop]"
               :disabled="isDisabled(item)"
               :placeholder="translate(item, 'select')">
@@ -140,13 +141,7 @@ import type { FormInstance } from 'element-plus'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useVModel } from '@vueuse/core'
-import {
-  formUtils,
-  ElementTypeEnum,
-  type FormColumn as Column,
-  type PageType
-} from '@/chant'
-import { vuei18n } from '@/plugs'
+import { formUtils, type FormColumn as Column, type Lang } from '@/chant'
 
 // type
 type ModelValue = {
@@ -157,15 +152,16 @@ type ModelValue = {
 const props = defineProps<{
   dict?: any // 字典
   labelWidth?: string // label宽度
-  lang?: any // 国际化
+  lang?: Lang // 国际化
   columns?: Column[] // model
   modelValue: ModelValue // modelValue
-  pageType?: PageType // 页面类型
+  pageType?: 'add' | 'edit' // 页面类型
 }>()
 // emits
 const emits = defineEmits(['instance', 'update:modelValue'])
 // use
 const { t: tg } = useI18n({ useScope: 'global' })
+const { t } = useI18n({ messages: props.lang })
 const vModel = useVModel(props, 'modelValue', emits)
 // ref
 const formRef = ref<FormInstance>()
@@ -179,7 +175,7 @@ const availableColumns = computed(() => {
     if (item.hide) {
       return false
     }
-    if (item.hideInPage?.includes(props.pageType!)) {
+    if (item.hideInPages?.includes(props.pageType!)) {
       return false
     }
     if (item.showCustom) {
@@ -187,11 +183,6 @@ const availableColumns = computed(() => {
     }
     return true
   })
-})
-const messages = computed(() => {
-  const locale = vuei18n.global.locale.value
-  const lang = props.lang
-  return lang ? lang[locale] : {}
 })
 // onMounted
 onMounted(() => {
@@ -204,7 +195,7 @@ onMounted(() => {
 function init() {
   props.columns?.forEach((item) => {
     // date range
-    if (formUtils.isDateRange(item)) {
+    if (formUtils.isDateRange(item.datepickerType)) {
       const start = rangeField(item, 'start')
       // watch
       watch(
@@ -216,10 +207,6 @@ function init() {
       )
     }
   })
-}
-// type类型转化
-function columnType(type?: ElementTypeEnum) {
-  return type as any
 }
 // daterange赋值
 function dateRangeVoluation(column: Column) {
@@ -246,11 +233,21 @@ function isDisabled(row: Column) {
 }
 // 是否显示一整行
 function isWhole(column: Column) {
-  if (column.type) {
-    return [ElementTypeEnum.Textarea, ElementTypeEnum.Upload].includes(
-      column.type
-    )
+  if (column.type === 'upload') {
+    return true
   }
+  if (column.inputType === 'textarea') {
+    return true
+  }
+}
+// range field
+function rangeField(column: Column, type: 'start' | 'end') {
+  const suffix = type.replace(/^\S/, (s) => s.toUpperCase())
+  if (column.dynamicStart || column.dynamicEnd) {
+    const key = `dynamic${suffix}` as 'dynamicStart' | 'dynamicEnd'
+    return column[key]!
+  }
+  return `${column.prop}${suffix}`
 }
 // 校验规则
 function rules(column: Column) {
@@ -264,25 +261,18 @@ function rules(column: Column) {
   }
   return column.rules
 }
-// range start
-function rangeField(column: Column, type: 'start' | 'end') {
-  const suffix = type.replace(/^\S/, (s) => s.toUpperCase())
-  const key = `dynamic${suffix}` as 'dynamicStart' | 'dynamicEnd'
-  return column[key] || `${column.prop}${suffix}`
-}
 // change
-function onChange(row: Column) {
-  return row.change && row.change(vModel.value.form)
+function onChange(column: Column) {
+  return column.change && column.change(vModel.value.form)
 }
 // 日期范围选择
-function onDateRange(row: Column) {
-  const prop = row.prop
-  let value = state.range[prop]
+function onDateRangeChange(column: Column) {
+  let value = state.range[column.prop]
   if (!value) {
     value = ['', '']
   }
-  vModel.value.form[rangeField(row, 'start')] = value[0]
-  vModel.value.form[rangeField(row, 'end')] = value[1]
+  vModel.value.form[rangeField(column, 'start')] = value[0]
+  vModel.value.form[rangeField(column, 'end')] = value[1]
 }
 // 翻译
 function translate(column: Column, type?: 'enter' | 'select') {
@@ -296,10 +286,7 @@ function translate(column: Column, type?: 'enter' | 'select') {
   if (pattern.test(label)) {
     return tips + label
   }
-  if (label.indexOf('.') >= 0) {
-    return tips + tg(label)
-  }
-  return tips + messages.value[label]
+  return tips + t(label)
 }
 </script>
 

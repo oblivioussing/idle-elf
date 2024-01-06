@@ -6,7 +6,7 @@ import { type FormState as State } from '@/chant'
 import { ApiCode } from '@/enum'
 import { bus, core } from '@/utils'
 
-type Config = { type?: 'page' | 'dialog' }
+type Config = { type?: 'page' | 'dialog' | 'inline' }
 
 function useFormer(config = { type: 'page' } as Config) {
   let formInstance: FormInstance
@@ -26,21 +26,16 @@ function useFormer(config = { type: 'page' } as Config) {
     formInstance = val
   }
   // 初始化
-  function created(callback: () => void, state?: any) {
-    if (state) {
-      state.query = route?.query
-      state.pageType = state.query?.pageType
-    }
-    callback()
+  function created(callback: (_: boolean) => void, state: State) {
+    state.query = route?.query
+    callback(_hasGetDetail())
     // onActivated
     onActivated(() => {
-      if (!state) {
-        return
-      }
-      if (JSON.stringify(state.query) !== JSON.stringify(route.query)) {
+      // 路由参数是否变化
+      const isModify = _isRouterQueryModify(state)
+      if (isModify) {
         state.query = route?.query
-        state.pageType = state.query?.pageType
-        callback()
+        callback(_hasGetDetail())
       }
     })
   }
@@ -77,7 +72,7 @@ function useFormer(config = { type: 'page' } as Config) {
       bus.emit(path)
       // 关闭页面
       core.closePage()
-    } else {
+    } else if (config.type === 'dialog') {
       const emitsOptions = (instance as any)?.emitsOptions
       if (emitsOptions?.hasOwnProperty('update')) {
         instance?.emit('update')
@@ -95,6 +90,23 @@ function useFormer(config = { type: 'page' } as Config) {
       console.error(error)
     }
     return status
+  }
+  // 路由参数是否变化
+  function _isRouterQueryModify(state: State) {
+    let status = false
+    const query = route.query
+    for (let item in query) {
+      if (query[item] !== state.query[item]) {
+        status = true
+      }
+    }
+    return status
+  }
+  // 是否需要获取详情
+  function _hasGetDetail() {
+    const copyAddFlag = route.query?.copyAddFlag
+    const props = instance?.props
+    return copyAddFlag === '1' || props?.type === 'edit'
   }
 
   return {
